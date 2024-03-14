@@ -1,4 +1,4 @@
-# ERT Flight Simulator
+# ERT Flight Simulator :)
 MATLAB flight simulator of the EPFL Rocket Team. 
 
 ## Repository Structure

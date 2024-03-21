@@ -1,0 +1,38 @@
+# Ignorer les fichiers de compilation MATLAB
+*.mex
+*.mexa64
+*.mexmaci64
+*.mexw64
+
+# Ignorer les fichiers de données temporaires MATLAB
+*.mat
+
+# Ignorer les fichiers générés par MATLAB lors de l'exécution du code
+*.asv
+*.m~
+*.mlx
+*.p
+*.prj
+*.slx
+*.slddc
+*.tlc
+
+# Ignorer les fichiers de résultats de tests MATLAB
+*.mldatx
+
+# Ignorer les fichiers de sauvegarde MATLAB
+*.bak
+
+# Ignorer les fichiers de configuration MATLAB
+*.mproj.local
+
+# Ignorer les fichiers et dossiers spécifiques à MATLAB
+SimulinkReports/
+Stateflow/
+CodeAnalyzer.xml
+rtwmakecfg.m
+slprj/
+
+# Ignorer Dossiers
+
+Declarations/

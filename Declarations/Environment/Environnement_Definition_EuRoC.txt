@@ -5,7 +5,7 @@ Start_Altitude 154
 Start_Latitude 39.393564
 Start_Longitude -8.287676
 dTdh -9.5
-V_inf 3
+V_inf 2
 V_Azimuth 250
 Turb_I 0.00
 Turb_model None

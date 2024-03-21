@@ -8,7 +8,9 @@ addpath(genpath('./Declarations'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
 Rocket = rocketReader('Nordend_EUROC.txt');
+
 Environment = environnementReader('Environment/Environnement_Definition_Wasserfallen.txt');
+
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
 SimObj = Simulator3D(Rocket, Environment, SimOutputs);
@@ -43,7 +45,7 @@ display(['Apogee AGL @t = ' num2str(T2(end))]);
 [maxi,index] = max(S2(:,6));
 display(['Max speed : ' num2str(maxi)]);
 display(['Max speed @t = ' num2str(T2(index))]);
-[~,a,~,rho,nu] = stdAtmos(S2(index,3),Environment);
+[~,a,~,rho,nu] = atmosphere(S2(index,3),Environment);
 Fd = 0.5*SimObj.SimAuxResults.Cd(index)*rho*pi*Rocket.dm^2/4*maxi^2;
 display(['Max drag force = ' num2str(Fd)]);
 display(['Max drag force along rocket axis = ' num2str(Fd*cos(SimObj.SimAuxResults.Delta(index)))]);

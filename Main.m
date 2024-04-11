@@ -7,9 +7,9 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_EUROC.txt');
+Rocket = rocketReader('Wildhorn.txt');
 
-Environment = environnementReader('Environment/Environnement_Definition_Wasserfallen.txt');
+Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 

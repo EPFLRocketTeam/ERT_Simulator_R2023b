@@ -7,7 +7,7 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Wildhorn.txt');
+Rocket = rocketReader('Nordend_N1332.txt');
 
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
@@ -70,20 +70,12 @@ display(['Max g @t = ' num2str(T_1_2(index))]);
 %--------------------------------------------------------------------------
 
 [T3, S3, T3E, S3E, I3E] = SimObj.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
-%figure('Name','Aerodynamic properties'); hold on;
-
-%plot(diff(S3(:,3))./diff(T3));
-legend show;
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Main
 %--------------------------------------------------------------------------
 % 
 [T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
-figure('Name','Parachute descent'); hold on;
-plot(T3,abs(S3(:,6)));
-plot(T4,abs(S4(:,6)));
-legend show;
 
 display(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
 
@@ -125,6 +117,17 @@ end
 %% ------------------------------------------------------------------------
 % Plots
 %--------------------------------------------------------------------------
+% % Plot aerodynamic properties
+% 
+% figure('Name','Aerodynamic properties'); hold on;
+% plot(diff(S3(:,3))./diff(T3));
+% legend show;
+% 
+% % Plot parachute descente
+% figure('Name','Parachute descent'); hold on;
+% plot(T3,abs(S3(:,6)));
+% plot(T4,abs(S4(:,6)));
+% legend show;
 
 % PLOT 1 : 3D rocket trajectory
 

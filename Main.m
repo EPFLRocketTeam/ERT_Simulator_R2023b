@@ -58,6 +58,19 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
+figure(Name="Euler angles")
+q = S2(:,7:10)';
+[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
+hold on
+plot(T2, phi .* 180 ./ pi, LineWidth=2)
+plot(T2, theta .* 180 ./ pi, LineWidth=2)
+plot(T2, psi .* 180 ./ pi, LineWidth=2)
+grid on
+box on
+xlabel("t [s]")
+ylabel("Angles")
+legend("\phi", "\theta", "\psi", fontsize=15)
+
 %figure('Name','Aerodynamic properties'); hold on;
 
 %plot(diff(S_1_2(:,2))./diff(T_1_2));

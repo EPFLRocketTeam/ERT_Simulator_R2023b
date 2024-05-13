@@ -196,6 +196,21 @@ while ~feof(rfid)
             data = line_data_num{1}';
             inertia = [data(1:3); data(4:6); data(7:9)];
             Rocket.rocket_inertia = inertia;
+        
+        % Read tank length
+        case 'tank_L'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_L = line_data_num{1}(1);
+        
+        % Read tank radius
+        case 'tank_r'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_r = line_data_num{1}(1);
+        
+        % Read tank position (from the top of the rocket)
+        case 'tank_z'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_z = line_data_num{1}(1);
                         
         otherwise
             display(['ERROR: In rocket definition, unknown line identifier: ' line_id]);

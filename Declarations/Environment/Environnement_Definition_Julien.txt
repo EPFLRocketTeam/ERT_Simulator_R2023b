@@ -1,0 +1,16 @@
+Temperature_Ground 289.15
+Pressure_Ground 102400.00
+Humidity_Ground 0.51031// à vérifier
+Start_Altitude 145
+Start_Latitude 39
+Start_Longitude -8
+dTdh -9.5 // c’est quoi?
+V_inf 2 // «2m/s vitesse moyenne »
+V_Azimuth 250 // c’est quoi ?
+Turb_I 0 //intensité de turbulence 10% moyenne
+Turb_model None
+Rail_Length 12
+Rail_Angle 5
+Rail_Azimuth 156 
+multilayerwind 2 10 6 0 0.6 20 7 1 0.7 // number of datapoint; altitude [m]; total wind speed [m/s]; azimuth; standart deviation; ... time number of point 
+map wasserfallenmapdata.xyz

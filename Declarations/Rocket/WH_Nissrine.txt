@@ -1,0 +1,30 @@
+stages 4
+diameters 0 0.102 0.102 0.08
+stage_z 0 0.51 2.75 2.8
+fin_n 4
+fin_xt 2.39
+fin_s 0.10
+fin_cr 0.36
+fin_ct 0.16
+fin_xs 0.2
+fin_L1 0.01
+fin_L2 0.028
+fin_t 0.003
+lug_n 2 
+lug_S 0,7e-4
+rocket_m 11.35
+rocket_I 8.76
+rocket_cm 0.97
+ab_x 1.390
+ab_n 0
+ab_phi -190.5
+pl_mass 1.25
+para_main_SCD 2.51
+para_drogue_SCD 0.3534
+para_main_event 400
+motor CS_N1560.txt
+motor_fac 1
+cone_mode on
+cp_fac 1
+CNa_fac 1
+CD_fac 1

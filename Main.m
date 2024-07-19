@@ -7,9 +7,10 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_N1332.txt');
-
-Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
+Rocket =  rocketReader('Rocket/RocketTest2.txt'); %Nordend : rocketReader('Rocket/Nordend_jul_ss_tank.txt');
+Environment = environnementReader('Environment/Environnement_Definition_WILDHORN_Nissrine.txt'); %NE : 
+% Rocket =  rocketReader('Rocket/RocketTest2.txt'); %Nordend : 
+% Environment = environnementReader('Environment/Environnement_Definition_Julien.txt'); %NE : environnementReader('Environment/Environnement_Definition_Julien.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
@@ -30,6 +31,7 @@ display(['Launch rail departure time : ' num2str(T1(end))]);
 
 [T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
 
+%%
 %SimObj.Rocket.cone_mode = 'off';
 
 [T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
@@ -223,7 +225,7 @@ plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Cn_{\alpha}';
 
 subplot(3,2,5);
-plot(T2, SimObj.SimAuxResults.Cd*1.3) % 1.3 is scale corrective CD factor!
+plot(T2, SimObj.SimAuxResults.Cd) % 1.3 is scale corrective CD factor!
 hold on;
 title 'SCALED CD';
 

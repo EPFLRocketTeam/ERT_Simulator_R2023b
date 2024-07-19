@@ -253,6 +253,8 @@ Rocket.fin_SE = (Rocket.fin_cr + Rocket.fin_ct )/2*Rocket.fin_s;
 Rocket.fin_df = interp1(Rocket.stage_z, Rocket.diameters, Rocket.fin_xt+Rocket.fin_cr/2, 'linear'); 
 % 4.6 Virtual fin planform area
 Rocket.fin_SF = Rocket.fin_SE + 1/2*Rocket.fin_df*Rocket.fin_cr; 
+Rocket.fin_SF= Rocket.fin_n * Rocket.fin_SF; %Ajout julien
+
 % 4.8 Rocket Length
 Rocket.L = Rocket.stage_z(end);
 

@@ -22,7 +22,7 @@ pl_mass 3.0
 para_main_SCD 12.064	
 para_drogue_SCD 1.7		
 para_main_event 200		
-motor CS_N1560J.txt
+motor CS_N1560.txt
 motor_fac 1
 cone_mode on			
 cp_fac 1

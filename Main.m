@@ -6,11 +6,12 @@ addpath(genpath('./Declarations'),...
         genpath('./Functions'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
-% Rocket Definition
-Rocket =  rocketReader('Rocket/RocketTest2.txt'); %Nordend : rocketReader('Rocket/Nordend_jul_ss_tank.txt');
-Environment = environnementReader('Environment/Environnement_Definition_WILDHORN_Nissrine.txt'); %NE : 
-% Rocket =  rocketReader('Rocket/RocketTest2.txt'); %Nordend : 
-% Environment = environnementReader('Environment/Environnement_Definition_Julien.txt'); %NE : environnementReader('Environment/Environnement_Definition_Julien.txt');
+% Rocket Definition for Wildhorn
+Rocket =  rocketReader('Rocket/WildhornN1560.txt');
+Environment = environnementReader('Environment/Environnement_Definition_WildhornN1560.txt'); %This Environment is also used for RocketTest1 and RocketTest2
+% Rocket Definition for Nordend
+% Rocket =  rocketReader('Rocket/NordendN1560Tankless.txt');
+% Environment = environnementReader('Environment/Environnement_Definition_NordendN1560.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
@@ -158,6 +159,7 @@ end
 %quiver3(S2(:,1), S2(:,2), S2(:,3), direcv(:,1), direcv(:,2), direcv(:,3));
 
 % plot trajectory of CM
+
 plot3(S2(:,1), S2(:,2), S2(:,3), 'DisplayName', 'Ascent','LineWidth',2);
 plot3(S3(:,1), S3(:,2), S3(:,3), 'DisplayName', 'Drogue Descent','LineWidth',2);
 plot3(S4(:,1), S4(:,2), S4(:,3), 'DisplayName', 'Main Descent','LineWidth',2);
@@ -178,8 +180,8 @@ legend show;
 figure('Name','Time dependent altitude'); hold on;
 plot(T2, S2(:,3), 'DisplayName', 'Ascent');
 plot(T3, S3(:,3), 'DisplayName', 'Drogue Descent');
-plot(T4, S4(:,3), 'DisplayName', 'Main Descent');
-plot(T5, S5(:,3), 'DisplayName', 'Ballistic Descent');
+plot(T4(find(S4(:,3)>0)), S4(find(S4(:,3)>0),3), 'DisplayName', 'Main Descent');
+plot(T5(find(S5(:,3)>0)), S5(find(S5(:,3)>0),3), 'DisplayName', 'Ballistic Descent');
 %plot(T6, S6(:,3), 'DisplayName', 'Ballistic Nosecone Descent', 'LineWidth', 2);
 title 'Altitude vs. time'
 xlabel 't [s]'; ylabel 'Altitude [m]';

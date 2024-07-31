@@ -22,7 +22,7 @@ Rc_crit = 5.14e6;
 % Skin friction coefficient T.54
 Rs=60e-6; %Roughness height of regular paint
 Rcrit = 51*(Rs/Rocket.L)^(-1.039); %Critical Reynold Number of roughness
-if Rl<10^4 %J distingue perfect finish de ce qu'on fait
+if Rl<10^4
     Cf=1.48e-2;
 elseif Rl<Rcrit
     Cf=(1.50*log(Rl)-5.6)^-2;

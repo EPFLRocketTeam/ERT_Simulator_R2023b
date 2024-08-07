@@ -34,6 +34,6 @@ rtwmakecfg.m
 slprj/
 
 # Ignorer les fichiers .csv produits pour avionics
-AV_TrainingDataProd/*.csv
+Snippets/AV_TrainingDataProd/*.csv
 # Ignorer Dossiers
 Declarations/

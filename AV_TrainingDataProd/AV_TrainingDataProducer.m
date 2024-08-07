@@ -1,5 +1,8 @@
 %% Description
 
+%       Utilisation:
+% Normalement, simplement lancer le programme. Il produit ensuite un
+% fichier.csv.
 %Le fichier comporte 15 colonnes:
 
     % colonne 1: temps de la mesure (s)
@@ -12,16 +15,21 @@
     % colonnes 11-13: rotation angulaire en x, y, z (rad/s). Dans le ref de
     % la fusée. (?)
     % colonne 14: pression atmosphérique (Pa)
-    % colonne 15: phase de vol: 1 correspond à rail, 2 montée avec moteur allumé, 22 montée après burnout, 3 descente avec drogue, 4 descente avec main.
+    % colonne 15: phase de vol: 1 correspond à rail, 2 montée avec moteur
+    % allumé, 22 montée après burnout, 3 descente avec drogue, 4 descente 
+    % avec main.
 
 %       REMARQUES
 % - Le rail est simulé en 1D -> pas de rotation et que vitesse/déplacement 
-% selon z (en vrai y a un petit angle de 5° avec la normal du sol, mais c'est ici négligeable).
+% selon z (en vrai y a un petit angle de 5° avec la normal du sol, mais 
+% c'est ici négligeable).
 % - Il faudrait vérifier la conversion de l'évolution des quaternions en
 % vitesse angulaire.
 % - Les phases 3 et 4 de vol ne prennent pas en compte les rotations de la
 % fusée (simulateur 3degrés de liberté), les vitesses angulaires 
 % valent donc toutes zéros.
+% - Source utile pour les quaternions: 
+% https://www.astro.rug.nl/software/kapteyn-beta/_downloads/attitude.pdf
 
 %% Rocket Simulator 3D
 % Initialize
@@ -184,6 +192,7 @@ writematrix(sim_results, "./AV_TrainingDataProd/AV_testData.csv")
 % functions
 %--------------------------------------------------------------------------
 
+% pas nécessaire
 % function Q = quatmatrice(q)
 %     Q=[q(1) -q(2) -q(3) -q(4);...
 %        q(2) q(1) -q(4) q(3);...
@@ -191,7 +200,9 @@ writematrix(sim_results, "./AV_TrainingDataProd/AV_testData.csv")
 %        q(4) -q(3) q(2) q(1)];
 % end 
 
-function W = quatratematrix(q)  % matrice pour passer à vitesse angulaire dans ref frame rocket voir https://www.astro.rug.nl/software/kapteyn-beta/_downloads/attitude.pdf
+% matrice pour passer à vitesse angulaire dans ref frame rocket voir
+% https://www.astro.rug.nl/software/kapteyn-beta/_downloads/attitude.pdf
+function W = quatratematrix(q)  
     W=[-q(2) q(1) q(4) -q(3);...
        -q(3) -q(4) q(1) q(2);...
        -q(4) q(3) -q(2) q(1)];

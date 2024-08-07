@@ -5,11 +5,14 @@ close all; clear all; clc;
 addpath(genpath('./Declarations'),...
         genpath('./Functions'),...
         genpath('./Snippets'),...
-        genpath('./Simulator_3D'));
+        genpath('./Simulator_3D'),...
+        genpath('./Calibration'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_EUROC.txt');
+% Rocket = rocketReader('Nordend_EUROC.txt');
+% Environment = environnementReader('Environment/Environnement_Definition_Wasserfallen.txt');
 
-Environment = environnementReader('Environment/Environnement_Definition_Wasserfallen.txt');
+Rocket = rocketReader('Nordend_N1332.txt');
+Environment = environnementReader('Calibration/Environnement_Definition_EuRoC.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
@@ -37,8 +40,13 @@ display(['Launch rail departure time : ' num2str(T1(end))]);
 T2 = [T2_1; T2_2(2:end)];
 S2 = [S2_1; S2_2(2:end, :)];
 
+% S_dot is [X_dot;V_dot;Q_dot;W_dot]
+
 T_1_2 = [T1;T2];
 S_1_2 = [S1;S2(:,3) S2(:,6)];
+
+% S2 [x,y,z, vx,vy,vz, Q1, Q2, Q3, Q4, W1, W2, W3] with Q quaternions in rocket frame,
+% W angle of attack in earth frame
 
 display(['Apogee AGL : ' num2str(S2(end,3))]);
 display(['Apogee AGL @t = ' num2str(T2(end))]);

@@ -5,14 +5,11 @@ close all; clear all; clc;
 addpath(genpath('./Declarations'),...
         genpath('./Functions'),...
         genpath('./Snippets'),...
-        genpath('./Simulator_3D'),...
-        genpath('./Calibration'));
+        genpath('./Simulator_3D'));
 % Rocket Definition
-% Rocket = rocketReader('Nordend_EUROC.txt');
-% Environment = environnementReader('Environment/Environnement_Definition_Wasserfallen.txt');
-
 Rocket = rocketReader('Nordend_N1332.txt');
-Environment = environnementReader('Calibration/Environnement_Definition_EuRoC.txt');
+
+Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
@@ -66,6 +63,19 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
+figure(Name="Euler angles")
+q = S2(:,7:10)';
+[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
+hold on
+plot(T2, phi .* 180 ./ pi, LineWidth=2)
+plot(T2, theta .* 180 ./ pi, LineWidth=2)
+plot(T2, psi .* 180 ./ pi, LineWidth=2)
+grid on
+box on
+xlabel("t [s]")
+ylabel("Angles")
+legend("\phi", "\theta", "\psi", fontsize=15)
+
 %figure('Name','Aerodynamic properties'); hold on;
 
 %plot(diff(S_1_2(:,2))./diff(T_1_2));
@@ -78,20 +88,12 @@ display(['Max g @t = ' num2str(T_1_2(index))]);
 %--------------------------------------------------------------------------
 
 [T3, S3, T3E, S3E, I3E] = SimObj.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
-%figure('Name','Aerodynamic properties'); hold on;
-
-%plot(diff(S3(:,3))./diff(T3));
-legend show;
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Main
 %--------------------------------------------------------------------------
 % 
 [T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
-figure('Name','Parachute descent'); hold on;
-plot(T3,abs(S3(:,6)));
-plot(T4,abs(S4(:,6)));
-legend show;
 
 display(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
 
@@ -133,6 +135,17 @@ end
 %% ------------------------------------------------------------------------
 % Plots
 %--------------------------------------------------------------------------
+% % Plot aerodynamic properties
+% 
+% figure('Name','Aerodynamic properties'); hold on;
+% plot(diff(S3(:,3))./diff(T3));
+% legend show;
+% 
+% % Plot parachute descente
+% figure('Name','Parachute descent'); hold on;
+% plot(T3,abs(S3(:,6)));
+% plot(T4,abs(S4(:,6)));
+% legend show;
 
 % PLOT 1 : 3D rocket trajectory
 

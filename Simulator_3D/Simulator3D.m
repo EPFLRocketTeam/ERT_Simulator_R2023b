@@ -149,7 +149,24 @@ classdef Simulator3D < handle
 
             % Rocket Inertia
             [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            
+            % Inertia using the given I_rocket and the motor
+            % Compute I_motor (approximate by a cylinder)
+            motor_inertia = inertia_fill_cylinder(M, ...
+                obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
+            % Total inertia
+            %I = inertial_matrix(obj.Rocket, Cm, t);
+            %disp(I)
+            I = obj.Rocket.rocket_inertia + motor_inertia;
+            %disp(I)
+            %disp("==============================")
+            I = C' * I * C; % Transfert to earth coordinates
+
+            % Temporal derivative of inertial matrix
+            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
+                obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
+            dIdt = C' * dIdt * C; % Transfert to earth coordinates
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -259,8 +276,8 @@ classdef Simulator3D < handle
             Q_dot = quat_evolve(Q, W);
             
             %W_dot = pinv(I)*M_tot;
-            W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
-           
+            %W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
+            W_dot = mldivide(I, M_tot - dIdt*angle');
 
             % Return derivative vector
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
@@ -428,7 +445,20 @@ classdef Simulator3D < handle
 
             % Rocket Inertia
             [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+
+            % Inertia using the given I_rocket and the motor
+            % Compute I_motor (approximate by a cylinder)
+            motor_inertia = inertia_fill_cylinder(M, ...
+                obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
+            % Total inertia
+            I = obj.Rocket.rocket_inertia + motor_inertia;
+            I = C' * I * C; % Transfert to earth coordinates
+
+            % Temporal derivative of inertial matrix
+            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
+                obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
+            dIdt = C' * dIdt * C; % Transfert to earth coordinates
 
             % Environment
             g = 9.81;               % Gravity [m/s2]
@@ -534,7 +564,8 @@ classdef Simulator3D < handle
 
             % Rotational dynamics
             Q_dot = quat_evolve(Q, W);
-            W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
+            %W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
+            W_dot = mldivide(I, M_tot - dIdt*angle');
 
             % Return derivative vector
             S_dot = [X_dot;V_dot;Q_dot;W_dot];

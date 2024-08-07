@@ -189,6 +189,28 @@ while ~feof(rfid)
         case 'CD_fac'
             line_data_num = textscan(line_data,'%f');
             Rocket.CD_fac = line_data_num{1}(1);
+        
+        % Read inertia matrix
+        case 'rocket_inertia'
+            line_data_num = textscan(line_data, '%f');
+            data = line_data_num{1}';
+            inertia = [data(1:3); data(4:6); data(7:9)];
+            Rocket.rocket_inertia = inertia;
+        
+        % Read tank length
+        case 'tank_L'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_L = line_data_num{1}(1);
+        
+        % Read tank radius
+        case 'tank_r'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_r = line_data_num{1}(1);
+        
+        % Read tank position (from the top of the rocket)
+        case 'tank_z'
+            line_data_num = textscan(line_data,'%f');
+            Rocket.tank_z = line_data_num{1}(1);
                         
         otherwise
             display(['ERROR: In rocket definition, unknown line identifier: ' line_id]);
@@ -233,6 +255,12 @@ Rocket.fin_df = interp1(Rocket.stage_z, Rocket.diameters, Rocket.fin_xt+Rocket.f
 Rocket.fin_SF = Rocket.fin_SE + 1/2*Rocket.fin_df*Rocket.fin_cr; 
 % 4.8 Rocket Length
 Rocket.L = Rocket.stage_z(end);
+
+% 4.9 Rocket inertia + motor and tank inertia
+[~, ~, ~, ~, I_L, ~, I_R, ~] = Mass_Properties(0, Rocket, 'Linear');
+if ~isfield(Rocket, 'rocket_inertia')
+    Rocket.rocket_inertia = [I_L, 0, 0; 0, I_L, 0; 0, 0, I_R];
+end
 
 % -------------------------------------------------------------------------
 % 5. Sub-routines

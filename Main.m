@@ -63,6 +63,29 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
+figure(Name="acceleration")
+v = S2(:,4:6)';
+ax = zeros(1,496)
+ay = zeros(1,496)
+az = zeros(1,496)
+for i = 1:495
+    ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
+    ay(i) = (v(2,i+1)-v(2,i))/(T2(i+1)-T2(i)) 
+    az(i) = (v(3,i+1)-v(3,i))/(T2(i+1)-T2(i))
+end
+ax(496) = ax(495)
+ay(496) = ay(495)
+az(496) = az(495)
+hold on
+plot(T2, ax)
+plot(T2, ay)
+plot(T2, az)
+grid on
+box on
+xlabel("t [s]")
+ylabel("acceleration")
+legend("ax","ay","az",fontsize=15)
+
 figure(Name="Euler angles")
 q = S2(:,7:10)';
 [phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));

@@ -63,51 +63,68 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
-figure(Name="acceleration")
-v = S2(:,4:6)';
-ax = zeros(1,496)
-ay = zeros(1,496)
-az = zeros(1,496)
-for i = 1:495
-    ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
-    ay(i) = (v(2,i+1)-v(2,i))/(T2(i+1)-T2(i)) 
-    az(i) = (v(3,i+1)-v(3,i))/(T2(i+1)-T2(i))
-end
-ax(496) = ax(495)
-ay(496) = ay(495)
-az(496) = az(495)
-hold on
-plot(T2, ax)
-plot(T2, ay)
-plot(T2, az)
-grid on
-box on
-xlabel("t [s]")
-ylabel("acceleration")
-legend("ax","ay","az",fontsize=15)
 
-figure(Name="acceleration")
-v = S2(:,4:6)';
-ax = zeros(1,496)
-ay = zeros(1,496)
-az = zeros(1,496)
-for i = 1:495
-    ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
-    ay(i) = (v(2,i+1)-v(2,i))/(T2(i+1)-T2(i)) 
-    az(i) = (v(3,i+1)-v(3,i))/(T2(i+1)-T2(i))
-end
-ax(496) = ax(495)
-ay(496) = ay(495)
-az(496) = az(495)
+
+
+% figure(Name="acceleration")
+% v = S2(:,4:6)';
+% ax = zeros(1,496)
+% ay = zeros(1,496)
+% az = zeros(1,496)
+% for i = 1:495
+%     ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
+%     ay(i) = (v(2,i+1)-v(2,i))/(T2(i+1)-T2(i)) 
+%     az(i) = (v(3,i+1)-v(3,i))/(T2(i+1)-T2(i))
+% end
+% ax(496) = ax(495)
+% ay(496) = ay(495)
+% az(496) = az(495)
+% hold on
+% plot(T2, ax)
+% plot(T2, ay)
+% plot(T2, az)
+% grid on
+% box on
+% xlabel("t [s]")
+% ylabel("acceleration")
+% legend("ax","ay","az",fontsize=15)
+% 
+% figure(Name="acceleration")
+% v = S2(:,4:6)';
+% ax = zeros(1,496)
+% ay = zeros(1,496)
+% az = zeros(1,496)
+% for i = 1:495
+%     ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
+%     ay(i) = (v(2,i+1)-v(2,i))/(T2(i+1)-T2(i)) 
+%     az(i) = (v(3,i+1)-v(3,i))/(T2(i+1)-T2(i))
+% end
+% ax(496) = ax(495)
+% ay(496) = ay(495)
+% az(496) = az(495)
+% hold on
+% plot(T2, ax)
+% plot(T2, ay)
+% plot(T2, az)
+% grid on
+% box on
+% xlabel("t [s]")
+% ylabel("acceleration")
+% legend("ax","ay","az",fontsize=15)
+
+figure(Name="acceleration_prime")
+ax = diff(S2(:,4))./diff(T2);
+ay = diff(S2(:,5))./diff(T2);
+az = diff(S2(:,6))./diff(T2);
 hold on
-plot(T2, ax)
-plot(T2, ay)
-plot(T2, az)
+plot(T2(1:end-1), ax, "Color","red" )
+plot(T2(1:end-1), ay, "Color","blue" )
+plot(T2(1:end-1), az, "Color","green" )
 grid on
 box on
 xlabel("t [s]")
-ylabel("acceleration")
-legend("ax","ay","az",fontsize=15)
+ylabel("Acceleration [m \cdot s^{-2}] ")
+legend("ax", "ay", "az", fontsize=15)
 
 figure(Name="Euler angles")
 q = S2(:,7:10)';

@@ -209,7 +209,7 @@ legend show;
 % PLOT 4 : Aerodynamic properties
 figure('Name','Aerodynamic properties'); hold on;
 % Plot Margin
-subplot(3,2,1);y
+subplot(3,2,1);
 plot(T2, SimObj.SimAuxResults.Margin)
 grid on
 box on

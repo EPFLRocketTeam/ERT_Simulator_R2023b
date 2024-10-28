@@ -95,7 +95,7 @@ legend("\phi", "\theta", "\psi", fontsize=15)
 % 
 [T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
 
-display(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
+disp(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
 
 %% ------------------------------------------------------------------------
 % 3DOF Crash Simulation
@@ -175,6 +175,8 @@ colormap('jet');
 surf(Environment.map_x, Environment.map_y, Environment.map_z, 'EdgeColor', 'none', 'DisplayName', 'Base Map');
 title '3D trajectory representation'
 xlabel 'S [m]'; ylabel 'E [m]'; zlabel 'Altitude [m]';
+grid on
+box on
 legend show;
 
 % PLOT 2 : time dependent altitude
@@ -186,6 +188,8 @@ plot(T5, S5(:,3), 'DisplayName', 'Ballistic Descent');
 %plot(T6, S6(:,3), 'DisplayName', 'Ballistic Nosecone Descent', 'LineWidth', 2);
 title 'Altitude vs. time'
 xlabel 't [s]'; ylabel 'Altitude [m]';
+grid on
+box on
 legend show;
 
 % PLOT 3 : Altitude vs. drift
@@ -198,13 +202,17 @@ plot(sqrt(S5(:,1).^2 + S5(:,2).^2), S5(:,3), 'd', 'DisplayName', 'CrashSim');
 title 'Altitude vs. drift'
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 %daspect([1 1 1]);
+grid on
+box on
 legend show;
 
 % PLOT 4 : Aerodynamic properties
 figure('Name','Aerodynamic properties'); hold on;
 % Plot Margin
-subplot(3,2,1);
+subplot(3,2,1);y
 plot(T2, SimObj.SimAuxResults.Margin)
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Margin';
@@ -212,23 +220,32 @@ title 'Margin';
 subplot(3,2,2);
 plot(T2, SimObj.SimAuxResults.Xcp)
 hold on;
+grid on
+box on
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'X_{cp}';
 % Plot AoA vs. time
 subplot(3,2,3);
 plot(T2, SimObj.SimAuxResults.Alpha)
 hold on;
+grid on
+box on
+
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title '\alpha';
 % Plot CNa vs. speed
 subplot(3,2,4);
 plot(T2, SimObj.SimAuxResults.Cn_alpha)
 hold on;
+grid on
+box on
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Cn_{\alpha}';
 
 subplot(3,2,5);
 plot(T2, SimObj.SimAuxResults.Cd*1.3) % 1.3 is scale corrective CD factor!
+grid on
+box on
 hold on;
 title 'SCALED CD';
 
@@ -239,6 +256,8 @@ plot(T2, SimObj.SimAuxResults.Delta)
 ylim([0, 1]);
 tmpYlim = ylim;
 set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Delta, angle with Oz'
@@ -284,6 +303,8 @@ plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 tmpYlim = ylim;
 title 'Mass';
 set(gca, 'YTick', tmpYlim(1):0.5:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 % Plot CM vs. time
@@ -291,7 +312,9 @@ subplot(2,2,2);
 plot(T2, SimObj.SimAuxResults.CM)
 tmpYlim = ylim;
 title 'CM';
-set(gca, 'YTick', tmpYlim(1):0.01:tmpYlim(2));
+set(gca, 'YTick', tmpYlim(1):0.03:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 % Plot Il vs. time
@@ -299,7 +322,9 @@ subplot(2,2,3);
 plot(T2, SimObj.SimAuxResults.Il)
 tmpYlim = ylim;
 title 'Il';
-set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
+set(gca, 'YTick', tmpYlim(1):0.5:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 %Plot Ir vs. time
@@ -309,6 +334,8 @@ title 'Ir';
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 screensize = get( groot, 'Screensize' );
+grid on
+box on
 set(gcf,'Position',[screensize(3)*0.5, screensize(2),...
     screensize(3)*0.5,screensize(3)*0.5]);            
 
@@ -323,11 +350,15 @@ yyaxis right;
 plot(T2, SimObj.SimAuxResults.Margin, 'DisplayName', 'Margin');
 ylabel 'Margin [calibers]';
 title 'Dynamic Stability Margin'
+grid on
+box on
 legend show;
 
 % plot 7 : norm of quaternion
 figure('Name','Norm of quaternion'); hold on;
 plot(T2, sqrt(sum(S2(:, 7:10).^2, 2)));
+grid on
+box on
 
 % % Plot 8
 % figure('Name','Nosecone crash angles'); hold on;

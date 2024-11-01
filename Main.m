@@ -8,6 +8,7 @@ addpath(genpath('./Declarations'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
 Rocket = rocketReader('Nordend_N1332.txt');
+% blabla
 
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
@@ -68,8 +69,8 @@ display(['Max g @t = ' num2str(T_1_2(index))]);
 
 % figure(Name="acceleration")
 % v = S2(:,4:6)';
-% ax = zeros(1,496)
-% ay = zeros(1,496)
+% ax = zeros(1,496);
+% ay = zeros(1,496);
 % az = zeros(1,496)
 % for i = 1:495
 %     ax(i) = (v(1,i+1)-v(1,i))/(T2(i+1)-T2(i))
@@ -88,7 +89,7 @@ display(['Max g @t = ' num2str(T_1_2(index))]);
 % xlabel("t [s]")
 % ylabel("acceleration")
 % legend("ax","ay","az",fontsize=15)
-% 
+
 % figure(Name="acceleration")
 % v = S2(:,4:6)';
 % ax = zeros(1,496)

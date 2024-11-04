@@ -80,18 +80,27 @@ Cf_turb_F = Cf_turb_F-B_F/Rc ;
 % 4.1 Wetted area ratio
 % 4.1.1 ogive cone (eq 171c, p 439)
 % 4.1.2 boattail cone (eq 172a, p 441)
-SsSm = 2/dm^2*sum((Rocket.diameters(2:end-1)+ Rocket.diameters(3:end)).*...
+
+% Calculate SsSm of every component of the rocket (for us, the nose (ogive
+% form), the body (cylinder) and the boattail) Then add all the SsSm. I
+% used the example in the section 6.2
+% Need to determine a better way of finding the interresting length (for
+% example I put the 2nd stage but it is possible that it is the third that
+% is needed)
+SsSm_nose = 2.7*Rocket.stage_z(1)/Rocket.diameters(3); %Ogive
+SsSm_cyl= 4*(Rocket.stage_z(2)-Rocket.stage_z(end-1))/Rocket.diameters(3);
+SsSm_boattail = 2/dm^2*sum((Rocket.diameters(2:end-1)+ Rocket.diameters(3:end)).*...
     (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1)).*...
     sqrt(1+((Rocket.diameters(2:end-1) - Rocket.diameters(3:end))./2./...
-    (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1))).^2)); 
-if strcmp(Rocket.cone_mode, 'on')
-    SsSm = SsSm + 2.67*Rocket.stage_z(2)/dm;
-end
+    (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1))).^2));  %Repris la formule du dessus
+ SsSm = SsSm_nose + SsSm_cyl + SsSm_boattail;
+
 
 if Rocket.stage_z(2)/dm < 1.5
     display('WARNING: In drag coefficient calculation, ogive cone ratio is out of bounds. Drag estimation cannot be trusted.');
 end
 
+ 
 % 4.2 Body drag
 % 4.2.1 (eq 161, p 431)
 CDf_B = (1+60/(Rocket.stage_z(end)/dm)^3+0.0025*(Rocket.stage_z(end)/dm))*SsSm; % partially calculated body drag

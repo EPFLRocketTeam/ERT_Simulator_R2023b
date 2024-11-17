@@ -153,9 +153,12 @@ plot3(S4(:,1), S4(:,2), S4(:,3), 'DisplayName', 'Main Descent','LineWidth',2);
 plot3(S5(:,1), S5(:,2), S5(:,3), 'DisplayName', 'Ballistic Descent','LineWidth',2)
 daspect([1 1 1]); pbaspect([1, 1, 1]); view(45, 45);
 %[XX, YY, M, Mcolor] = get_google_map(Environment.Start_Latitude, Environment.Start_Longitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
-xImage = [xlim',xlim'];
-yImage = [ylim;ylim];
-zImage = zeros(2);
+xlim([min([S2(:,1); S3(:,1); S4(:,1); S5(:,1)]) max([S2(:,1); S3(:,1); S4(:,1); S5(:,1)])]);
+ylim([min([S2(:,2); S3(:,2); S4(:,2); S5(:,2)]) max([S2(:,2); S3(:,2); S4(:,2); S5(:,2)])]);
+zlim([0 max([S2(:,3); S3(:,3); S4(:,3); S5(:,3)])]);
+% xImage = [xlim',xlim'];
+% yImage = [ylim;ylim];
+% zImage = zeros(2);
 colormap('jet');
 %surf(xImage, yImage, zImage, 'CData', M,'FaceColor', 'texturemap', 'EdgeColor', 'none', 'DisplayName', 'Base Map');
 surf(Environment.map_x, Environment.map_y, Environment.map_z, 'EdgeColor', 'none', 'DisplayName', 'Base Map');
@@ -164,6 +167,7 @@ xlabel 'S [m]'; ylabel 'E [m]'; zlabel 'Altitude [m]';
 grid on
 box on
 legend show;
+
 
 % PLOT 2 : time dependent altitude
 figure('Name','Time dependent altitude'); hold on;

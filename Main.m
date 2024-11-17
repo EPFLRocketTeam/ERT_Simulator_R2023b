@@ -76,12 +76,6 @@ xlabel("t [s]")
 ylabel("Angles")
 legend("\phi", "\theta", "\psi", fontsize=15)
 
-%figure('Name','Aerodynamic properties'); hold on;
-
-%plot(diff(S_1_2(:,2))./diff(T_1_2));
-%legend show;
-
-%plot(S2(:,1), S2(:,6));
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Drogue

@@ -9,6 +9,7 @@ addpath(genpath('./Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('Nordend_N1332.txt');
 
+
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
@@ -63,18 +64,9 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
-figure(Name="Euler angles")
-q = S2(:,7:10)';
-[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
-hold on
-plot(T2, phi .* 180 ./ pi, LineWidth=2)
-plot(T2, theta .* 180 ./ pi, LineWidth=2)
-plot(T2, psi .* 180 ./ pi, LineWidth=2)
-grid on
-box on
-xlabel("t [s]")
-ylabel("Angles")
-legend("\phi", "\theta", "\psi", fontsize=15)
+
+
+
 
 %figure('Name','Aerodynamic properties'); hold on;
 
@@ -342,3 +334,32 @@ plot(T2, sqrt(sum(S2(:, 7:10).^2, 2)));
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
 % title 'Delta, angle with Oz'
+
+% Plot 9
+figure(Name="acceleration")
+ax = diff(S2(:,4))./diff(T2);
+ay = diff(S2(:,5))./diff(T2);
+az = diff(S2(:,6))./diff(T2);
+hold on
+plot(T2(1:end-1), ax, "Color","red" )
+plot(T2(1:end-1), ay, "Color","blue" )
+plot(T2(1:end-1), az, "Color","green" )
+grid on
+box on
+xlabel("t [s]")
+ylabel("Acceleration [m \cdot s^{-2}] ")
+legend("ax", "ay", "az", fontsize=15)
+
+% Plot 10
+figure(Name="Euler angles")
+q = S2(:,7:10)';
+[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
+hold on
+plot(T2, phi .* 180 ./ pi, LineWidth=2)
+plot(T2, theta .* 180 ./ pi, LineWidth=2)
+plot(T2, psi .* 180 ./ pi, LineWidth=2)
+grid on
+box on
+xlabel("t [s]")
+ylabel("Angles")
+legend("\phi", "\theta", "\psi", fontsize=15)

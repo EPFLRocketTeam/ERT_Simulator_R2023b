@@ -41,6 +41,7 @@ ERT_simulator_R2023b
 ├── Test
 |
 ├── Snippets
+|   └── DragOR
 |
 ├── Declarations 
 │   └── **Drag**
@@ -54,8 +55,6 @@ ERT_simulator_R2023b
 |
 ├── Simulator_3D
 |   └── **Simulator3D_OR.m**
-|
-├── DragOR
 |
 └── Archives
 

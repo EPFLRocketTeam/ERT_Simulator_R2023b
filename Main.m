@@ -342,3 +342,13 @@ plot(T2, sqrt(sum(S2(:, 7:10).^2, 2)));
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
 % title 'Delta, angle with Oz'
+
+figure
+hold on
+plot(T2, SimObj.SimAuxResults.Cd*1.3)
+%plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
+legend('CD ERT-Sim')
+xlabel('Time [s]')
+ylabel('CD')
+grid on
+hold off

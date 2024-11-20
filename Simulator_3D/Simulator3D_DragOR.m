@@ -37,7 +37,7 @@ classdef Simulator3D_DragOR < handle
 % -------------------------------------------------------------------------   
    methods
        
-       function obj = Simulator3D(Rocket, Environment, Drag, interp_type, SimOutput)
+       function obj = Simulator3D_DragOR(Rocket, Environment, Drag, interp_type, SimOutput)
            if nargin == 0
                % TODO: Put default values or send warning message
            elseif nargin == 5
@@ -112,7 +112,7 @@ classdef Simulator3D_DragOR < handle
             T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
-            CD = drag(obj.Drag, obj.interp_type, t, x, v); % (TODO: make air-viscosity adaptable to temperature)
+            CD = drag_OR(obj.Drag, obj.interp_type, t, x, v); % (TODO: make air-viscosity adaptable to temperature)
             D = -0.5*rho*obj.Rocket.Sm*CD*v^2; % (TODO: define drag in wind coordinate system)
 
             F_tot = G + T*obj.Rocket.motor_fac + D;
@@ -253,7 +253,7 @@ classdef Simulator3D_DragOR < handle
             end
             % Drag
             % Drag coefficient
-            CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3))*obj.Rocket.CD_fac; 
+            CD = drag_OR(obj.Drag, obj.interp_type, t, X(3), V(3))*obj.Rocket.CD_fac; 
             if(t>obj.Rocket.Burn_Time)
               CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
             end
@@ -377,7 +377,7 @@ classdef Simulator3D_DragOR < handle
             G = -9.81*M*ZE;
             % Drag
             % Drag coefficient
-            CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3)); % (TODO: make air-viscosity adaptable to temperature)
+            CD = drag_OR(obj.Drag, obj.interp_type, t, X(3), V(3)); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
             D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
             % Translational dynamics

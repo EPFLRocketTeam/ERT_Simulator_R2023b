@@ -9,7 +9,7 @@ addpath(genpath('./Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('Nordend_CS_M795.txt');
 
-Environment = environnementReader('Environment/Environnement_Definition_NordendN1560.txt');
+Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
 SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
@@ -18,6 +18,9 @@ SimObj = Simulator3D(Rocket, Environment, SimOutputs);
 %% ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
+
+% Motor ignition
+SimObj.Rocket.motor_state = 'on';
 
 [T1, S1] = SimObj.RailSim();
 
@@ -82,6 +85,9 @@ legend("\phi", "\theta", "\psi", fontsize=15)
 %legend show;
 
 %plot(S2(:,1), S2(:,6));
+
+% Motor shutdown
+SimObj.Rocket.motor_state = 'off';
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Drogue

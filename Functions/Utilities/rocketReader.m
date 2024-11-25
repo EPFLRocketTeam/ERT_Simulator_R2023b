@@ -10,6 +10,10 @@ if rfid < 0
    error('ERROR: Rocket file name unfound.') 
 end
 Rocket.isHybrid = 0;
+
+% Rocket Motor on/off parameter
+Rocket.motor_state = 'off';
+
 while ~feof(rfid)
 
     line_content = fgetl(rfid);

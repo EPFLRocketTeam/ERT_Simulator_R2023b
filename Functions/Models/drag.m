@@ -74,7 +74,7 @@ Cf_turb_F = Cf_turb_F-B_F/Rc ;
 
 
 % -------------------------------------------------------------------------
-% 4. 0?? AoA drag
+% 4. 0   AoA drag
 % -------------------------------------------------------------------------
 
 % 4.1 Wetted area ratio
@@ -109,6 +109,7 @@ if Rl < Rl_crit
 else
     CDf_B = Cf_turb_B*CDf_B; % body drag for turbulent flow
 end
+
 % 4.2.2 Base drag (eq 162, p 431)
 CDb = 0.029*(Rocket.diameters(end)/dm)^3/sqrt(CDf_B);
 % 4.2.3 Body drag at 0?? AoA (eq 160, p 431)

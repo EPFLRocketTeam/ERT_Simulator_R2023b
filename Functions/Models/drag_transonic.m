@@ -83,7 +83,7 @@ function Value = drag_transonic(Rocket, alpha, Uinf, nu, a)
         Cfstar = 0.037036 * Rnstar ^ (-0.155079);
         
         % Compressible skin friction coefficient
-        Cf = Cfstar * (1 + 0.00798 * M - 0.1813 * M ^ (2) + 0.0632 * M ^ (3) - 0.00933 * M ^ (4) + 0.000549 * M ^ (5));
+        C   f = Cfstar * (1 + 0.00798 * M - 0.1813 * M ^ (2) + 0.0632 * M ^ (3) - 0.00933 * M ^ (4) + 0.000549 * M ^ (5));
         
         % Incompressible skin friction coefficient with roughness
         Cftermstar = 1 / ((1.89 + 1.62 * log10 (L / KB)) ^ (2.5));

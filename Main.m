@@ -7,7 +7,8 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_N1332.txt');
+Rocket = rocketReader('Nordend_CS_M795.txt');
+
 
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 
@@ -18,6 +19,9 @@ SimObj = Simulator3D(Rocket, Environment, SimOutputs);
 %% ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
+
+% Motor ignition
+SimObj.Rocket.motor_state = 'on';
 
 [T1, S1] = SimObj.RailSim();
 
@@ -63,25 +67,13 @@ display(['Max acceleration : ' num2str(maxi)]);
 display(['Max g : ' num2str(maxi/9.81)]);
 display(['Max g @t = ' num2str(T_1_2(index))]);
 
-figure(Name="Euler angles")
-q = S2(:,7:10)';
-[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
-hold on
-plot(T2, phi .* 180 ./ pi, LineWidth=2)
-plot(T2, theta .* 180 ./ pi, LineWidth=2)
-plot(T2, psi .* 180 ./ pi, LineWidth=2)
-grid on
-box on
-xlabel("t [s]")
-ylabel("Angles")
-legend("\phi", "\theta", "\psi", fontsize=15)
 
-%figure('Name','Aerodynamic properties'); hold on;
 
-%plot(diff(S_1_2(:,2))./diff(T_1_2));
-%legend show;
 
-%plot(S2(:,1), S2(:,6));
+
+
+% Motor shutdown
+SimObj.Rocket.motor_state = 'off';
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Drogue
@@ -95,7 +87,7 @@ legend("\phi", "\theta", "\psi", fontsize=15)
 % 
 [T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
 
-display(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
+disp(['Touchdown @t = ' num2str(T4(end)) ' = ' num2str(floor(T4(end)/60)) ' min ' num2str(mod(T4(end),60)) ' s']);
 
 %% ------------------------------------------------------------------------
 % 3DOF Crash Simulation
@@ -167,15 +159,21 @@ plot3(S4(:,1), S4(:,2), S4(:,3), 'DisplayName', 'Main Descent','LineWidth',2);
 plot3(S5(:,1), S5(:,2), S5(:,3), 'DisplayName', 'Ballistic Descent','LineWidth',2)
 daspect([1 1 1]); pbaspect([1, 1, 1]); view(45, 45);
 %[XX, YY, M, Mcolor] = get_google_map(Environment.Start_Latitude, Environment.Start_Longitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
-xImage = [xlim',xlim'];
-yImage = [ylim;ylim];
-zImage = zeros(2);
+xlim([min([S2(:,1); S3(:,1); S4(:,1); S5(:,1)]) max([S2(:,1); S3(:,1); S4(:,1); S5(:,1)])]);
+ylim([min([S2(:,2); S3(:,2); S4(:,2); S5(:,2)]) max([S2(:,2); S3(:,2); S4(:,2); S5(:,2)])]);
+zlim([0 max([S2(:,3); S3(:,3); S4(:,3); S5(:,3)])]);
+% xImage = [xlim',xlim'];
+% yImage = [ylim;ylim];
+% zImage = zeros(2);
 colormap('jet');
 %surf(xImage, yImage, zImage, 'CData', M,'FaceColor', 'texturemap', 'EdgeColor', 'none', 'DisplayName', 'Base Map');
 surf(Environment.map_x, Environment.map_y, Environment.map_z, 'EdgeColor', 'none', 'DisplayName', 'Base Map');
 title '3D trajectory representation'
 xlabel 'S [m]'; ylabel 'E [m]'; zlabel 'Altitude [m]';
+grid on
+box on
 legend show;
+
 
 % PLOT 2 : time dependent altitude
 figure('Name','Time dependent altitude'); hold on;
@@ -186,6 +184,8 @@ plot(T5, S5(:,3), 'DisplayName', 'Ballistic Descent');
 %plot(T6, S6(:,3), 'DisplayName', 'Ballistic Nosecone Descent', 'LineWidth', 2);
 title 'Altitude vs. time'
 xlabel 't [s]'; ylabel 'Altitude [m]';
+grid on
+box on
 legend show;
 
 % PLOT 3 : Altitude vs. drift
@@ -198,6 +198,8 @@ plot(sqrt(S5(:,1).^2 + S5(:,2).^2), S5(:,3), 'd', 'DisplayName', 'CrashSim');
 title 'Altitude vs. drift'
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 %daspect([1 1 1]);
+grid on
+box on
 legend show;
 
 % PLOT 4 : Aerodynamic properties
@@ -205,6 +207,8 @@ figure('Name','Aerodynamic properties'); hold on;
 % Plot Margin
 subplot(3,2,1);
 plot(T2, SimObj.SimAuxResults.Margin)
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Margin';
@@ -212,23 +216,32 @@ title 'Margin';
 subplot(3,2,2);
 plot(T2, SimObj.SimAuxResults.Xcp)
 hold on;
+grid on
+box on
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'X_{cp}';
 % Plot AoA vs. time
 subplot(3,2,3);
 plot(T2, SimObj.SimAuxResults.Alpha)
 hold on;
+grid on
+box on
+
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title '\alpha';
 % Plot CNa vs. speed
 subplot(3,2,4);
 plot(T2, SimObj.SimAuxResults.Cn_alpha)
 hold on;
+grid on
+box on
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Cn_{\alpha}';
 
 subplot(3,2,5);
 plot(T2, SimObj.SimAuxResults.Cd*1.3) % 1.3 is scale corrective CD factor!
+grid on
+box on
 hold on;
 title 'SCALED CD';
 
@@ -239,6 +252,8 @@ plot(T2, SimObj.SimAuxResults.Delta)
 ylim([0, 1]);
 tmpYlim = ylim;
 set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Delta, angle with Oz'
@@ -284,6 +299,8 @@ plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 tmpYlim = ylim;
 title 'Mass';
 set(gca, 'YTick', tmpYlim(1):0.5:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 % Plot CM vs. time
@@ -291,7 +308,9 @@ subplot(2,2,2);
 plot(T2, SimObj.SimAuxResults.CM)
 tmpYlim = ylim;
 title 'CM';
-set(gca, 'YTick', tmpYlim(1):0.01:tmpYlim(2));
+set(gca, 'YTick', tmpYlim(1):0.03:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 % Plot Il vs. time
@@ -299,7 +318,9 @@ subplot(2,2,3);
 plot(T2, SimObj.SimAuxResults.Il)
 tmpYlim = ylim;
 title 'Il';
-set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
+set(gca, 'YTick', tmpYlim(1):0.5:tmpYlim(2));
+grid on
+box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 %Plot Ir vs. time
@@ -309,6 +330,8 @@ title 'Ir';
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 screensize = get( groot, 'Screensize' );
+grid on
+box on
 set(gcf,'Position',[screensize(3)*0.5, screensize(2),...
     screensize(3)*0.5,screensize(3)*0.5]);            
 
@@ -323,11 +346,15 @@ yyaxis right;
 plot(T2, SimObj.SimAuxResults.Margin, 'DisplayName', 'Margin');
 ylabel 'Margin [calibers]';
 title 'Dynamic Stability Margin'
+grid on
+box on
 legend show;
 
 % plot 7 : norm of quaternion
 figure('Name','Norm of quaternion'); hold on;
 plot(T2, sqrt(sum(S2(:, 7:10).^2, 2)));
+grid on
+box on
 
 % % Plot 8
 % figure('Name','Nosecone crash angles'); hold on;
@@ -342,3 +369,32 @@ plot(T2, sqrt(sum(S2(:, 7:10).^2, 2)));
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
 % title 'Delta, angle with Oz'
+
+% Plot 9
+figure(Name="acceleration")
+ax = diff(S2(:,4))./diff(T2);
+ay = diff(S2(:,5))./diff(T2);
+az = diff(S2(:,6))./diff(T2);
+hold on
+plot(T2(1:end-1), ax, "Color","red" )
+plot(T2(1:end-1), ay, "Color","blue" )
+plot(T2(1:end-1), az, "Color","green" )
+grid on
+box on
+xlabel("t [s]")
+ylabel("Acceleration [m \cdot s^{-2}] ")
+legend("ax", "ay", "az", fontsize=15)
+
+% Plot 10
+figure(Name="Euler angles")
+q = S2(:,7:10)';
+[phi, theta, psi] = quat_to_euler_angles(q(1,:), q(2,:), q(3,:), q(4,:));
+hold on
+plot(T2, phi .* 180 ./ pi, LineWidth=2)
+plot(T2, theta .* 180 ./ pi, LineWidth=2)
+plot(T2, psi .* 180 ./ pi, LineWidth=2)
+grid on
+box on
+xlabel("t [s]")
+ylabel("Angles")
+legend("\phi", "\theta", "\psi", fontsize=15)

@@ -80,18 +80,27 @@ Cf_turb_F = Cf_turb_F-B_F/Rc ;
 % 4.1 Wetted area ratio
 % 4.1.1 ogive cone (eq 171c, p 439)
 % 4.1.2 boattail cone (eq 172a, p 441)
-SsSm = 2/dm^2*sum((Rocket.diameters(2:end-1)+ Rocket.diameters(3:end)).*...
+
+% Calculate SsSm of every component of the rocket (for us, the nose (ogive
+% form), the body (cylinder) and the boattail) Then add all the SsSm. I
+% used the example in the section 6.2
+% Need to determine a better way of finding the interresting length (for
+% example I put the 2nd stage but it is possible that it is the third that
+% is needed)
+SsSm_nose = 2.7*Rocket.stage_z(1)/Rocket.diameters(3); %Ogive
+SsSm_cyl= 4*(Rocket.stage_z(2)-Rocket.stage_z(end-1))/Rocket.diameters(3);
+SsSm_boattail = 2/dm^2*sum((Rocket.diameters(2:end-1)+ Rocket.diameters(3:end)).*...
     (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1)).*...
     sqrt(1+((Rocket.diameters(2:end-1) - Rocket.diameters(3:end))./2./...
-    (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1))).^2)); 
-if strcmp(Rocket.cone_mode, 'on')
-    SsSm = SsSm + 2.67*Rocket.stage_z(2)/dm;
-end
+    (Rocket.stage_z(3:end)-Rocket.stage_z(2:end-1))).^2));  %Repris la formule du dessus
+ SsSm = SsSm_nose + SsSm_cyl + SsSm_boattail;
+
 
 if Rocket.stage_z(2)/dm < 1.5
     display('WARNING: In drag coefficient calculation, ogive cone ratio is out of bounds. Drag estimation cannot be trusted.');
 end
 
+ 
 % 4.2 Body drag
 % 4.2.1 (eq 161, p 431)
 CDf_B = (1+60/(Rocket.stage_z(end)/dm)^3+0.0025*(Rocket.stage_z(end)/dm))*SsSm; % partially calculated body drag
@@ -138,12 +147,12 @@ etak = interp1(etatab(1,:),etatab(2,:),Rocket.stage_z(end)/dm,'linear','extrap')
 deltak=interp1(deltaktab(1,:),deltaktab(2,:),Rocket.stage_z(end)/dm,'linear','extrap');
 % 5.1.2 Compute body drag at angle of attack alpha
 % 5.1.2.1 x1 as defined by explanations of (eq 140, p 404)
-x1 = Rocket.stage_z(find(diff(Rocket.diameters)==0, 1, 'first'));
+x1 = Rocket.stage_z(find(diff(Rocket.diameters)==0, 1, 'first')); % TO CKECK - OK
 % 5.1.2.2 x0 as in (eq 140, p404)
-x0 = 0.55*x1+0.36*Rocket.stage_z(end);
+x0 = 0.55*x1+0.36*Rocket.stage_z(end); % Purely exp. values
 % 5.1.2.3 Section Area at station x0
-S0 = pi*interp1(Rocket.stage_z, Rocket.diameters, x0, 'linear')^2/4;
-% 5.1.2.4 Body drag at low AoA (eq 139, p. 404)
+S0 = pi*interp1(Rocket.stage_z, Rocket.diameters, x0, 'linear')^2/4; % Why divided by 4 ?
+% 5.1.2.4 Body drag at low AoA (eq 139, p. 404) %% ERROR IN THE BOOK !!!
 CDB_alpha = 2*deltak*S0/Sm*alpha*sin(alpha);
 tmp_stages = [x0, Rocket.stage_z(Rocket.stage_z>x0)];
 tmp_diameters = [interp1(Rocket.stage_z, Rocket.diameters, x0, 'linear'), Rocket.diameters(Rocket.stage_z>x0)];
@@ -154,15 +163,17 @@ CDB_alpha = CDB_alpha + 2*alpha^2*sin(alpha)/Sm*etak*1.2*sum((tmp_diameters(1, e
 % 5.2.1 Fin Exposed Surface Coefficient
 % TODO: Consider rocket roll for lateral exposed fin surface
 FESC = 2;
+% WHAT IS FESC ? 
 % 5.2.2 induced fin drag, similar to (eq 145, p 413)
 CDi = 1.2*alpha^2*SF/Sm*FESC;
 % 5.2.3 Interference coefficients as estimated by Hassan (eq 34 and 35, p
 % 12) based on Mandell Fig. 40 p 416.
 Rs = df/(2*Rocket.fin_s+df); % Total fin span ratio
 KFB = 0.8065*Rs^2+1.1553*Rs; % Interference of body on fin lift
-KBF = 0.1935*Rs^2+0.8174*Rs+1; % Interference of fins on body lift
+KBF = 0.1935*Rs^2+0.8174*Rs+1; % Interference of fins on body lift % WARNING ONLY VALID FOR GIVEN VALUES
 % 5.2.4 Interference Drag Coefficient (eq 146, p 415)
 DCDi = (KFB + KBF - 1)*3.12*SE/Sm*alpha^2*FESC; % Interference drag
+% 3.12 is dC_L/dalpha given by Hoerner
 CDF_alpha = CDi + DCDi;
 
 % 5.3 Total drag at AoA (eq 148, p 417)
@@ -175,6 +186,7 @@ CD_t_fin = 1.42*fin_efficiency(Rocket.fin_n);
 CD_t_body = 0.56;
 
 CD_t = (SE*CD_t_fin+CD_t_body*dm*(Rocket.stage_z(end)-Rocket.stage_z(2)))/Sm;
+% WARNING : Should be multiply by the body tube area
 % -------------------------------------------------------------------------
 % 6. Subsonic drag coefficient
 % -------------------------------------------------------------------------
@@ -226,6 +238,10 @@ end
         
     % -------------------------------------------------------------------------
     % 8. Supersonic drag coefficient
+    % Reference for equations : Calculation of the drag coefficient
+    % of a rocket at transonic and supersonic speed,
+    % Xavier PALLE, Jan Gerrit SCHULZ
+    % January 26, 2022, Semester Project
     % -------------------------------------------------------------------------
         
         % length of the nose
@@ -309,9 +325,12 @@ end
         
         % (eq 3.10, p 25)
         AB = pi * (Rocket.diameters(end) / 2)^2;
-%         if Rocket.motor_mode == "on"
-%             AB = AB - pi * (Rocket.motor_d / 2)^2;
-%         end
+        if strcmp(Rocket.motor_state, 'on')
+            AB = AB - pi*(Rocket.motor_dia/2)^2;
+        end
+
+        % Linear interpolation between transonic and supersonic drag
+        % coefficient. Interpolation between M = 1.5 and M = 3.
         if M < 3
             CD_trans = drag_transonic(Rocket, alpha, Uinf, nu, a);
             CD_sup =  CPn + CFnb + CPb + (CPf+CFf) * c*Rocket.fin_s / Sm + CB * AB / Sm;

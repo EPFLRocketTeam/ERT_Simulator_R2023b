@@ -7,7 +7,7 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_N1332.txt');
+Rocket = rocketReader('Nordend_CS_M795.txt');
 
 
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
@@ -19,6 +19,9 @@ SimObj = Simulator3D(Rocket, Environment, SimOutputs);
 %% ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
+
+% Motor ignition
+SimObj.Rocket.motor_state = 'on';
 
 [T1, S1] = SimObj.RailSim();
 
@@ -68,6 +71,9 @@ display(['Max g @t = ' num2str(T_1_2(index))]);
 
 
 
+
+% Motor shutdown
+SimObj.Rocket.motor_state = 'off';
 
 %% ------------------------------------------------------------------------
 % 3DOF Recovery Drogue

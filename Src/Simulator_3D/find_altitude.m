@@ -1,7 +1,9 @@
 function value=find_altitude(X,Y,Environnement)
 % Arguments:
-% - X: an array of x coordinates
+% - X: an array of x coordinates;
+% typically, will just be a 1x1
 % - Y: an array of y coordinates
+% typically will just be a 1x1
 % - Environnement: output of environnementReader.m
 
 % Output:

@@ -12,10 +12,10 @@ function value=find_altitude(X,Y,Environnement)
 % X and Y should be of the same dimensions; if not, issue a warning
 % our code will still work if Y has more elements than X,
 % but if the opposite is true, we truncate X
-if numel(X) ~= numel(Y):
+if numel(X) ~= numel(Y)
     warning('X and Y do not have the same number of elements');
 end
-if numel(X) > numel(Y):
+if numel(X) > numel(Y)
     X = X(1:numel(Y))
 end
 

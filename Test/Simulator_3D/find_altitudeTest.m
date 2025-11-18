@@ -3,7 +3,6 @@ classdef find_altitudeTest < matlab.unittest.TestCase
     % Private property to hold the paths that are added temporarily
     properties (Access = private)
         AddedPath;
-        AddedPath2;
     end
     
     methods (TestClassSetup) %
@@ -17,22 +16,17 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             
             % 2. Move up two directories to reach the root folder 
             % (e.g., ...\ERT_Simulator_R2023b)
-            rootPath = fileparts(fileparts(fileparts(testDir))); 
+            rootPath = fileparts(fileparts(testDir));
             
             % 3. Construct the path to the function file's directory 
             % (e.g., ...\ERT_Simulator_R2023b\Src\Simulator_3D)
             functionPath = fullfile(rootPath, 'Src', 'Simulator_3D');
-            % 3.1 Also add the path of useful utility functions
-            % (e.g., the environnementReader function);
-            functionPath2 = fullfile(rootPath, 'Src', 'Functions', 'Utilities');
             
             % 4. Add the paths to MATLAB's search path
             addpath(functionPath);
-            addpath(functionPath2);
             
             % 5. Store the paths so we can remove it later in TestClassTeardown
             testCase.AddedPath = functionPath;
-            testCase.AddedPath2 = functionPath2;
         end
     end
     
@@ -40,7 +34,6 @@ classdef find_altitudeTest < matlab.unittest.TestCase
         function removeFunctionPath(testCase)
             % This removes the paths added in TestClassSetup, keeping the MATLAB environment clean.
             rmpath(testCase.AddedPath);
-            rmpath(testCase.AddedPath2);
         end
     end
 
@@ -212,7 +205,7 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Y is treated as [6,12,13,9]
             % Redefine expected Z; this time, X is not truncated,
             % so Z will have the same shape as X (i.e. 2x2)
-            expected_Z = [10,3;3,5]
+            expected_Z = [10,3;3,5];
 
             % Verify
             Z = find_altitude(X,Y,Environment);

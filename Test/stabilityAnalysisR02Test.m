@@ -1,21 +1,19 @@
-classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
+classdef stabilityAnalysisR02Test < matlab.unittest.TestCase
     % Test class for the stability analysis calculation.
-    % To run, type 'runtests('stabilityAnalysisTest')' in the Command Window.
-    
-    % properties (TestParameter)
-    %     % Define tolerance for floating point comparisons
-    %     Tolerance = {1e-3}; 
-    % end
+    % To run, type 'runtests('stabilityAnalysisR02Test')' in the Command Window.
     
     properties (Access = private)
-        AnalysisResults;
+        analysisResults;
     end
     
     methods (TestClassSetup)
         function runAnalysis(testCase)
             % Execute the main analysis script and store results
-            % Note: stabilityAnalysis must be in the MATLAB path or current folder
-            testCase.AnalysisResults = StabilityAnalysis();
+            % Note: stabilityAnalysisR02 must be in the MATLAB path or current folder
+            addpath('../Src');
+            % The stabilityAnalysisR02 function returns a struct with field names
+            % like vNom, stabilityNom, epsilonNom, etc.
+            testCase.analysisResults = stabilityAnalysisR02(); 
         end
     end
     
@@ -27,33 +25,33 @@ classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
         
         function testNominalSpeed(testCase)
             % Check V_nom >= 20
-            V_nom_actual = testCase.AnalysisResults.V_nom;
+            vNomActual = testCase.analysisResults.vNom;
             diagnostic = sprintf(...
                 'Nominal Speed Error: Speed off rail must be >= 20 m/s. Actual: %f', ...
-                V_nom_actual);
-            testCase.verifyGreaterThanOrEqual(V_nom_actual, 20, diagnostic);
+                vNomActual);
+            testCase.verifyGreaterThanOrEqual(vNomActual, 20, diagnostic);
         end
         
         function testNominalStabilityMargin(testCase)
             % Check (P-W)/d >= 1.5
-            Stability_nom_actual = testCase.AnalysisResults.Stability_nom;
+            stabilityNomActual = testCase.analysisResults.stabilityNom;
             diagnostic = sprintf(...
                 'Nominal Stability Error: Static Margin (P-W)/d must be >= 1.5. Actual: %f', ...
-                Stability_nom_actual);
-            testCase.verifyGreaterThanOrEqual(Stability_nom_actual, 1.5, diagnostic);
+                stabilityNomActual);
+            testCase.verifyGreaterThanOrEqual(stabilityNomActual, 1.5, diagnostic);
         end
         
         function testNominalDampingRatio(testCase)
             % Check epsilon >= 0.05 and epsilon < 0.3
-            epsilon_nom_actual = testCase.AnalysisResults.epsilon_nom;
+            epsilonNomActual = testCase.analysisResults.epsilonNom;
             diagnostic = sprintf(...
                 'Nominal Damping Ratio Error: Epsilon must be >= 0.05. Actual: %f', ...
-                epsilon_nom_actual);
-            testCase.verifyGreaterThanOrEqual(epsilon_nom_actual, 0.05, diagnostic);
+                epsilonNomActual);
+            testCase.verifyGreaterThanOrEqual(epsilonNomActual, 0.05, diagnostic);
             diagnostic = sprintf(...
                 'Nominal Damping Ratio Error: Epsilon must be < 0.3. Actual: %f', ...
-                epsilon_nom_actual);
-            testCase.verifyLessThan(epsilon_nom_actual, 0.3, diagnostic);
+                epsilonNomActual);
+            testCase.verifyLessThan(epsilonNomActual, 0.3, diagnostic);
         end
         
         % =================================================================
@@ -62,33 +60,33 @@ classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
         
         function testMaxSpeedSpeed(testCase)
             % Check V_max >= 20
-            V_max_actual = testCase.AnalysisResults.V_max;
+            vMaxActual = testCase.analysisResults.vMax;
             diagnostic = sprintf(...
                 'Max Speed Error: Max speed must be >= 20 m/s. Actual: %f', ...
-                V_max_actual);
-            testCase.verifyGreaterThanOrEqual(V_max_actual, 20, diagnostic);
+                vMaxActual);
+            testCase.verifyGreaterThanOrEqual(vMaxActual, 20, diagnostic);
         end
         
         function testMaxSpeedStabilityMargin(testCase)
             % Check (P-W)/d >= 1.5
-            Stability_max_actual = testCase.AnalysisResults.Stability_max;
+            stabilityMaxActual = testCase.analysisResults.stabilityMax;
             diagnostic = sprintf(...
                 'Max Speed Stability Error: Static Margin (P-W)/d must be >= 1.5. Actual: %f', ...
-                Stability_max_actual);
-            testCase.verifyGreaterThanOrEqual(Stability_max_actual, 1.5, diagnostic);
+                stabilityMaxActual);
+            testCase.verifyGreaterThanOrEqual(stabilityMaxActual, 1.5, diagnostic);
         end
         
         function testMaxSpeedDampingRatio(testCase)
             % Check epsilon >= 0.05 and epsilon < 0.3
-            epsilon_max_actual = testCase.AnalysisResults.epsilon_max;
+            epsilonMaxActual = testCase.analysisResults.epsilonMax;
             diagnostic = sprintf(...
                 'Max Speed Damping Ratio Error: Epsilon must be >= 0.05. Actual: %f', ...
-                epsilon_max_actual);
-            testCase.verifyGreaterThanOrEqual(epsilon_max_actual, 0.05, diagnostic);
+                epsilonMaxActual);
+            testCase.verifyGreaterThanOrEqual(epsilonMaxActual, 0.05, diagnostic);
             diagnostic = sprintf(...
                 'Max Speed Damping Ratio Error: Epsilon must be < 0.3. Actual: %f', ...
-                epsilon_max_actual);
-            testCase.verifyLessThan(epsilon_max_actual, 0.3, diagnostic);
+                epsilonMaxActual);
+            testCase.verifyLessThan(epsilonMaxActual, 0.3, diagnostic);
         end
         
         % =================================================================
@@ -97,33 +95,33 @@ classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
         
         function testWorstCaseRailSpeed(testCase)
             % Check V_wc_rail >= 20
-            V_wc_rail_actual = testCase.AnalysisResults.V_wc_rail;
+            vWcRailActual = testCase.analysisResults.vWcRail;
             diagnostic = sprintf(...
                 'Worst Case Rail Speed Error: Speed off rail must be >= 20 m/s. Actual: %f', ...
-                V_wc_rail_actual);
-            testCase.verifyGreaterThanOrEqual(V_wc_rail_actual, 20, diagnostic);
+                vWcRailActual);
+            testCase.verifyGreaterThanOrEqual(vWcRailActual, 20, diagnostic);
         end
         
         function testWorstCaseRailStabilityMargin(testCase)
             % Check (P-W)/d >= 1.5
-            Stability_wc_rail_actual = testCase.AnalysisResults.Stability_wc_rail;
+            stabilityWcRailActual = testCase.analysisResults.stabilityWcRail;
             diagnostic = sprintf(...
                 'Worst Case Rail Stability Error: Static Margin (P-W)/d must be >= 1.5. Actual: %f', ...
-                Stability_wc_rail_actual);
-            testCase.verifyGreaterThanOrEqual(Stability_wc_rail_actual, 1.5, diagnostic);
+                stabilityWcRailActual);
+            testCase.verifyGreaterThanOrEqual(stabilityWcRailActual, 1.5, diagnostic);
         end
         
         function testWorstCaseRailDampingRatio(testCase)
             % Check epsilon >= 0.05 and epsilon < 0.3
-            epsilon_wc_rail_actual = testCase.AnalysisResults.epsilon_wc_rail;
+            epsilonWcRailActual = testCase.analysisResults.epsilonWcRail;
             diagnostic = sprintf(...
                 'Worst Case Rail Damping Ratio Error: Epsilon must be >= 0.05. Actual: %f', ...
-                epsilon_wc_rail_actual);
-            testCase.verifyGreaterThanOrEqual(epsilon_wc_rail_actual, 0.05, diagnostic);
+                epsilonWcRailActual);
+            testCase.verifyGreaterThanOrEqual(epsilonWcRailActual, 0.05, diagnostic);
             diagnostic = sprintf(...
                 'Worst Case Rail Damping Ratio Error: Epsilon must be < 0.3. Actual: %f', ...
-                epsilon_wc_rail_actual);
-            testCase.verifyLessThan(epsilon_wc_rail_actual, 0.3, diagnostic);
+                epsilonWcRailActual);
+            testCase.verifyLessThan(epsilonWcRailActual, 0.3, diagnostic);
         end
         
         % =================================================================
@@ -132,33 +130,33 @@ classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
         
         function testWorstCaseMaxSpeedSpeed(testCase)
             % Check V_wc_max >= 20
-            V_wc_max_actual = testCase.AnalysisResults.V_wc_max;
+            vWcMaxActual = testCase.analysisResults.vWcMax;
             diagnostic = sprintf(...
                 'Worst Case Max Speed Error: Max speed must be >= 20 m/s. Actual: %f', ...
-                V_wc_max_actual);
-            testCase.verifyGreaterThanOrEqual(V_wc_max_actual, 20, diagnostic);
+                vWcMaxActual);
+            testCase.verifyGreaterThanOrEqual(vWcMaxActual, 20, diagnostic);
         end
         
         function testWorstCaseMaxSpeedStabilityMargin(testCase)
             % Check (P-W)/d >= 1.5
-            Stability_wc_max_actual = testCase.AnalysisResults.Stability_wc_max;
+            stabilityWcMaxActual = testCase.analysisResults.stabilityWcMax;
             diagnostic = sprintf(...
                 'Worst Case Max Speed Stability Error: Static Margin (P-W)/d must be >= 1.5. Actual: %f',...
-                Stability_wc_max_actual);
-            testCase.verifyGreaterThanOrEqual(Stability_wc_max_actual, 1.5, diagnostic);
+                stabilityWcMaxActual);
+            testCase.verifyGreaterThanOrEqual(stabilityWcMaxActual, 1.5, diagnostic);
         end
         
         function testWorstCaseMaxSpeedDampingRatio(testCase)
             % Check epsilon >= 0.05 and epsilon < 0.3
-            epsilon_wc_max_actual = testCase.AnalysisResults.epsilon_wc_max;
+            epsilonWcMaxActual = testCase.analysisResults.epsilonWcMax;
             diagnostic = sprintf(...
                 'Worst Case Max Speed Damping Ratio Error: Epsilon must be >= 0.05. Actual: %f',...
-                epsilon_wc_max_actual);
-            testCase.verifyGreaterThanOrEqual(epsilon_wc_max_actual, 0.05, diagnostic);
+                epsilonWcMaxActual);
+            testCase.verifyGreaterThanOrEqual(epsilonWcMaxActual, 0.05, diagnostic);
             diagnostic = sprintf(...
                 'Worst Case Max Speed Damping Ratio Error: Epsilon must be < 0.3. Actual: %f', ...
-                epsilon_wc_max_actual);
-            testCase.verifyLessThan(epsilon_wc_max_actual, 0.3, diagnostic);
+                epsilonWcMaxActual);
+            testCase.verifyLessThan(epsilonWcMaxActual, 0.3, diagnostic);
         end
         
         % =================================================================
@@ -167,11 +165,11 @@ classdef StabilityAnalysisR02Test < matlab.unittest.TestCase
         
         function testMinStaticMarginNominal(testCase)
             % Check Min Static Margin (cut) is positive and reasonable
-            Min_Stability_nom_actual = testCase.AnalysisResults.Min_Stability_nom;
+            minStabilityNomActual = testCase.analysisResults.minStabilityNom;
             diagnostic = sprintf(...
                 'Nominal Min Static Margin Error: Should not be negative. Actual: %f', ...
-                Min_Stability_nom_actual);
-            testCase.verifyGreaterThanOrEqual(Min_Stability_nom_actual, 0, diagnostic);
+                minStabilityNomActual);
+            testCase.verifyGreaterThanOrEqual(minStabilityNomActual, 0, diagnostic);
         end
         
     end

@@ -78,30 +78,33 @@ while ~feof(rfid)
             line_data_string = textscan(line_data,'%s');
             Environnement.numberLayer = str2double(line_data_string{1}{1});
             i = 1: Environnement.numberLayer;
-            layerheight = i;
-            layerspeed = i;
+            layerHeight = i;
+            layerSpeed = i;
             layerAzi = i;
             layerTurb = i;
             for i = 1: Environnement.numberLayer
-                layerheight(i)= str2double(line_data_string{1}{2+4*(i-1)});
-                layerspeed(i)= str2double(line_data_string{1}{3+4*(i-1)});
+                layerHeight(i)= str2double(line_data_string{1}{2+4*(i-1)});
+                layerSpeed(i)= str2double(line_data_string{1}{3+4*(i-1)});
                 layerAzi(i)= str2double(line_data_string{1}{4*i});
                 layerTurb(i)= str2double(line_data_string{1}{1+4*i});
             end
             if nargin < 2
+                % standard deviation for azimuth of wind speed
+                % chosen to be 2 degrees for some reason
+                azi_std = 2;
                 for i = 1: Environnement.numberLayer
-                    turb_std = layerspeed(i) * layerTurb(i);
-                    layerAzi(i) = normrnd(layerAzi(i),2);
-                    layerspeed(i) = normrnd(layerspeed(i), turb_std);
+                    turb_std = layerSpeed(i) * layerTurb(i);
+                    layerAzi(i) = normrnd(layerAzi(i), azi_std);
+                    layerSpeed(i) = normrnd(layerSpeed(i), turb_std);
                 end
             end
             axis = 0:10: 4000;
-            Environnement.Vspeed = interp1(layerheight,layerspeed,axis, 'pchip', 'extrap');
-            Environnement.Vazy = interp1(layerheight,layerAzi,axis, 'pchip', 'extrap');
-            Environnement.Vturb= interp1(layerheight,layerTurb,axis, 'pchip', 'extrap');
-            Environnement.Vdirx= cosd(Environnement.Vazy);
-            Environnement.Vdiry= sind(Environnement.Vazy);
-            Environnement.Vdirz= 0*cosd(Environnement.Vazy);
+            Environnement.Vspeed = interp1(layerHeight,layerSpeed,axis, 'pchip', 'extrap');
+            Environnement.Vazy = interp1(layerHeight,layerAzi,axis, 'pchip', 'extrap');
+            Environnement.Vturb = interp1(layerHeight,layerTurb,axis, 'pchip', 'extrap');
+            Environnement.Vdirx = cosd(Environnement.Vazy);
+            Environnement.Vdiry = sind(Environnement.Vazy);
+            Environnement.Vdirz = 0*cosd(Environnement.Vazy);
             
             
             
@@ -118,9 +121,9 @@ while ~feof(rfid)
             line_data_string = textscan(line_data,'%s');
             map_name = line_data_string{1}{1};
             [Environnement.map_x, Environnement.map_y, Environnement.map_z]=xyz2grid(map_name);
-            Environnement.map_x=Environnement.map_x-2648540;
-            Environnement.map_y= Environnement.map_y-1195050;
-            Environnement.map_z= Environnement.map_z-Environnement.Start_Altitude;
+            Environnement.map_x = Environnement.map_x-2648540;  % what are
+            Environnement.map_y = Environnement.map_y-1195050;  % these constants
+            Environnement.map_z = Environnement.map_z-Environnement.Start_Altitude;
             
         otherwise
             display(['ERROR: In environnement definition, unknown line identifier: ' line_id]);

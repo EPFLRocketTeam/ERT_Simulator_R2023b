@@ -1,4 +1,4 @@
-classdef find_altitudeTest < matlab.unittest.TestCase
+classdef findAltitudeTest < matlab.unittest.TestCase
 
     % Private property to hold the paths that are added temporarily
     properties (Access = private)
@@ -7,7 +7,7 @@ classdef find_altitudeTest < matlab.unittest.TestCase
     
     methods (TestClassSetup) %
         function addFunctionPath(testCase)
-            % This function temporarily adds the directory of the find_altitude 
+            % This function temporarily adds the directory of the findAltitude 
             % function to the MATLAB path so the tests can find it
             
             % 1. Get the path of the current test file directory 
@@ -64,12 +64,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expected_Z = [10,3]-Environment.Start_Altitude;
+            expectedZ = [10,3]-Environment.Start_Altitude;
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
 
@@ -88,12 +88,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expected_Z = [0,0]-Environment.Start_Altitude;
+            expectedZ = [0,0]-Environment.Start_Altitude;
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
         
@@ -121,12 +121,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define X,Y and expected Z
             X = [];
             Y = [];
-            expected_Z = [];
+            expectedZ = [];
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
         
@@ -154,12 +154,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expected_Z = [10,3]-Environment.Start_Altitude;
+            expectedZ = [10,3]-Environment.Start_Altitude;
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
         
@@ -190,12 +190,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             Y = [6,12,13];
             % X should be truncated to [4,10,8]
             % Define expected Z
-            expected_Z = [10,3,3]-Environment.Start_Altitude;
+            expectedZ = [10,3,3]-Environment.Start_Altitude;
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
 
             % Redefine Y, so that numel(X) < numel(Y)
@@ -205,12 +205,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Y is treated as [6,12,13,9]
             % Redefine expected Z; this time, X is not truncated,
             % so Z will have the same shape as X (i.e. 2x2)
-            expected_Z = [10,3;3,5];
+            expectedZ = [10,3;3,5];
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
         
@@ -243,20 +243,20 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define expected Z; since there are no matches for (X,Y)
             % within the map, the altitude is assume to be the same as
             % the start altitude; hence, the relative altitude will be 0
-            expected_Z = [0,0];
+            expectedZ = [0,0];
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
 
             % Verify with a different start altitude to make sure
             % we did not get lucky
             Environment.Start_Altitude = 53;
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(0)));
         end
 
@@ -286,12 +286,12 @@ classdef find_altitudeTest < matlab.unittest.TestCase
             % Define X,Y and expected Z
             X = [2,3];
             Y = [1,4];
-            expected_Z = [9,2];
+            expectedZ = [9,2];
 
             % Verify
-            Z = find_altitude(X,Y,Environment);
+            Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
-                matlab.unittest.constraints.IsEqualTo(expected_Z, ...
+                matlab.unittest.constraints.IsEqualTo(expectedZ, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(1e-10)));
         end
         

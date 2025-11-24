@@ -52,53 +52,53 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             Environment = environnementReader(file);
             
             % Expected output of environnementReader
-            Environment_expected.Temperature_Ground = 3;
-            Environment_expected.Pressure_Ground = 1;
-            Environment_expected.Humidity_Ground = 4;
-            Environment_expected.Start_Altitude = 1;
-            Environment_expected.Start_Latitude = 5;
-            Environment_expected.Start_Longitude = 9;
-            Environment_expected.dTdh = 2;
-            Environment_expected.V_inf = 6;
-            Environment_expected.V_Azimuth = 5;
-            Environment_expected.Turb_I = 3;
-            Environment_expected.Turb_model = 'Vroom';
-            Environment_expected.Rail_Length = 5;
-            Environment_expected.Rail_Angle = 8/180*pi;
-            Environment_expected.Rail_Azimuth = 9/180*pi;
-            p_ws = exp(77.345+0.0057*Environment_expected.Temperature_Ground-7235/Environment_expected.Temperature_Ground)/Environment_expected.Temperature_Ground^8.2;
-            p_a = Environment_expected.Pressure_Ground;
-            Environment_expected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
-            Environment_expected.V_dir = [cosd(Environment_expected.V_Azimuth);sind(Environment_expected.V_Azimuth); 0];
+            EnvironmentExpected.Temperature_Ground = 3;
+            EnvironmentExpected.Pressure_Ground = 1;
+            EnvironmentExpected.Humidity_Ground = 4;
+            EnvironmentExpected.Start_Altitude = 1;
+            EnvironmentExpected.Start_Latitude = 5;
+            EnvironmentExpected.Start_Longitude = 9;
+            EnvironmentExpected.dTdh = 2;
+            EnvironmentExpected.V_inf = 6;
+            EnvironmentExpected.V_Azimuth = 5;
+            EnvironmentExpected.Turb_I = 3;
+            EnvironmentExpected.Turb_model = 'Vroom';
+            EnvironmentExpected.Rail_Length = 5;
+            EnvironmentExpected.Rail_Angle = 8/180*pi;
+            EnvironmentExpected.Rail_Azimuth = 9/180*pi;
+            p_ws = exp(77.345+0.0057*EnvironmentExpected.Temperature_Ground-7235/EnvironmentExpected.Temperature_Ground)/EnvironmentExpected.Temperature_Ground^8.2;
+            p_a = EnvironmentExpected.Pressure_Ground;
+            EnvironmentExpected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
+            EnvironmentExpected.V_dir = [cosd(EnvironmentExpected.V_Azimuth);sind(EnvironmentExpected.V_Azimuth); 0];
 
             % multilayerwind
-            Environment_expected.numberLayer = 3;
+            EnvironmentExpected.numberLayer = 3;
             layerHeight = [10,100,250];
             layerSpeed = [0.5,2,4];
             layerTurb = [0,0,0];
             axis = 0:10: 4000;
-            Environment_expected.Vspeed = interp1(layerHeight,layerSpeed,axis,'pchip','extrap');
+            EnvironmentExpected.Vspeed = interp1(layerHeight,layerSpeed,axis,'pchip','extrap');
             % I don't know how to test for random values, so I leave this untested for now
-            Environment_expected.Vazy = Environment.Vazy;
-            Environment_expected.Vturb = interp1(layerHeight,layerTurb,axis,'pchip','extrap');
-            Environment_expected.Vdirx = cosd(Environment_expected.Vazy);
-            Environment_expected.Vdiry = sind(Environment_expected.Vazy);
-            Environment_expected.Vdirz = 0*cosd(Environment_expected.Vazy);
-            Environment_expected.isWindLayered = 1;
+            EnvironmentExpected.Vazy = Environment.Vazy;
+            EnvironmentExpected.Vturb = interp1(layerHeight,layerTurb,axis,'pchip','extrap');
+            EnvironmentExpected.Vdirx = cosd(EnvironmentExpected.Vazy);
+            EnvironmentExpected.Vdiry = sind(EnvironmentExpected.Vazy);
+            EnvironmentExpected.Vdirz = 0*cosd(EnvironmentExpected.Vazy);
+            EnvironmentExpected.isWindLayered = 1;
 
             % map
-            [Environment_expected.map_x,Environment_expected.map_y,Environment_expected.map_z] =...
+            [EnvironmentExpected.map_x,EnvironmentExpected.map_y,EnvironmentExpected.map_z] =...
                 xyz2grid('maptest.xyz');
-            Environment_expected.map_x = Environment_expected.map_x-2648540;
-            Environment_expected.map_y = Environment_expected.map_y-1195050;
-            Environment_expected.map_z = Environment_expected.map_z-Environment_expected.Start_Altitude;
+            EnvironmentExpected.map_x = EnvironmentExpected.map_x-2648540;
+            EnvironmentExpected.map_y = EnvironmentExpected.map_y-1195050;
+            EnvironmentExpected.map_z = EnvironmentExpected.map_z-EnvironmentExpected.Start_Altitude;
 
             % constants; no need to test
-            Environment_expected.T_Nu = Environment.T_Nu;
-            Environment_expected.Viscosity = Environment.Viscosity;
+            EnvironmentExpected.T_Nu = Environment.T_Nu;
+            EnvironmentExpected.Viscosity = Environment.Viscosity;
             
             testCase.verifyThat(Environment, ...
-                matlab.unittest.constraints.IsEqualTo(Environment_expected, ...
+                matlab.unittest.constraints.IsEqualTo(EnvironmentExpected, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(1e-10)));
         end
 
@@ -120,32 +120,32 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             Environment = environnementReader(tempFile);
 
             % Declare expected Environment struct, with default values
-            Environment_expected.Temperature_Ground = 289.15;
-            Environment_expected.Pressure_Ground = 102400;
-            Environment_expected.Humidity_Ground = 0.7;
-            Environment_expected.Start_Altitude = 154;
-            Environment_expected.Start_Latitude = 39.393564;
-            Environment_expected.Start_Longitude = -8.287676;
-            Environment_expected.dTdh = -9.5;
-            Environment_expected.V_inf = 2;
-            Environment_expected.V_Azimuth = 250;
-            Environment_expected.Turb_I = 0;
-            Environment_expected.Turb_model = 'None';
-            Environment_expected.Rail_Length = 12;
-            Environment_expected.Rail_Angle = 5/180*pi;
-            Environment_expected.Rail_Azimuth = 156/180*pi;
-            p_ws = exp(77.345+0.0057*Environment_expected.Temperature_Ground-7235/Environment_expected.Temperature_Ground)/Environment_expected.Temperature_Ground^8.2;
-            p_a = Environment_expected.Pressure_Ground;
-            Environment_expected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
-            Environment_expected.V_dir = [cosd(Environment_expected.V_Azimuth);sind(Environment_expected.V_Azimuth); 0];
+            EnvironmentExpected.Temperature_Ground = 289.15;
+            EnvironmentExpected.Pressure_Ground = 102400;
+            EnvironmentExpected.Humidity_Ground = 0.7;
+            EnvironmentExpected.Start_Altitude = 154;
+            EnvironmentExpected.Start_Latitude = 39.393564;
+            EnvironmentExpected.Start_Longitude = -8.287676;
+            EnvironmentExpected.dTdh = -9.5;
+            EnvironmentExpected.V_inf = 2;
+            EnvironmentExpected.V_Azimuth = 250;
+            EnvironmentExpected.Turb_I = 0;
+            EnvironmentExpected.Turb_model = 'None';
+            EnvironmentExpected.Rail_Length = 12;
+            EnvironmentExpected.Rail_Angle = 5/180*pi;
+            EnvironmentExpected.Rail_Azimuth = 156/180*pi;
+            p_ws = exp(77.345+0.0057*EnvironmentExpected.Temperature_Ground-7235/EnvironmentExpected.Temperature_Ground)/EnvironmentExpected.Temperature_Ground^8.2;
+            p_a = EnvironmentExpected.Pressure_Ground;
+            EnvironmentExpected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
+            EnvironmentExpected.V_dir = [cosd(EnvironmentExpected.V_Azimuth);sind(EnvironmentExpected.V_Azimuth); 0];
 
             % Constant fields;
-            Environment_expected.T_Nu = Environment.T_Nu;
-            Environment_expected.Viscosity = Environment.Viscosity;
+            EnvironmentExpected.T_Nu = Environment.T_Nu;
+            EnvironmentExpected.Viscosity = Environment.Viscosity;
 
             % Verify
             testCase.verifyThat(Environment, ...
-                matlab.unittest.constraints.IsEqualTo(Environment_expected, ...
+                matlab.unittest.constraints.IsEqualTo(EnvironmentExpected, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(1e-10)));
 
             % Delete temporary file

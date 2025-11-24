@@ -1,4 +1,4 @@
-function value=find_altitude(X,Y,Environnement)
+function value=findAltitude(X,Y,Environnement)
 % Arguments:
 % - X: an array of x coordinates;
 % typically, will just be a 1x1
@@ -28,16 +28,16 @@ Z=0*X;
 % iterate over X; we can now assume X and Y have the same number of elements
 for i=1:numel(X)
     % find the [row,col] indices of the positions on the map close to [X(i),Y(i)]
-    [map_pos_row, map_pos_col]=find(abs(Environnement.map_x-X(i))< 2 & abs(Environnement.map_y-Y(i))< 2);
+    [mapPosRow, mapPosCol]=find(abs(Environnement.map_x-X(i))< 2 & abs(Environnement.map_y-Y(i))< 2);
 
-    if(isempty(map_pos_row))
+    if(isempty(mapPosRow))
         % if no indices were found, assume the altitude is
         % the same as Environnement.Start_Altitude
         map_z=Environnement.Start_Altitude;
     else 
         % if indices were found, set the altitude to the
         % altitude specified in the map by the first [row,col] index pair
-        map_z=Environnement.map_z(map_pos_row(1),map_pos_col(1));
+        map_z=Environnement.map_z(mapPosRow(1),mapPosCol(1));
     end
 
     % subtract Environnement.Start_Altitude to get the relative altitude

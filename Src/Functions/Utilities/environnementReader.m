@@ -7,7 +7,7 @@ function Environnement = environnementReader(environnementFilePath,varargin)
 rfid = fopen(environnementFilePath);
 
 if rfid < 0
-   error('ERROR: Environnement file name unfound.') 
+   error('environnementReader:FileNotFound','ERROR: Environnement file name unfound.') 
 end
 
 while ~feof(rfid)
@@ -129,22 +129,99 @@ while ~feof(rfid)
             display(['ERROR: In environnement definition, unknown line identifier: ' line_id]);
          
     end
-end  
+end
+
+% -------------------------------------------------------------------------
+% 2. Check undefined fields
+% -------------------------------------------------------------------------
+
+% The default values are taken from Environnement_Definition_EuRoC.txt
+
+if ~isfield(Environnement,'Temperature_Ground')
+    default_Temperature_Ground = 289.15;
+    Environnement.Temperature_Ground = default_Temperature_Ground;
+    warning('Missing field "Temperature_Ground"; defaulted to 289.15');
+end
+if ~isfield(Environnement,'Pressure_Ground')
+    default_Pressure_Ground = 102400;
+    Environnement.Pressure_Ground = default_Pressure_Ground;
+    warning('Missing field "Pressure_Ground"; defaulted to 102400');
+end
+if ~isfield(Environnement,'Humidity_Ground')
+    default_Humidity_Ground = 0.7;
+    Environnement.Humidity_Ground = default_Humidity_Ground;
+    warning('Missing field "Humidity_Ground"; defaulted to 0.7');
+end
+if ~isfield(Environnement,'Start_Altitude')
+    default_Start_Altitude = 154;
+    Environnement.Start_Altitude = default_Start_Altitude;
+    warning('Missing field "Start_Altitude"; defaulted to 154');
+end
+if ~isfield(Environnement,'Start_Latitude')
+    default_Start_Latitude = 39.393564;
+    Environnement.Start_Latitude = default_Start_Latitude;
+    warning('Missing field "Start_Latitude"; defaulted to 39.393564');
+end
+if ~isfield(Environnement,'Start_Longitude')
+    default_Start_Longitude = -8.287676;
+    Environnement.Start_Longitude = default_Start_Longitude;
+    warning('Missing field "Start_Longitude"; defaulted to -8.287676');
+end
+if ~isfield(Environnement,'dTdh')
+    default_dTdh = -9.5;
+    Environnement.dTdh = default_dTdh;
+    warning('Missing field "dTdh"; defaulted to -9.5');
+end
+if ~isfield(Environnement,'V_inf')
+    default_V_inf = 2;
+    Environnement.V_inf = default_V_inf;
+    warning('Missing field "V_inf"; defaulted to 2');
+end
+if ~isfield(Environnement,'V_Azimuth')
+    default_V_Azimuth = 250;
+    Environnement.V_Azimuth = default_V_Azimuth;
+    warning('Missing field "V_Azimuth"; defaulted to 250');
+end
+if ~isfield(Environnement,'Turb_I')
+    default_Turb_I = 0;
+    Environnement.Turb_I = default_Turb_I;
+    warning('Missing field "Turb_I"; defaulted to 0');
+end
+if ~isfield(Environnement,'Turb_model')
+    default_Turb_model = 'None';
+    Environnement.Turb_model = default_Turb_model;
+    warning('Missing field "Turb_model"; defaulted to "None"');
+end
+if ~isfield(Environnement,'Rail_Length')
+    default_Rail_Length = 12;
+    Environnement.Rail_Length = default_Rail_Length;
+    warning('Missing field "Rail_Length"; defaulted to 12');
+end
+if ~isfield(Environnement,'Rail_Angle')
+    default_Rail_Angle = 5;
+    Environnement.Rail_Angle = default_Rail_Angle;
+    warning('Missing field "Rail_Angle"; defaulted to 5');
+end
+if ~isfield(Environnement,'Rail_Azimuth')
+    default_Rail_Azimuth = 156;
+    Environnement.Rail_Azimuth = default_Rail_Azimuth;
+    warning('Missing field "Rail_Azimuth"; defaulted to 156');
+end
     
 % -------------------------------------------------------------------------
-% 2. Intrinsic parameters
+% 3. Intrinsic parameters
 % -------------------------------------------------------------------------
-% 2.1 Environnement Viscosity
+% 3.1 Environnement Viscosity
 Tmp = xlsread('Snippets/Viscosity.xlsx');
 Environnement.T_Nu = Tmp(:,1);
 Environnement.Viscosity = Tmp(:,2);
 
-% 2.2 Humidity Changes
+% 3.2 Humidity Changes
 p_ws = exp(77.345+0.0057*Environnement.Temperature_Ground-7235/Environnement.Temperature_Ground)/Environnement.Temperature_Ground^8.2;
 p_a = Environnement.Pressure_Ground;
 Environnement.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
 
-% 2.3 Wind direction
+% 3.3 Wind direction
 Environnement.V_dir = [cosd(Environnement.V_Azimuth);sind(Environnement.V_Azimuth); 0];
 end
 

@@ -66,6 +66,10 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             Environment_expected.Rail_Length = 5;
             Environment_expected.Rail_Angle = 8/180*pi;
             Environment_expected.Rail_Azimuth = 9/180*pi;
+            p_ws = exp(77.345+0.0057*Environment_expected.Temperature_Ground-7235/Environment_expected.Temperature_Ground)/Environment_expected.Temperature_Ground^8.2;
+            p_a = Environment_expected.Pressure_Ground;
+            Environment_expected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
+            Environment_expected.V_dir = [cosd(Environment_expected.V_Azimuth);sind(Environment_expected.V_Azimuth); 0];
 
             % multilayerwind
             Environment_expected.numberLayer = 3;
@@ -92,13 +96,74 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             % constants; no need to test
             Environment_expected.T_Nu = Environment.T_Nu;
             Environment_expected.Viscosity = Environment.Viscosity;
-            Environment_expected.Saturation_Vapor_Ratio = Environment.Saturation_Vapor_Ratio;
-            Environment_expected.V_dir = Environment.V_dir;
             
             testCase.verifyThat(Environment, ...
                 matlab.unittest.constraints.IsEqualTo(Environment_expected, ...
                 'Within', matlab.unittest.constraints.AbsoluteTolerance(1e-10)));
         end
+
+        function testNonexistentFile(testCase)
+            % Verify that attempting to read a nonexistent file produces an error
+            testCase.verifyError(@() environnementReader('nonexistent.txt'), ...
+                'environnementReader:FileNotFound');
+        end
+
+        function testEmptyFile(testCase)
+            % Test whether it can deal with empty files
+            % "Default" values should be assigned
+            % Create temporary empty file
+            tempFile = 'temp_empty.txt';
+            fid = fopen(tempFile, 'w');
+            fclose(fid);
+
+            % Read empty file
+            Environment = environnementReader(tempFile);
+
+            % Declare expected Environment struct, with default values
+            Environment_expected.Temperature_Ground = 289.15;
+            Environment_expected.Pressure_Ground = 102400;
+            Environment_expected.Humidity_Ground = 0.7;
+            Environment_expected.Start_Altitude = 154;
+            Environment_expected.Start_Latitude = 39.393564;
+            Environment_expected.Start_Longitude = -8.287676;
+            Environment_expected.dTdh = -9.5;
+            Environment_expected.V_inf = 2;
+            Environment_expected.V_Azimuth = 250;
+            Environment_expected.Turb_I = 0;
+            Environment_expected.Turb_model = 'None';
+            Environment_expected.Rail_Length = 12;
+            Environment_expected.Rail_Angle = 5/180*pi;
+            Environment_expected.Rail_Azimuth = 156/180*pi;
+            p_ws = exp(77.345+0.0057*Environment_expected.Temperature_Ground-7235/Environment_expected.Temperature_Ground)/Environment_expected.Temperature_Ground^8.2;
+            p_a = Environment_expected.Pressure_Ground;
+            Environment_expected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
+            Environment_expected.V_dir = [cosd(Environment_expected.V_Azimuth);sind(Environment_expected.V_Azimuth); 0];
+
+            % Constant fields;
+            Environment_expected.T_Nu = Environment.T_Nu;
+            Environment_expected.Viscosity = Environment.Viscosity;
+
+            % Verify
+            testCase.verifyThat(Environment, ...
+                matlab.unittest.constraints.IsEqualTo(Environment_expected, ...
+                'Within', matlab.unittest.constraints.AbsoluteTolerance(1e-10)));
+
+            % Delete temporary file
+            delete(tempFile);
+        end
         
+        function testMalformedData(testCase)
+            % Test with malformed data lines
+            tempFile = 'temp_malformed.txt';
+            fid = fopen(tempFile, 'w');
+            fprintf(fid, 'Temperature_Ground gibberish\n');
+            fclose(fid);
+            
+            % Should handle parsing errors
+            testCase.verifyError(@() environnementReader(tempFile), 'environnementReader:NaN');
+
+            % Delete temporary file
+            delete(tempFile);
+        end
     end
 end

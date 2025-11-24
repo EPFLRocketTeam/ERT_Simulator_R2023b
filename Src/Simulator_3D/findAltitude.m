@@ -18,7 +18,7 @@ if numel(X) ~= numel(Y)
     warning('X and Y do not have the same number of elements');
 end
 if numel(X) > numel(Y)
-    X = X(1:numel(Y))
+    X = X(1:numel(Y));
 end
 
 % initialize our to-be-returned value as a vector with the same

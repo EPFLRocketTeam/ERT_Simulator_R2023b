@@ -1,4 +1,4 @@
-function [mass,dmassdt] = Mass_Lin(t,Rocket)
+function [mass,dmassdt] = massLin(t,Rocket)
 %	Return the rocket mass during burn time
 %   INPUT:
 %   - t         Time

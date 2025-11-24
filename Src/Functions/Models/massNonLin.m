@@ -1,4 +1,4 @@
-function [mass,dmassdt] = Mass_Non_Lin(t,Rocket)
+function [mass,dmassdt] = massNonLin(t,Rocket)
 %	Return the tocket mass during burn time
 %   INPUT:
 %   - t         Time

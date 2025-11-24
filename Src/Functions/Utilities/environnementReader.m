@@ -7,95 +7,168 @@ function Environnement = environnementReader(environnementFilePath,varargin)
 rfid = fopen(environnementFilePath);
 
 if rfid < 0
-   error('environnementReader:FileNotFound','ERROR: Environnement file name unfound.') 
+   error('environnementReader:FileNotFound','ERROR: Environnement file name unfound.');
 end
+
+% Declare Environnement as an empty struct
+Environnement = struct();
 
 while ~feof(rfid)
 
-    line_content = fgetl(rfid);
-    [line_id, line_data] = strtok(line_content);
-    switch line_id
+    lineContent = fgetl(rfid);
+    [lineId, lineData] = strtok(lineContent);
+    switch lineId
         
         case 'Temperature_Ground'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Temperature_Ground = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Temperature_Ground is not a number.');
+            end
+            Environnement.Temperature_Ground = lineDataNum;
             
         case 'Pressure_Ground'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Pressure_Ground = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Pressure_Ground is not a number.');
+            end
+            Environnement.Pressure_Ground = lineDataNum;
             
         case 'Humidity_Ground'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Humidity_Ground = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Humidity_Ground is not a number.');
+            end
+            Environnement.Humidity_Ground = lineDataNum;
         
         case 'V_inf'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.V_inf = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : V_inf is not a number.');
+            end
+            Environnement.V_inf = lineDataNum;
            
         case 'V_Azimuth'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.V_Azimuth = line_data_num{1};  
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : V_Azimuth is not a number.');
+            end
+            Environnement.V_Azimuth = lineDataNum;  
             
         case 'Turb_I'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Turb_I = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Turb_I is not a number.');
+            end
+            Environnement.Turb_I = lineDataNum;
             
         case 'Turb_model'
-            line_data_string = textscan(line_data,'%s');
-            Environnement.Turb_model = line_data_string{1}{1};
+            lineDataCells = textscan(lineData,'%s');
+            Environnement.Turb_model = lineDataCells{1}{1};
             
         case 'Rail_Length'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Rail_Length = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Rail_Length is not a number.');
+            end
+            Environnement.Rail_Length = lineDataNum;
             
         case 'Rail_Angle'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Rail_Angle = line_data_num{1}(1)/180*pi;
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Rail_Angle is not a number.');
+            end
+            Environnement.Rail_Angle = lineDataNum/180*pi;
             
         case 'Rail_Azimuth'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Rail_Azimuth = line_data_num{1}(1)/180*pi;
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Rail_Azimuth is not a number.');
+            end
+            Environnement.Rail_Azimuth = lineDataNum/180*pi;
             
         case 'Start_Altitude'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Start_Altitude = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Start_Altitude is not a number.');
+            end
+            Environnement.Start_Altitude = lineDataNum;
         
         case 'Start_Latitude'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Start_Latitude = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Start_Latitude is not a number.');
+            end
+            Environnement.Start_Latitude = lineDataNum;
             
         case 'Start_Longitude'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.Start_Longitude = line_data_num{1}(1);
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : Start_Longitude is not a number.');
+            end
+            Environnement.Start_Longitude = lineDataNum;
             
         case 'dTdh'
-            line_data_num = textscan(line_data, '%f');
-            Environnement.dTdh = line_data_num{1}(1);  
+            lineDataCells = textscan(lineData, '%s');
+            lineDataNum = str2double(lineDataCells{1}(1));
+            if isnan(lineDataNum)
+                error('environnementReader:NaN', 'Environment definition : dTdh is not a number.');
+            end
+            Environnement.dTdh = lineDataNum;  
           
             %multilayerwind, number of layer , windlayer1, ..., windlayer n
             % windlayer: mesured_height, V_inf, V_Azimuth, Turb_I 
         case 'multilayerwind'
-            line_data_string = textscan(line_data,'%s');
-            Environnement.numberLayer = str2double(line_data_string{1}{1});
+            lineDataCells = textscan(lineData,'%s');
+            Environnement.numberLayer = str2double(lineDataCells{1}{1});
+            if isnan(Environnement.numberLayer)
+                error('environnementReader:NaN', 'Environment definition : multilayerwind number of layers is not a number.');
+            end
             i = 1: Environnement.numberLayer;
             layerHeight = i;
             layerSpeed = i;
             layerAzi = i;
             layerTurb = i;
             for i = 1: Environnement.numberLayer
-                layerHeight(i)= str2double(line_data_string{1}{2+4*(i-1)});
-                layerSpeed(i)= str2double(line_data_string{1}{3+4*(i-1)});
-                layerAzi(i)= str2double(line_data_string{1}{4*i});
-                layerTurb(i)= str2double(line_data_string{1}{1+4*i});
+                layerHeight(i)= str2double(lineDataCells{1}{2+4*(i-1)});
+                if isnan(layerHeight(i))
+                    error('environnementReader:NaN', 'Environment definition : multilayerwind layer height is not a number.');
+                end
+
+                layerSpeed(i)= str2double(lineDataCells{1}{3+4*(i-1)});
+                if isnan(layerSpeed(i))
+                    error('environnementReader:NaN', 'Environment definition : multilayerwind wind speed is not a number.');
+                end
+
+                layerAzi(i)= str2double(lineDataCells{1}{4*i});
+                if isnan(layerAzi(i))
+                    error('environnementReader:NaN', 'Environment definition : multilayerwind azimuth is not a number.');
+                end
+
+                layerTurb(i)= str2double(lineDataCells{1}{1+4*i});
+                if isnan(layerTurb(i))
+                    error('environnementReader:NaN', 'Environment definition : multilayerwind standard deviation is not a number.');
+                end
             end
             if nargin < 2
                 % standard deviation for azimuth of wind speed
                 % chosen to be 2 degrees for some reason
-                azi_std = 2;
+                aziStd = 2;
                 for i = 1: Environnement.numberLayer
-                    turb_std = layerSpeed(i) * layerTurb(i);
-                    layerAzi(i) = normrnd(layerAzi(i), azi_std);
-                    layerSpeed(i) = normrnd(layerSpeed(i), turb_std);
+                    turbStd = layerSpeed(i) * layerTurb(i);
+                    layerAzi(i) = normrnd(layerAzi(i), aziStd);
+                    layerSpeed(i) = normrnd(layerSpeed(i), turbStd);
                 end
             end
             axis = 0:10: 4000;
@@ -118,15 +191,15 @@ while ~feof(rfid)
             Environnement.isWindLayered = 1;
             
         case 'map'
-            line_data_string = textscan(line_data,'%s');
-            map_name = line_data_string{1}{1};
+            lineDataCells = textscan(lineData,'%s');
+            map_name = lineDataCells{1}{1};
             [Environnement.map_x, Environnement.map_y, Environnement.map_z]=xyz2grid(map_name);
             Environnement.map_x = Environnement.map_x-2648540;  % what are
             Environnement.map_y = Environnement.map_y-1195050;  % these constants
             Environnement.map_z = Environnement.map_z-Environnement.Start_Altitude;
             
         otherwise
-            display(['ERROR: In environnement definition, unknown line identifier: ' line_id]);
+            display(['ERROR: In environnement definition, unknown line identifier: ' lineId]);
          
     end
 end
@@ -198,14 +271,14 @@ if ~isfield(Environnement,'Rail_Length')
     warning('Missing field "Rail_Length"; defaulted to 12');
 end
 if ~isfield(Environnement,'Rail_Angle')
-    default_Rail_Angle = 5;
+    default_Rail_Angle = 5/180*pi;
     Environnement.Rail_Angle = default_Rail_Angle;
-    warning('Missing field "Rail_Angle"; defaulted to 5');
+    warning('Missing field "Rail_Angle"; defaulted to 5/180*pi');
 end
 if ~isfield(Environnement,'Rail_Azimuth')
-    default_Rail_Azimuth = 156;
+    default_Rail_Azimuth = 156/180*pi;
     Environnement.Rail_Azimuth = default_Rail_Azimuth;
-    warning('Missing field "Rail_Azimuth"; defaulted to 156');
+    warning('Missing field "Rail_Azimuth"; defaulted to 156/180*pi');
 end
     
 % -------------------------------------------------------------------------

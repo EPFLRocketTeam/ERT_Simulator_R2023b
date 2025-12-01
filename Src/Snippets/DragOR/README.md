@@ -1,9 +1,5 @@
 # Introduction
-This alternative version of the ERTSim was developed in order to use the 
-drag coefficients computed on the rocket simulator OpenRocket for a given 
-rocket, motor and environment. The drag coefficients are interpolated with 
-a polynomial of degree six either from the time, the altitude or the the 
-speed of the rocket.
+This alternative version of the ERTSim was developed in order to use the drag coefficients computed on the rocket simulator OpenRocket for a given rocket, motor and environment. The drag coefficients are interpolated with a polynomial of degree six either from the time, the altitude or the the speed of the rocket.
 
 ## Implementation
 In order to run this version, the following folder and files have to be 
@@ -11,13 +7,10 @@ created/modified (all the mentioned files/folders can be found in the
 "DragOR" folder): 
 
    1. Export data from OpenRocket
-After running a simulation on OpenRocket for a given rocket, motor and 
-environment, the data must be exported on a .csv table containing the time, 
-altitude total speed and drag coefficient
+After running a simulation on OpenRocket for a given rocket, motor and environment, the data must be exported on a .csv table containing the time, altitude total speed and drag coefficient.
 
    2. Drag folder
-The drag folder must be added to the folder "Declarations". This folder 
-will contain the .csv file from the corresponding OpenRocket simulation.
+The drag folder must be added to the folder "Declarations". This folder will contain the .csv file from the corresponding OpenRocket simulation.
 
    3. Main_DragOR.m
 The file "Main.m" has to be replaced by the the file "Main\_DragOR.m".

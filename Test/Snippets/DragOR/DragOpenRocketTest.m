@@ -1,4 +1,4 @@
-classdef DragORTest < matlab.unittest.TestCase
+classdef DragOpenRocketTest < matlab.unittest.TestCase
     % Test class for the drag_OR function
     
     properties (Access = private)
@@ -41,30 +41,30 @@ classdef DragORTest < matlab.unittest.TestCase
         
         function testTimeInterpolation(testCase)
             % Test interpolation based on time
-            CD = dragOR(testCase.SampleDragData, 'time', 5.5, 0, 0);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            dragCoefficient = dragOR(testCase.SampleDragData, 'time', 5.5, 0, 0);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should return non-negative scalar');
         end
         
         function testAltitudeInterpolation(testCase)
             % Test interpolation based on altitude
-            CD = dragOR(testCase.SampleDragData, 'altitude', 0, 250, 0);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            dragCoefficient = dragOR(testCase.SampleDragData, 'altitude', 0, 250, 0);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should return non-negative scalar');
         end
         
         function testSpeedInterpolation(testCase)
             % Test interpolation based on speed
-            CD = dragOR(testCase.SampleDragData, 'speed', 0, 0, 75);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            dragCoefficient = dragOR(testCase.SampleDragData, 'speed', 0, 0, 75);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should return non-negative scalar');
         end
         
         function testCaseInsensitivity(testCase)
             % Test case insensitivity
-            CD1 = dragOR(testCase.SampleDragData, 'TIME', 5, 0, 0);
-            CD2 = dragOR(testCase.SampleDragData, 'time', 5, 0, 0);
-            testCase.verifyEqual(CD1, CD2, 'Should be case insensitive');
+            dragCoefficient1 = dragOR(testCase.SampleDragData, 'TIME', 5, 0, 0);
+            dragCoefficient2 = dragOR(testCase.SampleDragData, 'time', 5, 0, 0);
+            testCase.verifyEqual(dragCoefficient1, dragCoefficient2, 'Should be case insensitive');
         end
         
         function testInvalidInterpolationType(testCase)
@@ -87,53 +87,53 @@ classdef DragORTest < matlab.unittest.TestCase
         
         function testSmallDataset(testCase)
             % Test with small dataset
-            small_data = [1, 100, 50, 0.8; 2, 200, 60, 0.7; 3, 300, 70, 0.6];
-            CD = dragOR(small_data, 'time', 1.5, 0, 0);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            smallData = [1, 100, 50, 0.8; 2, 200, 60, 0.7; 3, 300, 70, 0.6];
+            dragCoefficient = dragOR(smallData, 'time', 1.5, 0, 0);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should handle small datasets');
         end
         
         function testSinglePointDataset(testCase)
             % Test with single data point (should error)
-            single_point = [1, 100, 50, 0.8];
-            testCase.verifyError(@() dragOR(single_point, 'time', 1.5, 0, 0), ...
+            singlePoint = [1, 100, 50, 0.8];
+            testCase.verifyError(@() dragOR(singlePoint, 'time', 1.5, 0, 0), ...
                 'drag_OR:InsufficientData');
         end
         
         function testDataWithNaN(testCase)
             % Test data with NaN values
-            data_with_nan = testCase.SampleDragData;
-            data_with_nan(5, :) = NaN; % Add a NaN row
-            CD = dragOR(data_with_nan, 'time', 5, 0, 0);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            dataWithNaN = testCase.SampleDragData;
+            dataWithNaN(5, :) = NaN; % Add a NaN row
+            dragCoefficient = dragOR(dataWithNaN, 'time', 5, 0, 0);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should handle NaN values gracefully');
         end
         
         function testDuplicateXValues(testCase)
             % Test data with duplicate x values
-            duplicate_data = [testCase.SampleDragData; testCase.SampleDragData(1:5, :)];
-            CD = dragOR(duplicate_data, 'time', 5, 0, 0);
-            testCase.verifyTrue(isscalar(CD) && CD >= 0, ...
+            duplicateData = [testCase.SampleDragData; testCase.SampleDragData(1:5, :)];
+            dragCoefficient = dragOR(duplicateData, 'time', 5, 0, 0);
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0, ...
                 'Should handle duplicate x values');
         end
         
         function testModerateExtrapolation(testCase)
             % Test with moderate extrapolation (within reasonable bounds)
             warning('off', 'drag_OR:ModerateExtrapolation');
-            CD = dragOR(testCase.SampleDragData, 'time', 12, 0, 0);
+            dragCoefficient = dragOR(testCase.SampleDragData, 'time', 12, 0, 0);
             warning('on', 'drag_OR:ModerateExtrapolation');
             
-            testCase.verifyTrue(isscalar(CD) && CD >= 0 && CD <= 2, ...
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0 && dragCoefficient <= 2, ...
                 'Should handle moderate extrapolation gracefully');
         end
 
         function testFarExtrapolation(testCase)
             % Test with far extrapolation
             warning('off', 'drag_OR:FarExtrapolation');
-            CD = dragOR(testCase.SampleDragData, 'time', 100, 0, 0);
+            dragCoefficient = dragOR(testCase.SampleDragData, 'time', 100, 0, 0);
             warning('on', 'drag_OR:FarExtrapolation');
             
-            testCase.verifyTrue(isscalar(CD) && CD >= 0 && CD <= 2, ...
+            testCase.verifyTrue(isscalar(dragCoefficient) && dragCoefficient >= 0 && dragCoefficient <= 2, ...
                 'Should handle far extrapolation gracefully');
         end
     end

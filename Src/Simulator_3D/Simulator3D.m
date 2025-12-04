@@ -15,19 +15,19 @@ classdef Simulator3D < handle
    
    properties(Access = private)
       firstSimFlag = 1;
-      tmp_Margin
-      tmp_Alpha
-      tmp_Cn_alpha
-      tmp_Xcp
-      tmp_Cd
-      tmp_Mass
-      tmp_CM
-      tmp_Il
-      tmp_Ir
-      tmp_Delta
+      tmpMargin
+      tmpAlpha
+      tmpCnAlpha
+      tmpXcp
+      tmpDragCoefficient
+      tmpMass
+      tmpCenterOfMass
+      tmpInertiaLong
+      tmpInertiaRot
+      tmpDelta
       
-      tmp_Nose_Alpha
-      tmp_Nose_Delta
+      tmpNoseAlpha
+      tmpNoseDelta
    end
    
 % -------------------------------------------------------------------------  
@@ -48,19 +48,19 @@ classdef Simulator3D < handle
            end
  
            % Initialise Auxiliary results structure
-           obj.SimAuxResults.Margin = [];
-           obj.SimAuxResults.Alpha = [];
-           obj.SimAuxResults.Cn_alpha = [];
-           obj.SimAuxResults.Xcp = [];
-           obj.SimAuxResults.Cd = [];
-           obj.SimAuxResults.Mass = [];
-           obj.SimAuxResults.CM = [];
-           obj.SimAuxResults.Il = [];
-           obj.SimAuxResults.Ir = [];
-           obj.SimAuxResults.Delta = [];
+           obj.SimAuxResults.margin = [];
+           obj.SimAuxResults.alpha = [];
+           obj.SimAuxResults.cnAlpha = [];
+           obj.SimAuxResults.xcp = [];
+           obj.SimAuxResults.dragCoefficient = [];
+           obj.SimAuxResults.mass = [];
+           obj.SimAuxResults.centerOfMass = [];
+           obj.SimAuxResults.inertiaLong = [];
+           obj.SimAuxResults.inertiaRot = [];
+           obj.SimAuxResults.delta = [];
            
-           obj.SimAuxResults.Nose_Alpha = [];
-           obj.SimAuxResults.Nose_Delta = [];
+           obj.SimAuxResults.noseAlpha = [];
+           obj.SimAuxResults.noseDelta = [];
        end
        
    end
@@ -80,30 +80,30 @@ classdef Simulator3D < handle
             v = s(2); % speed
 
             % Rocket Inertia
-            [Mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
+            [mass,massRate] = Mass_Non_Lin(t,obj.Rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
-            [~, a, ~, rho, Nu] = atmosphere(x*sin(obj.Environment.Rail_Angle),obj.Environment); % Atmosphere information (TODO: Include effect of humidity and departure altitude)
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(x*sin(obj.Environment.Rail_Angle),obj.Environment); % Atmosphere information (TODO: Include effect of humidity and departure altitude)
 
             % Force estimation
 
             % gravity
-            G = -g*cos(obj.Environment.Rail_Angle)*Mass;
+            G = -g*cos(obj.Environment.Rail_Angle)*mass;
 
             % Thrust 
             T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
-            CD = drag(obj.Rocket, 0, v,Nu, a); % (TODO: make air-viscosity adaptable to temperature)
-            D = -0.5*rho*obj.Rocket.Sm*CD*v^2; % (TODO: define drag in wind coordinate system)
+            dragCoefficient = drag(obj.Rocket, 0, v,kinematicViscosity, a); % (TODO: make air-viscosity adaptable to temperature)
+            D = -0.5*rho*obj.Rocket.Sm*dragCoefficient*v^2; % (TODO: define drag in wind coordinate system)
 
-            F_tot = G + T*obj.Rocket.motor_fac + D;
+            totalForce = G + T*obj.Rocket.motor_fac + D;
 
             % State derivatives
             
             x_dot = v;
-            v_dot = 1/Mass*(F_tot);
+            v_dot = 1/mass*(totalForce);
             if v_dot < 0
                 x_dot = 0;
                 v_dot = 0;
@@ -134,13 +134,13 @@ classdef Simulator3D < handle
             % Coordinate systems
 
             % Rotation matrix from rocket coordinates to Earth coordinates
-            C = quat2rotmat(Q);
-            angle = rot2anglemat(C);
+            rotationMatrix = quat2rotmat(Q);
+            angleOfAttack = rot2anglemat(rotationMatrix);
 
             % Rocket principle frame vectors expressed in earth coordinates
-            YA = C*[1,0,0]'; % Yaw axis
-            PA = C*[0,1,0]'; % Pitch Axis
-            RA = C*[0,0,1]'; % Roll Axis
+            YA = rotationMatrix*[1,0,0]'; % Yaw axis
+            PA = rotationMatrix*[0,1,0]'; % Pitch Axis
+            RA = rotationMatrix*[0,0,1]'; % Roll Axis
 
             % Earth coordinate vectors expressed in earth's frame
             XE = [1, 0, 0]';
@@ -148,29 +148,29 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [mass, massRate, centerOfMass, ~, inertiaLong, ~, inertiaRot, ~] = Mass_Properties(t,obj.Rocket,'NonLinear');
+            %I = rotationMatrix'*diag([inertiaLong, inertiaLong, inertiaRot])*rotationMatrix; % Inertia TODO: inertiaRot in Mass_Properties
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
-            motor_inertia = inertia_fill_cylinder(M, ...
+            motorInertia = inertia_fill_cylinder(mass, ...
                 obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
             % Total inertia
-            %I = inertial_matrix(obj.Rocket, Cm, t);
+            %I = inertial_matrix(obj.Rocket,  centerOfMass, t);
             %disp(I)
-            I = obj.Rocket.rocket_inertia + motor_inertia;
+            I = obj.Rocket.rocket_inertia + motorInertia;
             %disp(I)
             %disp("==============================")
-            I = C' * I * C; % Transfert to earth coordinates
+            I = rotationMatrix' * I * rotationMatrix; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
+            inertiaRate = inertia_fill_cylinder(massRate, obj.Rocket.motor_length, ...
                 obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
-            dIdt = C' * dIdt * C; % Transfert to earth coordinates
+            inertiaRate = rotationMatrix' * inertiaRate * rotationMatrix; % Transfert to earth coordinates
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
-            [~, a, ~, rho, nu] = atmosphere(X(3)+obj.Environment.Start_Altitude,...
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(X(3)+obj.Environment.Start_Altitude,...
                 obj.Environment); % Atmosphere information 
 
             % Force estimations 
@@ -180,41 +180,41 @@ classdef Simulator3D < handle
             T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
-            G = -g*M*ZE;
+            G = -g*mass*ZE;
 
             % Aerodynamic corrective forces
-            % Compute center of mass angle of attack
-            Vcm = V -...
+            % Compute center of mass angleOfAttack of attack
+            centerOfMassVelocity = V -...
                      ... % Wind as computed by windmodel
                 windModel(t, obj.Environment.Turb_I,obj.Environment.V_inf*obj.Environment.V_dir,...
                 obj.Environment.Turb_model,X(3)); 
 
-            Vcm_mag = norm(Vcm);
-            alpha_cm = atan2(norm(cross(RA, Vcm)), dot(RA, Vcm));
+            centerOfMassSpeed = norm(centerOfMassVelocity);
+            centerOfMassAngleOfAttack = atan2(norm(cross(RA, centerOfMassVelocity)), dot(RA, centerOfMassVelocity));
 
             % Mach number
-            Mach = Vcm_mag/a;
+            Mach = centerOfMassSpeed/a;
             % Normal lift coefficient and center of pressure
-            [CNa, Xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
-                Mach, angle(3), 1);
+            [CNa, xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, centerOfMassAngleOfAttack, 1.1,...
+                Mach, angleOfAttack(3), 1);
             
             
             % Stability margin
-            margin = (Xcp-Cm);
+            margin = (xcp- centerOfMass);
 
-            % Compute Rocket angle of attack
+            % Compute Rocket angleOfAttack of attack
             Wnorm = W/norm(W);
             if(isnan(Wnorm))
                 Wnorm  = zeros(3,1);
             end
-            Vrel = Vcm + margin*sin(acos(dot(RA,Wnorm)))*(cross(RA, W));
-            Vmag = norm(Vrel);
-            Vnorm = normalizeVect(Vrel);
+            relativeVelocity = centerOfMassVelocity + margin*sin(acos(dot(RA,Wnorm)))*(cross(RA, W));
+            relativeSpeed = norm(relativeVelocity);
+            normalizedVelocity = normalizeVect(relativeVelocity);
 
             % Angle of attack 
-            Vcross = cross(RA, Vnorm);
-            Vcross_norm = normalizeVect(Vcross);
-            alpha = atan2(norm(cross(RA, Vnorm)), dot(RA, Vnorm));
+            velocityCrossProduct = cross(RA, normalizedVelocity);
+            normalizedCrossProduct = normalizeVect(velocityCrossProduct);
+            alpha = atan2(norm(cross(RA, normalizedVelocity)), dot(RA, normalizedVelocity));
             delta = atan2(norm(cross(RA, ZE)), dot(RA, ZE));
             
             % wind coordinate transformation
@@ -223,83 +223,83 @@ classdef Simulator3D < handle
 %             elseif(abs(alpha-pi)<1e-3)
 %                 RW = -RA;
 %             else
-%                 Cw = quat2rotmat([Vcross_norm*sin(alpha/2); cos(alpha/2)]);
-%                 RW = C*Cw*[0;0;1];
+%                 Cw = quat2rotmat([normalizedCrossProduct*sin(alpha/2); cos(alpha/2)]);
+%                 RW = rotationMatrix*Cw*[0;0;1];
 %             end
 
             % normal force
-            NA = cross(RA, Vcross); % normal axis
-            if norm(NA) == 0
-                N = [0, 0, 0]'; 
+            normalAxis = cross(RA, velocityCrossProduct); % normal axis
+            if norm(normalAxis) == 0
+                normalForce = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                normalForce = 0.5*rho*obj.Rocket.Sm*CNa*alpha*relativeSpeed^2*normalAxis/norm(normalAxis);
             end
             % Drag
             % Drag coefficient
-            CD = drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.CD_fac; 
+            dragCoefficient = drag(obj.Rocket, alpha, relativeSpeed, kinematicViscosity, a)*obj.Rocket.CD_fac; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              dragCoefficient = dragCoefficient + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, relativeSpeed, kinematicViscosity); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm ;
+            D = -0.5*rho*obj.Rocket.Sm*dragCoefficient*relativeSpeed^2*normalizedVelocity ;
 
             % Total forces
-            F_tot = ...
+            totalForce = ...
                 T*obj.Rocket.motor_fac +...  ;% Thrust
                 G +...  ;% gravity
-                N +... ;% normal force
+                normalForce +... ;% normal force
                 D      ; % drag force
 
             % Moment estimation
 
             %Aerodynamic corrective moment
-            MN = norm(N)*margin*Vcross_norm ;
+            normalMoment = norm(normalForce)*margin*normalizedCrossProduct ;
 
             % Aerodynamic damping moment
-            W_pitch = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
-            CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
-                dMdt, Cm, norm(W_pitch) , Vmag); 
+            pitchAngularVelocity = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
+            pitchDampingCoefficient = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
+                massRate,  centerOfMass, norm(pitchAngularVelocity) , relativeSpeed); 
             
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            dampingMoment = -0.5*rho*pitchDampingCoefficient*obj.Rocket.Sm*relativeSpeed^2*normalizeVect(pitchAngularVelocity);
             
-            M_tot = ...
-                MN...  ; % aerodynamic corrective moment
-               + MD; % aerodynamic damping moment
+            totalMoment = ...
+                normalMoment...  ; % aerodynamic corrective moment
+               + dampingMoment; % aerodynamic damping moment
 
             % State derivatives
 
             % Translational dynamics
             X_dot = V;
-            V_dot = 1/M*(F_tot);
+            V_dot = 1/mass*(totalForce);
 
             % Rotational dynamics
             Q_dot = quat_evolve(Q, W);
             
-            %W_dot = pinv(I)*M_tot;
-            %W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
-            W_dot = mldivide(I, M_tot - dIdt*angle');
+            %W_dot = pinv(I)*totalMoment;
+            %W_dot = mldivide(I,totalMoment); % (TODO: Add inertia variation with time)
+            W_dot = mldivide(I, totalMoment - inertiaRate*angleOfAttack');
 
             % Return derivative vector
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
             
             % cache auxiliary result data
-            obj.tmp_Margin = margin/obj.Rocket.dm;
-            obj.tmp_Alpha = alpha;
-            obj.tmp_Cn_alpha = CNa;
-            obj.tmp_Xcp = Xcp;
-            obj.tmp_Cd = CD;
-            obj.tmp_Mass = M;
-            obj.tmp_CM = Cm;
-            obj.tmp_Il = I_L;
-            obj.tmp_Ir = I_R;
-            obj.tmp_Delta = delta;
+            obj.tmpMargin = margin/obj.Rocket.dm;
+            obj.tmpAlpha = alpha;
+            obj.tmpCnAlpha = CNa;
+            obj.tmpXcp = xcp;
+            obj.tmpDragCoefficient = dragCoefficient;
+            obj.tmpMass = mass;
+            obj.tmpCenterOfMass =  centerOfMass;
+            obj.tmpInertiaLong = inertiaLong;
+            obj.tmpInertiaRot = inertiaRot;
+            obj.tmpDelta = delta;
         end
         
         % --------------------------- 
         % 3DOF Parachute descent Equations
         % ---------------------------
         
-        function dsdt = Dynamics_Parachute_3DOF(obj, t,s, Rocket, Environment, M, Main)
+        function dsdt = Dynamics_Parachute_3DOF(obj, t,s, Rocket, Environment, mass, Main)
 
             X = s(1:3);
             V = s(4:6);
@@ -308,7 +308,7 @@ classdef Simulator3D < handle
             [~, ~, ~, rho] = atmosphere(X(3)+Environment.Start_Altitude, Environment); % Atmosphere [K,m/s,Pa,kg/m3]
 
             % Aerodynamic force
-            Vrel = -V + ...
+            relativeVelocity = -V + ...
                  ... % Wind as computed by windmodel
                 windModel(t, Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
                 Environment.Turb_model,X(3));
@@ -318,14 +318,14 @@ classdef Simulator3D < handle
             elseif Main == 0
                 SCD = Rocket.para_drogue_SCD;
             end
-            D = 0.5*rho*SCD*norm(Vrel)*Vrel;
+            D = 0.5*rho*SCD*norm(relativeVelocity)*relativeVelocity;
 
             % Gravity force
             g = 9.81*[0;0;-1];
-            G = g*M;
+            G = g*mass;
 
             dXdt = V;
-            dVdt = (D+G)/M;
+            dVdt = (D+G)/mass;
 
             dsdt = [dXdt; dVdt];
         end
@@ -345,27 +345,27 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % atmosphere
-            [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.rocket_m;
+            mass = Rocket.rocket_m;
 
-            V_rel = V -...
+            relativeVelocity = V -...
                  ... % Wind as computed by windmodel
                 windModel(t, Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
                 Environment.Turb_model,X(3));
 
             % gravity
             % Gravity
-            G = -9.81*M*ZE;
+            G = -9.81*mass*ZE;
             % Drag
             % Drag coefficient
-            CD = drag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
+            dragCoefficient = drag(Rocket, 0, norm(relativeVelocity), kinematicViscosity, a); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
-            D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
+            D = -0.5*rho*Rocket.Sm*dragCoefficient*relativeVelocity*norm(relativeVelocity); 
             % Translational dynamics
             X_dot = V;
-            V_dot = 1/M*(D + G);
+            V_dot = 1/mass*(D + G);
 
             S_dot = [X_dot; V_dot];
 
@@ -386,28 +386,28 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % atmosphere
-            [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.rocket_m;
+            mass = Rocket.rocket_m;
 
-            V_rel = V -...
+            relativeVelocity = V -...
                  ... % Wind as computed by windmodel
                 windModel(t, Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
                 Environment.Turb_model,X(3));
 
             % gravity
             % Gravity
-            G = -9.81*M*ZE;
+            G = -9.81*mass*ZE;
             % Drag
             % Drag coefficient
-            CD = Nose_drag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
+            dragCoefficient = Nose_drag(Rocket, 0, norm(relativeVelocity), kinematicViscosity, a); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
-            D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
+            D = -0.5*rho*Rocket.Sm*dragCoefficient*relativeVelocity*norm(relativeVelocity); 
 
             % Translational dynamics
             X_dot = V;
-            V_dot = 1/M*(D + G);
+            V_dot = 1/mass*(D + G);
 
             S_dot = [X_dot; V_dot];
 
@@ -430,13 +430,13 @@ classdef Simulator3D < handle
             % Coordinate systems
 
             % Rotation matrix from rocket coordinates to Earth coordinates
-            C = quat2rotmat(Q);
-            angle = rot2anglemat(C);
+            rotationMatrix = quat2rotmat(Q);
+            angleOfAttack = rot2anglemat(rotationMatrix);
 
             % Rocket principle frame vectors expressed in earth coordinates
-            YA = C*[1,0,0]'; % Yaw axis
-            PA = C*[0,1,0]'; % Pitch Axis
-            RA = C*[0,0,1]'; % Roll Axis
+            YA = rotationMatrix*[1,0,0]'; % Yaw axis
+            PA = rotationMatrix*[0,1,0]'; % Pitch Axis
+            RA = rotationMatrix*[0,0,1]'; % Roll Axis
 
             % Earth coordinate vectors expressed in earth's frame
             XE = [1, 0, 0]';
@@ -444,25 +444,25 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [mass,massRate, centerOfMass,~,inertiaLong,~,inertiaRot,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
+            %I = rotationMatrix'*diag([inertiaLong, inertiaLong, inertiaRot])*rotationMatrix; % Inertia TODO: inertiaRot in Mass_Properties
 
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
-            motor_inertia = inertia_fill_cylinder(M, ...
+            motorInertia = inertia_fill_cylinder(mass, ...
                 obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
             % Total inertia
-            I = obj.Rocket.rocket_inertia + motor_inertia;
-            I = C' * I * C; % Transfert to earth coordinates
+            I = obj.Rocket.rocket_inertia + motorInertia;
+            I = rotationMatrix' * I * rotationMatrix; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
+            inertiaRate = inertia_fill_cylinder(massRate, obj.Rocket.motor_length, ...
                 obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
-            dIdt = C' * dIdt * C; % Transfert to earth coordinates
+            inertiaRate = rotationMatrix' * inertiaRate * rotationMatrix; % Transfert to earth coordinates
 
             % Environment
             g = 9.81;               % Gravity [m/s2]
-            [~, a, ~, rho, nu] = atmosphere(X(3)+obj.Environment.Start_Altitude,...
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(X(3)+obj.Environment.Start_Altitude,...
                 obj.Environment); % Atmosphere information 
 
             % Force estimations 
@@ -472,39 +472,39 @@ classdef Simulator3D < handle
             T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
-            G = -g*M*ZE;
+            G = -g*mass*ZE;
 
             % Aerodynamic corrective forces
-            % Compute center of mass angle of attack
-            Vcm = V -...
+            % Compute center of mass angleOfAttack of attack
+            centerOfMassVelocity = V -...
                      ... % Wind as computed by windmodel
                 windModel(t, obj.Environment.Turb_I,obj.Environment.V_inf*obj.Environment.V_dir,...
                 obj.Environment.Turb_model,X(3)); 
 
-            Vcm_mag = norm(Vcm);
-            alpha_cm = atan2(norm(cross(RA, Vcm)), dot(RA, Vcm));
+            centerOfMassSpeed = norm(centerOfMassVelocity);
+            centerOfMassAngleOfAttack = atan2(norm(cross(RA, centerOfMassVelocity)), dot(RA, centerOfMassVelocity));
 
             % Mach number
-            Mach = Vcm_mag/a;
+            Mach = centerOfMassSpeed/a;
             % Normal lift coefficient and center of pressure
-            [CNa, Xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
-                Mach, angle(3), 1);
+            [CNa, xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, centerOfMassAngleOfAttack, 1.1,...
+                Mach, angleOfAttack(3), 1);
             % Stability margin
-            margin = (Xcp-Cm);
+            margin = (xcp- centerOfMass);
 
-            % Compute Rocket angle of attack
+            % Compute Rocket angleOfAttack of attack
             Wnorm = W/norm(W);
             if(isnan(Wnorm))
                 Wnorm  = zeros(3,1);
             end
-            Vrel = Vcm + margin*sin(acos(dot(RA,Wnorm)))*(cross(RA, W));
-            Vmag = norm(Vrel);
-            Vnorm = normalizeVect(Vrel);
+            relativeVelocity = centerOfMassVelocity + margin*sin(acos(dot(RA,Wnorm)))*(cross(RA, W));
+            relativeSpeed = norm(relativeVelocity);
+            normalizedVelocity = normalizeVect(relativeVelocity);
 
             % Angle of attack 
-            Vcross = cross(RA, Vnorm);
-            Vcross_norm = normalizeVect(Vcross);
-            alpha = atan2(norm(cross(RA, Vnorm)), dot(RA, Vnorm));
+            velocityCrossProduct = cross(RA, normalizedVelocity);
+            normalizedCrossProduct = normalizeVect(velocityCrossProduct);
+            alpha = atan2(norm(cross(RA, normalizedVelocity)), dot(RA, normalizedVelocity));
             delta = atan2(norm(cross(RA, ZE)), dot(RA, ZE));
 
             % wind coordinate transformation
@@ -513,66 +513,66 @@ classdef Simulator3D < handle
 %             elseif(abs(alpha-pi)<1e-3)
 %                 RW = -RA;
 %             else
-%                 Cw = quat2rotmat([Vcross_norm*sin(alpha/2); cos(alpha/2)]);
-%                 RW = C*Cw*[0;0;1];
+%                 Cw = quat2rotmat([normalizedCrossProduct*sin(alpha/2); cos(alpha/2)]);
+%                 RW = rotationMatrix*Cw*[0;0;1];
 %             end
 
             % normal force
-            NA = cross(RA, Vcross); % normal axis
-            if norm(NA) == 0
-                N = [0, 0, 0]'; 
+            normalAxis = cross(RA, velocityCrossProduct); % normal axis
+            if norm(normalAxis) == 0
+                normalForce = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                normalForce = 0.5*rho*obj.Rocket.Sm*CNa*alpha*relativeSpeed^2*normalAxis/norm(normalAxis);
             end
 
             % Drag
             % Drag coefficient
-            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.CD_fac; 
+            dragCoefficient = Nose_drag(obj.Rocket, alpha, relativeSpeed, kinematicViscosity, a)*obj.Rocket.CD_fac; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              dragCoefficient = dragCoefficient + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, relativeSpeed, kinematicViscosity); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm;
+            D = -0.5*rho*obj.Rocket.Sm*dragCoefficient*relativeSpeed^2*normalizedVelocity;
 
             % Total forces
-            F_tot = ...
+            totalForce = ...
                 T*obj.Rocket.motor_fac +...  ;% Thrust
                 G +...  ;% gravity
-                N +... ;% normal force
+                normalForce +... ;% normal force
                 D      ; % drag force
 
             % Moment estimation
 
             %Aerodynamic corrective moment
-            MN = norm(N)*margin*Vcross_norm;
+            normalMoment = norm(normalForce)*margin*normalizedCrossProduct;
 
             % Aerodynamic damping moment
-            W_pitch = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
-            CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
-                dMdt, Cm, norm(W_pitch) , Vmag); 
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            pitchAngularVelocity = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
+            pitchDampingCoefficient = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
+                massRate,  centerOfMass, norm(pitchAngularVelocity) , relativeSpeed); 
+            dampingMoment = -0.5*rho*pitchDampingCoefficient*obj.Rocket.Sm*relativeSpeed^2*normalizeVect(pitchAngularVelocity);
 
-            M_tot = ...
-                MN...  ; % aerodynamic corrective moment
-               + MD ; % aerodynamic damping moment
+            totalMoment = ...
+                normalMoment...  ; % aerodynamic corrective moment
+               + dampingMoment ; % aerodynamic damping moment
 
             % State derivatives
 
             % Translational dynamics
             X_dot = V;
-            V_dot = 1/M*(F_tot);
+            V_dot = 1/mass*(totalForce);
 
             % Rotational dynamics
             Q_dot = quat_evolve(Q, W);
-            %W_dot = mldivide(I,M_tot); % (TODO: Add inertia variation with time)
-            W_dot = mldivide(I, M_tot - dIdt*angle');
+            %W_dot = mldivide(I,totalMoment); % (TODO: Add inertia variation with time)
+            W_dot = mldivide(I, totalMoment - inertiaRate*angleOfAttack');
 
             % Return derivative vector
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
             
             % cache auxiliary result data
-            obj.tmp_Nose_Alpha = alpha;
-            obj.tmp_Nose_Delta = delta;
+            obj.tmpNoseAlpha = alpha;
+            obj.tmpNoseDelta = delta;
         end
         
         % --------------------------- 
@@ -590,28 +590,28 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % atmosphere
-            [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
+            [~, a, ~, rho, kinematicViscosity] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.pl_mass;
+            mass = Rocket.pl_mass;
 
-            V_rel = V -...
+            relativeVelocity = V -...
                  ... % Wind as computed by windmodel
                 windModel(t, Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
                 Environment.Turb_model);
 
             % gravity
             % Gravity
-            G = -9.81*M*ZE;
+            G = -9.81*mass*ZE;
             % Drag
             % Drag coefficient
             SCD = 2.56e-2; 
             % Drag force
-            D = -0.5*rho*SCD*V_rel*norm(V_rel); 
+            D = -0.5*rho*SCD*relativeVelocity*norm(relativeVelocity); 
 
             % Translational dynamics
             X_dot = V;
-            V_dot = 1/M*(D + G);
+            V_dot = 1/mass*(D + G);
 
             S_dot = [X_dot; V_dot];
 
@@ -653,15 +653,15 @@ classdef Simulator3D < handle
                 V = arg2;
                 
                 % Rail vector
-                C_rail = rotmat(obj.Environment.Rail_Azimuth, 3)*...
+                railRotationMatrix = rotmat(obj.Environment.Rail_Azimuth, 3)*...
                     rotmat(obj.Environment.Rail_Angle, 2)*...
                     rotmat(obj.Environment.Rail_Azimuth, 3)';
-                RV = C_rail*[0;0;1];
+                railVector = railRotationMatrix*[0;0;1];
 
                 % Initial Conditions
-                X0 = RV*obj.Environment.Rail_Length; % spatial position of cm
-                V0 = RV*V; % Initial velocity of cm
-                Q0 = rot2quat(C_rail'); % Initial attitude
+                X0 = railVector*obj.Environment.Rail_Length; % spatial position of centerOfMass
+                V0 = railVector*V; % Initial velocity of centerOfMass
+                Q0 = rot2quat(railRotationMatrix'); % Initial attitude
                 W0 = [0;0;0]; % Initial angular rotation in rocket principle coordinates
                 S0 = [X0; V0; Q0; W0];
             elseif (nargin == 6)
@@ -696,7 +696,7 @@ classdef Simulator3D < handle
             S0 = [X0; V0];
 
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            mass = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
 
             % time span
             tspan = [T0, 5000];
@@ -705,7 +705,7 @@ classdef Simulator3D < handle
             Option = odeset('Events', @(T,X) MainEvent(T,X,obj.Rocket));
 
             % integration
-            [T3,S3, T3E, S3E, I3E] = ode45(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 0),tspan,S0, Option);
+            [T3,S3, T3E, S3E, I3E] = ode45(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, mass, 0),tspan,S0, Option);
         
         end
         
@@ -718,7 +718,7 @@ classdef Simulator3D < handle
             S0 = [X0; V0];
 
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            mass = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
 
             % time span
             tspan = [T0, 5000];
@@ -727,7 +727,7 @@ classdef Simulator3D < handle
             Option = odeset('Events',@(T,X) CrashEvent(T,X,obj.Environment));
 
             % integration
-            [T4, S4, T4E, S4E, I4E] = ode45(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 1),tspan,S0, Option);
+            [T4, S4, T4E, S4E, I4E] = ode45(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, mass, 1),tspan,S0, Option);
             
         end
         
@@ -830,41 +830,41 @@ methods(Access = private)
             obj.firstSimFlag = 0;
             
             if obj.SimOutput.Margin
-                obj.SimAuxResults.Margin = [obj.SimAuxResults.Margin, obj.tmp_Margin];
+                obj.SimAuxResults.margin = [obj.SimAuxResults.margin, obj.tmpMargin];
             end 
             if obj.SimOutput.Alpha
-                obj.SimAuxResults.Alpha = [obj.SimAuxResults.Alpha, obj.tmp_Alpha];
+                obj.SimAuxResults.alpha = [obj.SimAuxResults.alpha, obj.tmpAlpha];
             end 
             if obj.SimOutput.Cn_alpha
-                obj.SimAuxResults.Cn_alpha = [obj.SimAuxResults.Cn_alpha, obj.tmp_Cn_alpha];
+                obj.SimAuxResults.cnAlpha = [obj.SimAuxResults.cnAlpha, obj.tmpCnAlpha];
             end 
             if obj.SimOutput.Xcp
-                obj.SimAuxResults.Xcp = [obj.SimAuxResults.Xcp, obj.tmp_Xcp];
+                obj.SimAuxResults.xcp = [obj.SimAuxResults.xcp, obj.tmpXcp];
             end 
             if obj.SimOutput.Cd
-                obj.SimAuxResults.Cd = [obj.SimAuxResults.Cd, obj.tmp_Cd];
+                obj.SimAuxResults.dragCoefficient = [obj.SimAuxResults.dragCoefficient, obj.tmpDragCoefficient];
             end 
             if obj.SimOutput.Mass
-                obj.SimAuxResults.Mass = [obj.SimAuxResults.Mass, obj.tmp_Mass];
+                obj.SimAuxResults.mass = [obj.SimAuxResults.mass, obj.tmpMass];
             end 
             if obj.SimOutput.CM
-                obj.SimAuxResults.CM = [obj.SimAuxResults.CM, obj.tmp_CM];
+                obj.SimAuxResults.centerOfMass = [obj.SimAuxResults.centerOfMass, obj.tmpCenterOfMass];
             end 
             if obj.SimOutput.Il
-                obj.SimAuxResults.Il = [obj.SimAuxResults.Il, obj.tmp_Il];
+                obj.SimAuxResults.inertiaLong = [obj.SimAuxResults.inertiaLong, obj.tmpInertiaLong];
             end 
             if obj.SimOutput.Ir
-                obj.SimAuxResults.Ir = [obj.SimAuxResults.Ir, obj.tmp_Ir];
+                obj.SimAuxResults.inertiaRot = [obj.SimAuxResults.inertiaRot, obj.tmpInertiaRot];
             end
             if obj.SimOutput.Delta
-                obj.SimAuxResults.Delta = [obj.SimAuxResults.Delta, obj.tmp_Delta];
+                obj.SimAuxResults.delta = [obj.SimAuxResults.delta, obj.tmpDelta];
             end
             
             if obj.SimOutput.Nose_Alpha
-                obj.SimAuxResults.Nose_Alpha = [obj.SimAuxResults.Nose_Alpha, obj.tmp_Nose_Alpha];
+                obj.SimAuxResults.noseAlpha = [obj.SimAuxResults.noseAlpha, obj.tmpNoseAlpha];
             end
             if obj.SimOutput.Nose_Delta
-                obj.SimAuxResults.Nose_Delta = [obj.SimAuxResults.Nose_Delta, obj.tmp_Nose_Delta];
+                obj.SimAuxResults.noseDelta = [obj.SimAuxResults.noseDelta, obj.tmpNoseDelta];
             end
             
         end
@@ -880,10 +880,10 @@ methods(Access = private)
 
             obj.firstSimFlag = 0;
             if obj.SimOutput.Nose_Alpha
-                obj.SimAuxResults.Nose_Alpha = [obj.SimAuxResults.Nose_Alpha, obj.tmp_Nose_Alpha];
+                obj.SimAuxResults.noseAlpha = [obj.SimAuxResults.noseAlpha, obj.tmpNoseAlpha];
             end
             if obj.SimOutput.Nose_Delta
-                obj.SimAuxResults.Nose_Delta = [obj.SimAuxResults.Nose_Delta, obj.tmp_Nose_Delta];
+                obj.SimAuxResults.noseDelta = [obj.SimAuxResults.noseDelta, obj.tmpNoseDelta];
             end
             
         end

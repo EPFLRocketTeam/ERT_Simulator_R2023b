@@ -55,10 +55,10 @@ display(['Apogee AGL @t = ' num2str(T2(end))]);
 display(['Max speed : ' num2str(maxi)]);
 display(['Max speed @t = ' num2str(T2(index))]);
 [~,a,~,rho,nu] = atmosphere(S2(index,3),Environment);
-Fd = 0.5*SimObj.SimAuxResults.Cd(index)*rho*pi*Rocket.dm^2/4*maxi^2;
+Fd = 0.5*SimObj.SimAuxResults.dragCoefficient(index)*rho*pi*Rocket.dm^2/4*maxi^2;
 display(['Max drag force = ' num2str(Fd)]);
-display(['Max drag force along rocket axis = ' num2str(Fd*cos(SimObj.SimAuxResults.Delta(index)))]);
-C_Dab = drag_shuriken(Rocket, 0, SimObj.SimAuxResults.Delta(index), maxi, nu);
+display(['Max drag force along rocket axis = ' num2str(Fd*cos(SimObj.SimAuxResults.delta(index)))]);
+C_Dab = drag_shuriken(Rocket, 0, SimObj.SimAuxResults.delta(index), maxi, nu);
 F_Dab = 0.5*C_Dab*rho*pi*Rocket.dm^2/4*maxi^2;
 display(['AB drag force at max speed = ' num2str(F_Dab)]);
 display(['Max Mach number : ' num2str(maxi/a)]);
@@ -239,7 +239,7 @@ plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Cn_{\alpha}';
 
 subplot(3,2,5);
-plot(T2, SimObj.SimAuxResults.Cd*1.3) % 1.3 is scale corrective CD factor!
+plot(T2, SimObj.SimAuxResults.dragCoefficient*1.3) % 1.3 is scale corrective CD factor!
 grid on
 box on
 hold on;
@@ -248,7 +248,7 @@ title 'SCALED CD';
 
 % Plot angle with vertical
 subplot(3,2,6);
-plot(T2, SimObj.SimAuxResults.Delta)
+plot(T2, SimObj.SimAuxResults.delta)
 ylim([0, 1]);
 tmpYlim = ylim;
 set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
@@ -256,7 +256,7 @@ grid on
 box on
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-title 'Delta, angle with Oz'
+title 'delta, angle with Oz'
 screensize = get( groot, 'Screensize' );
 set(gcf,'Position',[screensize(1:2), screensize(3)*0.5,screensize(4)]);
 
@@ -265,25 +265,25 @@ set(gcf,'Position',[screensize(1:2), screensize(3)*0.5,screensize(4)]);
 % 
 % [max,idx] = max(S2(:,6));
 %  %[~, index] = unique(RAW{:,1}); 0.0: 0.01 :  max(S2(:,6))
-%  AX = interp1(S2(1:idx,6),SimObj.SimAuxResults.Cd(1:idx),  S2(1,6): 0.01 :  max , 'pchip', 'extrap');  
+%  AX = interp1(S2(1:idx,6),SimObj.SimAuxResults.dragCoefficient(1:idx),  S2(1,6): 0.01 :  max , 'pchip', 'extrap');  
 % 
 %       %      to_log = transpose([ 20.0: 0.01 : bound+20 ; AX ; AY ; AZ ; P ]);
 %             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% plot( S2(1,6): 0.01 :  max , AX ) %SimObj.SimAuxResults.Cd
+% plot( S2(1,6): 0.01 :  max , AX ) %SimObj.SimAuxResults.dragCoefficient
 % ylim([0, 3]);
 % xlim([S2(1,6),max]);
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.2:tmpYlim(2));
 % hold on;
-% title 'Cd'
+% title 'dragCoefficient'
 % 
-% AY = interp1(S2(idx:end,6),SimObj.SimAuxResults.Cd(idx:end),  S2(end,6): 0.01 :  max , 'pchip', 'extrap');  
-% plot( S2(end,6): 0.01 :  max , AY ) %SimObj.SimAuxResults.Cd
+% AY = interp1(S2(idx:end,6),SimObj.SimAuxResults.dragCoefficient(idx:end),  S2(end,6): 0.01 :  max , 'pchip', 'extrap');  
+% plot( S2(end,6): 0.01 :  max , AY ) %SimObj.SimAuxResults.dragCoefficient
 % ylim([0, 3]);
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.2:tmpYlim(2));
 % hold on;
-% title 'Cd'
+% title 'dragCoefficient'
 
 
 
@@ -362,13 +362,13 @@ box on
 % subplot(1,2,1);
 % plot(T6, SimObj.SimAuxResults.Nose_Alpha)
 % title '\alpha';
-% % Delta, angle with vertical
+% % delta, angle with vertical
 % subplot(1,2,2);
 % plot(T6, SimObj.SimAuxResults.Nose_Delta)
 % ylim([0, 1]);
 % tmpYlim = ylim;
 % set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
-% title 'Delta, angle with Oz'
+% title 'delta, angle with Oz'
 
 % Plot 9
 figure(Name="acceleration")

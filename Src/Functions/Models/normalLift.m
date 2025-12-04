@@ -19,8 +19,8 @@ function [CNa, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, alpha, K, M
 
 [CNa_barrowman, Xp_barrowman] = barrowmanLift(Rocket, alpha, M, theta);
 % Fac for montecarlo simulation 
-Xp_barrowman = Xp_barrowman*Rocket.cp_fac;
-CNa_barrowman = CNa_barrowman*Rocket.CNa_fac;
+Xp_barrowman = Xp_barrowman*Rocket.centerOfPressureFactor;
+CNa_barrowman = CNa_barrowman*Rocket.normalForceCoefficientFactor;
 if Galejs
     [CNa_galejs, Xp_galejs] = robertGalejsLift(Rocket, alpha, K);
     CNa = sum([CNa_barrowman, CNa_galejs]);

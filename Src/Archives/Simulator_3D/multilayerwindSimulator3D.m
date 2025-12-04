@@ -96,9 +96,9 @@ classdef multilayerwindSimulator3D < handle
 
             % drag
             CD = drag(obj.Rocket, 0, v,Nu, a); % (TODO: make air-viscosity adaptable to temperature)
-            D = -0.5*rho*obj.Rocket.Sm*CD*v^2; % (TODO: define drag in wind coordinate system)
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*v^2; % (TODO: define drag in wind coordinate system)
 
-            F_tot = G + T*obj.Rocket.motor_fac + D;
+            F_tot = G + T*obj.Rocket.motorThrustFactor + D;
 
             % State derivatives
 
@@ -205,21 +205,21 @@ classdef multilayerwindSimulator3D < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*rho*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
             end
 
             % Drag
             % Drag coefficient
-            CD = drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.CD_fac; 
+            CD = drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm; 
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*Vmag^2*Vnorm; 
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motor_fac +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force
@@ -233,7 +233,7 @@ classdef multilayerwindSimulator3D < handle
             W_pitch = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
             CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
                 dMdt, Cm, norm(W_pitch) , Vmag); 
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            MD = -0.5*rho*CDM*obj.Rocket.maxCrossSectionArea*Vmag^2*normalizeVect(W_pitch);
 
             M_tot = ...
                 MN...  ; % aerodynamic corrective moment
@@ -253,7 +253,7 @@ classdef multilayerwindSimulator3D < handle
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
             
             % cache auxiliary result data
-            obj.tmp_Margin = margin/obj.Rocket.dm;
+            obj.tmp_Margin = margin/obj.Rocket.maxDiameter;
             obj.tmp_Alpha = alpha;
             obj.tmp_Cn_alpha = CNa;
             obj.tmp_Xcp = Xcp;
@@ -285,9 +285,9 @@ classdef multilayerwindSimulator3D < handle
                 V_inf;
 
             if Main
-                SCD = Rocket.para_main_SCD;
+                SCD = Rocket.mainParachuteDragArea;
             elseif Main == 0
-                SCD = Rocket.para_drogue_SCD;
+                SCD = Rocket.drogueParachuteDragArea;
             end
             D = 0.5*rho*SCD*norm(Vrel)*Vrel;
 
@@ -319,7 +319,7 @@ classdef multilayerwindSimulator3D < handle
             [~, a, ~, rho, nu] = stdAtmos(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.rocket_m;
+            M = Rocket.emptyMass;
             alt = min(400, max(1,round(X(3)/10)));
             V_inf = Environment.Vspeed(alt)*[Environment.Vdirx(alt);Environment.Vdiry(alt);Environment.Vdirz(alt)];
             V_rel = V -...
@@ -333,7 +333,7 @@ classdef multilayerwindSimulator3D < handle
             % Drag coefficient
             CD = drag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
-            D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
+            D = -0.5*rho*Rocket.maxCrossSectionArea*CD*V_rel*norm(V_rel); 
 
             % Translational dynamics
             X_dot = V;
@@ -442,21 +442,21 @@ classdef multilayerwindSimulator3D < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*rho*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
             end
 
             % Drag
             % Drag coefficient
-            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.CD_fac; 
+            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm;
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*Vmag^2*Vnorm;
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motor_fac +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force
@@ -470,7 +470,7 @@ classdef multilayerwindSimulator3D < handle
             W_pitch = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
             CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
                 dMdt, Cm, norm(W_pitch) , Vmag); 
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            MD = -0.5*rho*CDM*obj.Rocket.maxCrossSectionArea*Vmag^2*normalizeVect(W_pitch);
 
             M_tot = ...
                 MN...  ; % aerodynamic corrective moment
@@ -577,7 +577,7 @@ classdef multilayerwindSimulator3D < handle
             S0 = [X0; V0];
 
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
             tspan = [T0, 500];
@@ -606,7 +606,7 @@ classdef multilayerwindSimulator3D < handle
             S0 = [X0; V0];
             
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
             tspan = [T0, 500];

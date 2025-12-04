@@ -22,7 +22,7 @@ CD_AB = drag_shuriken(Rocket,theta,0,x(2),Nu);
 
 % Behaviour Equation:
 xdot(1) = x(2);
-xdot(2) = Amplifier*T/M-g-x(2)*dMdt/M-0.5*rho*Rocket.Sm*x(2).^2*(CD+CD_AB)/M;
+xdot(2) = Amplifier*T/M-g-x(2)*dMdt/M-0.5*rho*Rocket.maxCrossSectionArea*x(2).^2*(CD+CD_AB)/M;
 
 end
 

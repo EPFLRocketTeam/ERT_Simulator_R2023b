@@ -5,7 +5,7 @@ V = [s(2);s(4)];
 
 % Compute mass
 [M,~] = Mass_Lin(t,Rocket);
-M = M - Rocket.pl_mass;
+M = M - Rocket.payloadMass;
 
 % Atmospheric Data
 [~, ~, ~, rho] = stdAtmos(X(2)); % Atmosphere [K,m/s,Pa,kg/m3]

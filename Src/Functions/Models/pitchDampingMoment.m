@@ -11,7 +11,7 @@ function CDM = pitchDampingMoment(Rocket, rho, Calpha, CP, dMdt, CM, w, V)
         % Thrust damping
         % -------------------------------------------------------------------------
 
-        CDM_thrust = dMdt*(Rocket.L-CM).^2*w*2/V^2/rho/Rocket.Sm;
+        CDM_thrust = dMdt*(Rocket.totalLength-CM).^2*w*2/V^2/rho/Rocket.maxCrossSectionArea;
 
         % -------------------------------------------------------------------------
         % Aerdynamic damping
@@ -29,9 +29,9 @@ function CDM = pitchDampingMoment(Rocket, rho, Calpha, CP, dMdt, CM, w, V)
 
 %         % OpenRocket method, see OpenRocket documentation 3.2.3
 %         % Damping coefficient relative to body
-%         CDM_body = 0.275*Rocket.stage_z(end)^4/Rocket.Sm*w^2/V^2;
+%         CDM_body = 0.275*Rocket.stagePositions(end)^4/Rocket.maxCrossSectionArea*w^2/V^2;
 %         % Damping coefficient relative to fins
-%         CDM_fin = 0.6*Rocket.fin_n*Rocket.fin_SE*(Rocket.fin_xt-CM)^3/Rocket.Sm/Rocket.dm*w^2/V^2;
+%         CDM_fin = 0.6*Rocket.numFins*Rocket.exposedFinArea*(Rocket.finRootPosition-CM)^3/Rocket.maxCrossSectionArea/Rocket.maxDiameter*w^2/V^2;
 %         % Total
 %         CDM_aero = CDM_body + CDM_fin;
 

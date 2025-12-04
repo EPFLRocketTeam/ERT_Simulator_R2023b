@@ -29,17 +29,17 @@ end
 % -------------------------------------------------------------------------
 % 1. Geometrical Parameters
 % -------------------------------------------------------------------------
-maxDiameter = rocket.dm; % maximum rocket diameter 
-maxCrossSectionalArea = rocket.Sm; % maximum cross-sectional body area
-finChord = rocket.fin_c; % fin cord
-finExposedPlanformArea = rocket.fin_SE; % Exposed planform fin area
-bodyDiameterAtFinStation = rocket.fin_df; % body diameter at middle of fin station
-finVirtualPlanformArea = rocket.fin_SF; % Virtual fin planform area
+maxDiameter = rocket.maxDiameter; % maximum rocket diameter 
+maxCrossSectionalArea = rocket.maxCrossSectionArea; % maximum cross-sectional body area
+finChord = rocket.meanFinChord; % fin cord
+finExposedPlanformArea = rocket.exposedFinArea; % Exposed planform fin area
+bodyDiameterAtFinStation = rocket.finBodyDiameter; % body diameter at middle of fin station
+finVirtualPlanformArea = rocket.virtualFinArea; % Virtual fin planform area
 % -------------------------------------------------------------------------
 % 2. Reynolds Numbers (eq 191, p 458)
 % -------------------------------------------------------------------------
 % 2.1 Body 
-reynoldsNumberBody = rocket.stage_z(end) * freestreamVelocity / kinematicViscosity;
+reynoldsNumberBody = rocket.stagePositions(end) * freestreamVelocity / kinematicViscosity;
 reynoldsNumberBodyCritical = 5e5;
 % 2.2 Fins
 reynoldsNumberFins = finChord * freestreamVelocity / kinematicViscosity; 
@@ -79,33 +79,33 @@ skinFrictionCoeffTurbulentFins = skinFrictionCoeffTurbulentFins - transitionFact
 % Need to determine a better way of finding the interresting length (for
 % example I put the 2nd stage but it is possible that it is the third that
 % is needed)
-wettedAreaRatioNose = 2.7 * rocket.stage_z(1) / rocket.diameters(3); %Ogive
-wettedAreaRatioCylinder = 4 * (rocket.stage_z(2) - rocket.stage_z(end-1)) / rocket.diameters(3);
-wettedAreaRatioBoattail = 2 / maxDiameter^2 * sum((rocket.diameters(2:end-1) + rocket.diameters(3:end)) .* ...
-    (rocket.stage_z(3:end) - rocket.stage_z(2:end-1)) .* ...
-    sqrt(1 + ((rocket.diameters(2:end-1) - rocket.diameters(3:end)) ./ 2 ./ ...
-    (rocket.stage_z(3:end) - rocket.stage_z(2:end-1))).^2));  %Repris la formule du dessus
+wettedAreaRatioNose = 2.7 * rocket.stagePositions(1) / rocket.stageDiameters(3); %Ogive
+wettedAreaRatioCylinder = 4 * (rocket.stagePositions(2) - rocket.stagePositions(end-1)) / rocket.stageDiameters(3);
+wettedAreaRatioBoattail = 2 / maxDiameter^2 * sum((rocket.stageDiameters(2:end-1) + rocket.stageDiameters(3:end)) .* ...
+    (rocket.stagePositions(3:end) - rocket.stagePositions(2:end-1)) .* ...
+    sqrt(1 + ((rocket.stageDiameters(2:end-1) - rocket.stageDiameters(3:end)) ./ 2 ./ ...
+    (rocket.stagePositions(3:end) - rocket.stagePositions(2:end-1))).^2));  %Repris la formule du dessus
  
 totalWettedAreaRatio = wettedAreaRatioNose + wettedAreaRatioCylinder + wettedAreaRatioBoattail;
-if rocket.stage_z(2) / maxDiameter < 1.5
+if rocket.stagePositions(2) / maxDiameter < 1.5
     display('WARNING: In drag coefficient calculation, ogive cone ratio is out of bounds. Drag estimation cannot be trusted.');
 end
  
 % 4.2 Body drag
 % 4.2.1 (eq 161, p 431)
-bodyFrictionDragCoeff = (1 + 60 / (rocket.stage_z(end) / maxDiameter)^3 + 0.0025 * (rocket.stage_z(end) / maxDiameter)) * totalWettedAreaRatio; % partially calculated body drag
+bodyFrictionDragCoeff = (1 + 60 / (rocket.stagePositions(end) / maxDiameter)^3 + 0.0025 * (rocket.stagePositions(end) / maxDiameter)) * totalWettedAreaRatio; % partially calculated body drag
 if reynoldsNumberBody < reynoldsNumberBodyCritical
     bodyFrictionDragCoeff = skinFrictionCoeffLaminarBody * bodyFrictionDragCoeff; % body drag for laminar flow
 else
     bodyFrictionDragCoeff = skinFrictionCoeffTurbulentBody * bodyFrictionDragCoeff; % body drag for turbulent flow
 end
 % 4.2.2 Base drag (eq 162, p 431)
-baseDragCoeff = 0.029 * (rocket.diameters(end) / maxDiameter)^3 / sqrt(bodyFrictionDragCoeff);
+baseDragCoeff = 0.029 * (rocket.stageDiameters(end) / maxDiameter)^3 / sqrt(bodyFrictionDragCoeff);
 % 4.2.3 Body drag at 0° AoA (eq 160, p 431)
 zeroAoaBodyDragCoeff = bodyFrictionDragCoeff + baseDragCoeff;
 % 4.3 Fin drag
 % 4.3.1 Fin drag at 0° AoA (eq 159, p 433)
-zeroAoaFinDragCoeff = 2 * (1 + 2 * rocket.fin_t / finChord) * rocket.fin_n * finVirtualPlanformArea / maxCrossSectionalArea;
+zeroAoaFinDragCoeff = 2 * (1 + 2 * rocket.finThickness / finChord) * rocket.numFins * finVirtualPlanformArea / maxCrossSectionalArea;
 if reynoldsNumberFins < reynoldsNumberFinsCritical
     zeroAoaFinDragCoeff = zeroAoaFinDragCoeff * skinFrictionCoeffLaminarFins;
 else
@@ -114,11 +114,11 @@ end
 % 4.4 Launch lug drag mounted on body (eq 119 p 390)
 % TODO consider launch lugs mounted near fins with a different drag
 % coefficient.
-launchLugDragCoeff = rocket.lug_n * 5.75 * rocket.lug_S / maxCrossSectionalArea;
+launchLugDragCoeff = rocket.numLaunchLugs * 5.75 * rocket.lugSurfaceArea / maxCrossSectionalArea;
 % 4.5 Fin and Body drag at 0 AoA (eq 158, p 430) plus launch lug drag
 zeroAoaTotalDragCoeff = zeroAoaBodyDragCoeff + zeroAoaFinDragCoeff + launchLugDragCoeff;
 % 4.6 Drag for nosecone failure
-if strcmp(rocket.cone_mode, 'off')
+if strcmp(rocket.coneMode, 'off')
    zeroAoaTotalDragCoeff = zeroAoaTotalDragCoeff + 1 - bodyFrictionDragCoeff;
 end
 % -------------------------------------------------------------------------
@@ -129,19 +129,19 @@ end
 angleOfAttack = abs(angleOfAttack);
 etaTable = [4 6 8 10 12 14 16 18 20 22 24; 0.6 0.63 0.66 0.68 0.71 0.725 0.74 0.75 0.758 0.77 0.775];
 deltaKTable = [4 6 8 10 12 14 16 18 20; 0.78 0.86 0.92 0.94 0.96 0.97 0.975 0.98 0.982];
-etaK = interp1(etaTable(1,:), etaTable(2,:), rocket.stage_z(end) / maxDiameter, 'linear', 'extrap');
-deltaK = interp1(deltaKTable(1,:), deltaKTable(2,:), rocket.stage_z(end) / maxDiameter, 'linear', 'extrap');
+etaK = interp1(etaTable(1,:), etaTable(2,:), rocket.stagePositions(end) / maxDiameter, 'linear', 'extrap');
+deltaK = interp1(deltaKTable(1,:), deltaKTable(2,:), rocket.stagePositions(end) / maxDiameter, 'linear', 'extrap');
 % 5.1.2 Compute body drag at angle of attack alpha
 % 5.1.2.1 x1 as defined by explanations of (eq 140, p 404)
-shoulderPosition = rocket.stage_z(find(diff(rocket.diameters) == 0, 1, 'first')); % TO CHECK - OK
+shoulderPosition = rocket.stagePositions(find(diff(rocket.stageDiameters) == 0, 1, 'first')); % TO CHECK - OK
 % 5.1.2.2 x0 as in (eq 140, p404)
-referenceStationX0 = 0.55 * shoulderPosition + 0.36 * rocket.stage_z(end); % Purely exp. values
+referenceStationX0 = 0.55 * shoulderPosition + 0.36 * rocket.stagePositions(end); % Purely exp. values
 % 5.1.2.3 Section Area at station x0
-crossSectionalAreaAtX0 = pi * interp1(rocket.stage_z, rocket.diameters, referenceStationX0, 'linear')^2 / 4; % Why divided by 4 ?
+crossSectionalAreaAtX0 = pi * interp1(rocket.stagePositions, rocket.stageDiameters, referenceStationX0, 'linear')^2 / 4; % Why divided by 4 ?
 % 5.1.2.4 Body drag at low AoA (eq 139, p. 404) %% ERROR IN THE BOOK !!!
 bodyAoaDragCoeff = 2 * deltaK * crossSectionalAreaAtX0 / maxCrossSectionalArea * angleOfAttack * sin(angleOfAttack);
-tempStages = [referenceStationX0, rocket.stage_z(rocket.stage_z > referenceStationX0)];
-tempDiameters = [interp1(rocket.stage_z, rocket.diameters, referenceStationX0, 'linear'), rocket.diameters(rocket.stage_z > referenceStationX0)];
+tempStages = [referenceStationX0, rocket.stagePositions(rocket.stagePositions > referenceStationX0)];
+tempDiameters = [interp1(rocket.stagePositions, rocket.stageDiameters, referenceStationX0, 'linear'), rocket.stageDiameters(rocket.stagePositions > referenceStationX0)];
 % 5.1.2.4 Body drag at high AoA (eq 142, p. 406)
 bodyAoaDragCoeff = bodyAoaDragCoeff + 2 * angleOfAttack^2 * sin(angleOfAttack) / maxCrossSectionalArea * etaK * 1.2 * sum((tempDiameters(1, end-1) + tempDiameters(2:end)) / 2 .* (tempStages(2:end) - tempStages(1:end-1)));
 % 5.2 Fin drag at AoA
@@ -155,7 +155,7 @@ finExposedSurfaceCoeff = 2;
 inducedFinDragCoeff = 1.2 * angleOfAttack^2 * finVirtualPlanformArea / maxCrossSectionalArea * finExposedSurfaceCoeff;
 % 5.2.3 Interference coefficients as estimated by Hassan (eq 34 and 35, p
 % 12) based on Mandell Fig. 40 p 416.
-finSpanRatio = bodyDiameterAtFinStation / (2 * rocket.fin_s + bodyDiameterAtFinStation); % Total fin span ratio
+finSpanRatio = bodyDiameterAtFinStation / (2 * rocket.finSpan + bodyDiameterAtFinStation); % Total fin span ratio
 interferenceFactorBodyOnFin = 0.8065 * finSpanRatio^2 + 1.1553 * finSpanRatio; % Interference of body on fin lift
 interferenceFactorFinOnBody = 0.1935 * finSpanRatio^2 + 0.8174 * finSpanRatio + 1; % Interference of fins on body lift % WARNING ONLY VALID FOR GIVEN VALUES
 % 5.2.4 Interference Drag Coefficient (eq 146, p 415)
@@ -168,9 +168,9 @@ totalAoaDragCoeff = bodyAoaDragCoeff + finAoaDragCoeff;
 % 7. Drag of tumbeling body (c.f. OpenRocket Documentation section 3.5)
 % -------------------------------------------------------------------------
 finEfficiency = [0.5, 1, 1.5, 1.41, 1.81, 1.73, 1.9, 1.85];
-tumblingDragCoeffFins = 1.42 * finEfficiency(rocket.fin_n);
+tumblingDragCoeffFins = 1.42 * finEfficiency(rocket.numFins);
 tumblingDragCoeffBody = 0.56;
-totalTumblingDragCoeff = (finExposedPlanformArea * tumblingDragCoeffFins + tumblingDragCoeffBody * maxDiameter * (rocket.stage_z(end) - rocket.stage_z(2))) / maxCrossSectionalArea;
+totalTumblingDragCoeff = (finExposedPlanformArea * tumblingDragCoeffFins + tumblingDragCoeffBody * maxDiameter * (rocket.stagePositions(end) - rocket.stagePositions(2))) / maxCrossSectionalArea;
 % WARNING : Should be multiply by the body tube area
 % -------------------------------------------------------------------------
 % 6. Subsonic drag coefficient
@@ -189,9 +189,9 @@ end
     % "Calculation of the drag coefficient of a rocket at transonic and 
     % supersonic speed" (January 2022)
     
-    noseLengthInches = rocket.stage_z(2) * 39.3701;     % Length of the rocket's nose
-    maxDiameterInches = rocket.dm * 39.3701;           % Maximum rocket diameter
-    effectiveLengthInches = rocket.stage_z(end) * 39.3701; % Effective lenght of the rocket
+    noseLengthInches = rocket.stagePositions(2) * 39.3701;     % Length of the rocket's nose
+    maxDiameterInches = rocket.maxDiameter * 39.3701;           % Maximum rocket diameter
+    effectiveLengthInches = rocket.stagePositions(end) * 39.3701; % Effective lenght of the rocket
         
     % Transonic drag divergence Mach Number
     dragDivergenceMach = -0.0156 * (noseLengthInches / maxDiameterInches)^2 + 0.136 * (noseLengthInches / maxDiameterInches) + 0.6817;
@@ -229,11 +229,11 @@ end
     % -------------------------------------------------------------------------
         
         % length of the nose
-        noseLengthMeters = rocket.stage_z(2);
+        noseLengthMeters = rocket.stagePositions(2);
         % radius at the base of the nose
-        noseBaseRadiusMeters = rocket.diameters(2) / 2;
+        noseBaseRadiusMeters = rocket.stageDiameters(2) / 2;
         % length of the body
-        bodyLengthMeters = rocket.stage_z(end) - noseLengthMeters;
+        bodyLengthMeters = rocket.stagePositions(end) - noseLengthMeters;
         
         % heat capacity ratio
         heatCapacityRatio = 1.4;
@@ -267,14 +267,14 @@ end
         % 3.2.1  Pressure drag (eq 3.5, p 20 and eq 3.7, p 23)
         pressureDragConstantC1 = 2 / sqrt(machNumber^2 - 1);
         pressureDragConstantC2 = ((machNumber^2 - 2)^2 + heatCapacityRatio * machNumber^4) / (2 * (machNumber^2 - 1)^2);
-        pressureDragIntermediateJ1 = rocket.fin_t^2 / 4 * (1 / rocket.fin_L1 + 1 / rocket.fin_L2);
-        pressureDragIntermediateJ2 = rocket.fin_t^3 / 8 * (1 / rocket.fin_L1^2 - 1 / rocket.fin_L2^2);
-        if rocket.fin_cr == rocket.fin_ct
-            finPressureDragCoeff = (2 * pressureDragConstantC1 * pressureDragIntermediateJ1 + 2 * pressureDragConstantC2 * pressureDragIntermediateJ2) / rocket.fin_cr;
+        pressureDragIntermediateJ1 = rocket.finThickness^2 / 4 * (1 / rocket.finLeadingEdgeLength + 1 / rocket.finTrailingEdgeLength);
+        pressureDragIntermediateJ2 = rocket.finThickness^3 / 8 * (1 / rocket.finLeadingEdgeLength^2 - 1 / rocket.finTrailingEdgeLength^2);
+        if rocket.finRootChord == rocket.finTipChord
+            finPressureDragCoeff = (2 * pressureDragConstantC1 * pressureDragIntermediateJ1 + 2 * pressureDragConstantC2 * pressureDragIntermediateJ2) / rocket.finRootChord;
         else
-            finPressureDragCoeff = (2 * pressureDragConstantC1 * pressureDragIntermediateJ1 + 2 * pressureDragConstantC2 * pressureDragIntermediateJ2) * log(rocket.fin_ct / rocket.fin_cr) / (rocket.fin_ct - rocket.fin_cr);
+            finPressureDragCoeff = (2 * pressureDragConstantC1 * pressureDragIntermediateJ1 + 2 * pressureDragConstantC2 * pressureDragIntermediateJ2) * log(rocket.finTipChord / rocket.finRootChord) / (rocket.finTipChord - rocket.finRootChord);
         end
-        phiAngles = 2 * pi / rocket.fin_n * linspace(0, rocket.fin_n - 1, rocket.fin_n);
+        phiAngles = 2 * pi / rocket.numFins * linspace(0, rocket.numFins - 1, rocket.numFins);
         finPressureDragCoeff = finPressureDragCoeff + 2 * pressureDragConstantC1 * sum((asin(sin(angleOfAttack) * sin(phiAngles))).^2);
         
         % 3.2.2  Friction drag (eq 3.4, p 19)
@@ -308,7 +308,7 @@ end
         % ---------------------------------------------------------------------
         
         % (eq 3.10, p 25)
-        baseArea = pi * (rocket.diameters(end) / 2)^2;
+        baseArea = pi * (rocket.stageDiameters(end) / 2)^2;
         if strcmp(rocket.motor_state, 'on')
             baseArea = baseArea - pi * (rocket.motor_dia / 2)^2;
         end
@@ -316,10 +316,10 @@ end
         % coefficient. Interpolation between M = 1.5 and M = 3.
         if machNumber < 3
             transonicDrag = dragTransonic(rocket, angleOfAttack, freestreamVelocity, kinematicViscosity, speedOfSound);
-            supersonicDrag =  nosePressureDragCoeff + noseBodyFrictionDragCoeff + bodyPressureDragCoeff + (finPressureDragCoeff + finFrictionDragCoeff) * finChord * rocket.fin_s / maxCrossSectionalArea + supersonicBaseDragCoeff * baseArea / maxCrossSectionalArea;
+            supersonicDrag =  nosePressureDragCoeff + noseBodyFrictionDragCoeff + bodyPressureDragCoeff + (finPressureDragCoeff + finFrictionDragCoeff) * finChord * rocket.finSpan / maxCrossSectionalArea + supersonicBaseDragCoeff * baseArea / maxCrossSectionalArea;
             dragCoefficient = ((3 - machNumber) * transonicDrag + (machNumber - 1.5) * supersonicDrag) / 1.5;
         else
-            dragCoefficient =  nosePressureDragCoeff + noseBodyFrictionDragCoeff + bodyPressureDragCoeff + (finPressureDragCoeff + finFrictionDragCoeff) * finChord * rocket.fin_s / maxCrossSectionalArea + supersonicBaseDragCoeff * baseArea / maxCrossSectionalArea;
+            dragCoefficient =  nosePressureDragCoeff + noseBodyFrictionDragCoeff + bodyPressureDragCoeff + (finPressureDragCoeff + finFrictionDragCoeff) * finChord * rocket.finSpan / maxCrossSectionalArea + supersonicBaseDragCoeff * baseArea / maxCrossSectionalArea;
         end
         
     end

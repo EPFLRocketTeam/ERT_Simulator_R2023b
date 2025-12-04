@@ -119,11 +119,11 @@ for i=1:k
 end
 
 if nz_param == 3
-    SimObj.Rocket.stage_z = [0, z1, z1 + z12, z1 + z12 + z13];
+    SimObj.Rocket.stagePositions = [0, z1, z1 + z12, z1 + z12 + z13];
 end
 
 if nd_param == 2
-    SimObj.Rocket.diameters = [0, dmin + dd, dmin + dd, dmin];
+    SimObj.Rocket.stageDiameters = [0, dmin + dd, dmin + dd, dmin];
 end
 
 if isChanged_Vi
@@ -139,19 +139,19 @@ end
 % Changing the dependent parameters (see rocketReader.m part 4)
 
 % 4.1 Maximum body diameter
-SimObj.Rocket.dm = SimObj.Rocket.diameters(find(SimObj.Rocket.diameters == max(SimObj.Rocket.diameters), 1, 'first'));
+SimObj.Rocket.maxDiameter = SimObj.Rocket.stageDiameters(find(SimObj.Rocket.stageDiameters == max(SimObj.Rocket.stageDiameters), 1, 'first'));
 % 4.2 Fin cord
-SimObj.Rocket.fin_c = (SimObj.Rocket.fin_cr + SimObj.Rocket.fin_ct)/2; 
+SimObj.Rocket.meanFinChord = (SimObj.Rocket.finRootChord + SimObj.Rocket.finTipChord)/2; 
 % 4.3 Maximum cross-sectional body area
-SimObj.Rocket.Sm = pi*SimObj.Rocket.dm^2/4; 
+SimObj.Rocket.maxCrossSectionArea = pi*SimObj.Rocket.maxDiameter^2/4; 
 % 4.4 Exposed planform fin area
-SimObj.Rocket.fin_SE = (SimObj.Rocket.fin_cr + SimObj.Rocket.fin_ct )/2*SimObj.Rocket.fin_s; 
+SimObj.Rocket.exposedFinArea = (SimObj.Rocket.finRootChord + SimObj.Rocket.finTipChord )/2*SimObj.Rocket.finSpan; 
 % 4.5 Body diameter at middle of fin station (CAREFUL, assumption for the SA)
-SimObj.Rocket.fin_df = SimObj.Rocket.dm; 
+SimObj.Rocket.finBodyDiameter = SimObj.Rocket.maxDiameter; 
 % 4.6 Virtual fin planform area
-SimObj.Rocket.fin_SF = SimObj.Rocket.fin_SE + 1/2*SimObj.Rocket.fin_df*SimObj.Rocket.fin_cr; 
+SimObj.Rocket.virtualFinArea = SimObj.Rocket.exposedFinArea + 1/2*SimObj.Rocket.finBodyDiameter*SimObj.Rocket.finRootChord; 
 % 4.8 Rocket Length
-SimObj.Rocket.L = SimObj.Rocket.stage_z(end);
+SimObj.Rocket.totalLength = SimObj.Rocket.stagePositions(end);
 % Saturation Vapor Ration
 p_ws = exp(77.345+0.0057*SimObj.Environment.Temperature_Ground-7235/SimObj.Environment.Temperature_Ground)/SimObj.Environment.Temperature_Ground^8.2;
 p_a = SimObj.Environment.Pressure_Ground;
@@ -161,7 +161,7 @@ SimObj.Rocket.casing_massP = SimObj.Rocket.motor_massP-SimObj.Rocket.propel_mass
 SimObj.Rocket.casing_massF = SimObj.Rocket.motor_massF-SimObj.Rocket.propel_massF;
 %Global motor info
 SimObj.Rocket.motor_dia = max(SimObj.Rocket.motor_diaP, SimObj.Rocket.motor_diaF);
-SimObj.Rocket.motor_length = SimObj.Rocket.motor_lengthP + SimObj.Rocket.motor_lengthF + SimObj.Rocket.intermotor_d ;
+SimObj.Rocket.motor_length = SimObj.Rocket.motor_lengthP + SimObj.Rocket.motor_lengthF + SimObj.Rocket.interMotorDistance ;
 SimObj.Rocket.propel_mass = SimObj.Rocket.propel_massP + SimObj.Rocket.propel_massF ;
 SimObj.Rocket.motor_mass = SimObj.Rocket.motor_massP + SimObj.Rocket.motor_massF; 
 SimObj.Rocket.casing_mass = SimObj.Rocket.casing_massP + SimObj.Rocket.casing_massF ;

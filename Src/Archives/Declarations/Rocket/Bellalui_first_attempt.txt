@@ -1,28 +1,28 @@
-stages 4
-diameters 0 0.156 0.156 0.135
-stage_z 0 0.242 4 4.05
-fin_n 3
-fin_xt 3.72
-fin_s 0.2
-fin_cr 0.28
-fin_ct 0.125
-fin_xs 0.107
-fin_t 0.004
-lug_n 2
-lug_S 1.81e-4
-rocket_m 33.775
-rocket_I 17
-rocket_cm 2.09 //should be 2.09 but hybrid motor weight is such that we should decrease cm by 0.10
-ab_x 100
-ab_n 0
-ab_phi 0
-pl_mass 4.0
-para_main_SCD 11.2312
-para_drogue_SCD 0.4299
-para_main_event 282.854
-motor BL_whole_hybrid_doctor_but_merged.txt
-motor_fac 1
-cone_mode on
-cp_fac 1
-CNa_fac 1
-CD_fac 1
+numStages 4
+stageDiameters 0 0.156 0.156 0.135
+stagePositions 0 0.242 4 4.05
+numFins 3
+finRootPosition 3.72
+finSpan 0.2
+finRootChord 0.28
+finTipChord 0.125
+finSweepDistance 0.107
+finThickness 0.004
+numLaunchLugs 2
+lugSurfaceArea 1.81e-4
+emptyMass 33.775
+emptyInertia 17
+emptyCenterOfMass 2.09 //should be 2.09 but hybrid motor weight is such that we should decrease cm by 0.10
+airbrakePosition 100
+numAirbrakes 0
+airbrakeAngle 0
+payloadMass 4.0
+mainParachuteDragArea 11.2312
+drogueParachuteDragArea 0.4299
+mainParachuteDeploymentAltitude 282.854
+motorId BL_whole_hybrid_doctor_but_merged.txt
+motorThrustFactor 1
+coneMode on
+centerOfPressureFactor 1
+normalForceCoefficientFactor 1
+dragCoefficientFactor 1

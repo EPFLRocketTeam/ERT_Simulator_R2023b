@@ -7,7 +7,7 @@ addpath(genpath('./Declarations'),...
         genpath('./Snippets'),...
         genpath('./Simulator_3D'));
 % Rocket Definition
-Rocket = rocketReader('Nordend_EUROC.txt');
+Rocket = rocketReader('Wildhorn.txt');
 
 
 Environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
@@ -34,7 +34,7 @@ display(['Launch rail departure time : ' num2str(T1(end))]);
 
 [T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
 
-%SimObj.Rocket.cone_mode = 'off';
+%SimObj.Rocket.coneMode = 'off';
 
 [T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
 
@@ -55,11 +55,11 @@ display(['Apogee AGL @t = ' num2str(T2(end))]);
 display(['Max speed : ' num2str(maxi)]);
 display(['Max speed @t = ' num2str(T2(index))]);
 [~,a,~,rho,nu] = atmosphere(S2(index,3),Environment);
-Fd = 0.5*SimObj.SimAuxResults.Cd(index)*rho*pi*Rocket.dm^2/4*maxi^2;
+Fd = 0.5*SimObj.SimAuxResults.Cd(index)*rho*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['Max drag force = ' num2str(Fd)]);
 display(['Max drag force along rocket axis = ' num2str(Fd*cos(SimObj.SimAuxResults.Delta(index)))]);
 C_Dab = drag_shuriken(Rocket, 0, SimObj.SimAuxResults.Delta(index), maxi, nu);
-F_Dab = 0.5*C_Dab*rho*pi*Rocket.dm^2/4*maxi^2;
+F_Dab = 0.5*C_Dab*rho*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['AB drag force at max speed = ' num2str(F_Dab)]);
 display(['Max Mach number : ' num2str(maxi/a)]);
 [maxi,index] = max(diff(S_1_2(:,2))./diff(T_1_2));

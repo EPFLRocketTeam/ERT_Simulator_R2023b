@@ -63,13 +63,13 @@ W = SimObj.SimAuxResults.CM(1);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
-d = max(Rocket.diameters);
+d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
 C2A = rho * V * Ar / 2 * CNa2A;
 
 [~,dMdt] = Mass_Non_Lin(T1(end), Rocket);
-Lne = Rocket.stage_z(end);
+Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
 
@@ -89,8 +89,8 @@ Il = SimObj.SimAuxResults.Il(1);
 epsilon = C2 / (2 * sqrt(C1 * Il));
 
 display('=============== Nominal case');
-% display(['CG - Nominal case : ' num2str(Rocket.rocket_cm)]);
-% display(['Il initial - Nominal case : ' num2str(Rocket.rocket_I)]);
+% display(['CG - Nominal case : ' num2str(Rocket.emptyCenterOfMass)]);
+% display(['Il initial - Nominal case : ' num2str(Rocket.emptyInertia)]);
 % display(['Rho - Nominal case : ' num2str(rho)]);
 
 if norm(V)>=20
@@ -161,13 +161,13 @@ W = SimObj.SimAuxResults.CM(index);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
-d = max(Rocket.diameters);
+d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
 C2A = rho * norm(V) * Ar / 2 * CNa2A;
 
 [~,dMdt] = Mass_Non_Lin(T2(index), Rocket);
-Lne = Rocket.stage_z(end);
+Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
 
@@ -187,8 +187,8 @@ Il = SimObj.SimAuxResults.Il(index);
 epsilon = C2 / (2 * sqrt(C1 * Il));
 
 display('=============== Max speed case');
-% display(['CG - Max speed : ' num2str(Rocket.rocket_cm)]);
-% display(['Il initial - Max speed : ' num2str(Rocket.rocket_I)]);
+% display(['CG - Max speed : ' num2str(Rocket.emptyCenterOfMass)]);
+% display(['Il initial - Max speed : ' num2str(Rocket.emptyInertia)]);
 % display(['Rho - Max speed : ' num2str(rho)]);
 
 if norm(V)>=20
@@ -245,8 +245,8 @@ display(['Max Static Margin : ' num2str(max(Stability))]);
 % =========================================================================
 
 % ROCKET CHANGES
-Rocket.rocket_cm = Rocket.rocket_cm * 1.05;
-Rocket.rocket_I = Rocket.rocket_I * 1.15;
+Rocket.emptyCenterOfMass = Rocket.emptyCenterOfMass * 1.05;
+Rocket.emptyInertia = Rocket.emptyInertia * 1.15;
 % Speed off rail
 V = 20;
 
@@ -290,13 +290,13 @@ W = SimObj.SimAuxResults.CM(1);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
-d = max(Rocket.diameters);
+d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
 C2A = rho * V * Ar / 2 * CNa2A;
 
 [~,dMdt] = Mass_Non_Lin(T1(end), Rocket);
-Lne = Rocket.stage_z(end);
+Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
 
@@ -316,8 +316,8 @@ Il = SimObj.SimAuxResults.Il(1);
 epsilon = C2 / (2 * sqrt(C1 * Il));
 
 display('=============== Worst case');
-% display(['CG - Worst case : ' num2str(Rocket.rocket_cm)]);
-% display(['Il initial - Worst case : ' num2str(Rocket.rocket_I)]);
+% display(['CG - Worst case : ' num2str(Rocket.emptyCenterOfMass)]);
+% display(['Il initial - Worst case : ' num2str(Rocket.emptyInertia)]);
 % display(['Rho - Worst case : ' num2str(rho)]);
 
 if norm(V)>=20
@@ -392,13 +392,13 @@ W = SimObj.SimAuxResults.CM(index);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
-d = max(Rocket.diameters);
+d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
 C2A = rho * norm(V) * Ar / 2 * CNa2A;
 
 [~,dMdt] = Mass_Non_Lin(T2(index), Rocket);
-Lne = Rocket.stage_z(end);
+Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
 
@@ -418,8 +418,8 @@ Il = SimObj.SimAuxResults.Il(index);
 epsilon = C2 / (2 * sqrt(C1 * Il));
 
 display('=============== Worst case max speed');
-% display(['CG - Worst case Max speed : ' num2str(Rocket.rocket_cm)]);
-% display(['Il initial - Worst case Max speed : ' num2str(Rocket.rocket_I)]);
+% display(['CG - Worst case Max speed : ' num2str(Rocket.emptyCenterOfMass)]);
+% display(['Il initial - Worst case Max speed : ' num2str(Rocket.emptyInertia)]);
 % display(['Rho - Worst case Max speed : ' num2str(rho)]);
 
 if norm(V)>=20

@@ -1,285 +1,277 @@
 function Rocket = rocketReader(rocketFilePath)
 
 % -------------------------------------------------------------------------
-% 1. Read Rocket
+% 1. Read Rocket Configuration File
 % -------------------------------------------------------------------------
 
-rfid = fopen(rocketFilePath);
+fileId = fopen(rocketFilePath);
 
-if rfid < 0
-   error('ERROR: Rocket file name unfound.') 
+if fileId < 0
+   error('ERROR: Rocket file not found: %s', rocketFilePath) 
 end
-Rocket.isHybrid = 0;
+Rocket.isHybrid = false;
 
 % Rocket Motor on/off parameter
-Rocket.motor_state = 'off';
+Rocket.motorState = 'off';
 
-while ~feof(rfid)
-
-    line_content = fgetl(rfid);
-    [line_id, line_data] = strtok(line_content);
-    switch line_id
+while ~feof(fileId)
+    lineContent = fgetl(fileId);
+    [lineIdentifier, lineData] = strtok(lineContent);
+    
+    switch lineIdentifier
         
-        % Integer number indicating how many stages (diameter changes) the
-        % rocket has. Typically, a straight rocket will have only 3 stages:
-        % tip, cone base and tail. A rocket with a boattail has one
-        % additional stage.
-        case 'stages'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.stages = line_data_num{1}(1);
+        % Number of diameter stages in the rocket
+        case 'numStages'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.numStages = lineDataNumeric{1}(1);
             
-        % List containing as many numbers as defined by the 'stages' 
-        % parameter. Each number indicates the diameter at that stage     
-        case 'diameters'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.diameters = line_data_num{1}';
+        % Diameters at each stage [m]
+        case 'stageDiameters'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.stageDiameters = lineDataNumeric{1}';
             
-        % List containing as many numbers as defined by the 'stages' 
-        % parameter. Each number indicates the position from the rocket's
-        % tip of the diameter change
-        case 'stage_z'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.stage_z = line_data_num{1}';
+        % Position from rocket tip for each diameter change [m]
+        case 'stagePositions'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.stagePositions = lineDataNumeric{1}';
         
-        % Indicates if the aerodynamics are computed with or without the 
-        % cone. 'cone_mode' = 'on' indicates the cone is on the rocket, 
-        % 'cone_mode = off' indicates the cone is removed from the rocket
-        case 'cone_mode'
-            line_data_string = textscan(line_data,'%s');
-            Rocket.cone_mode = line_data_string{1}{1};    
+        % Cone inclusion in aerodynamic calculations
+        case 'coneMode'
+            lineDataString = textscan(lineData,'%s');
+            Rocket.coneMode = lineDataString{1}{1};    
             
-        % Integer referring to the number of fins    
-        case 'fin_n'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_n = line_data_num{1}(1);
+        % Number of fins    
+        case 'numFins'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.numFins = lineDataNumeric{1}(1);
         
-        % distance of the fin's leading edge root from the rocket's tip    
-        case 'fin_xt'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_xt = line_data_num{1}(1);
+        % Distance from rocket tip to fin leading edge root [m]    
+        case 'finRootPosition'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finRootPosition = lineDataNumeric{1}(1);
         
-        % fin span    
-        case 'fin_s'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_s = line_data_num{1}(1);
+        % Fin span [m]    
+        case 'finSpan'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finSpan = lineDataNumeric{1}(1);
         
-        % fin root chord    
-        case 'fin_cr'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_cr = line_data_num{1}(1);    
+        % Fin root chord [m]    
+        case 'finRootChord'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finRootChord = lineDataNumeric{1}(1);    
         
-        % fin tip chord    
-        case 'fin_ct'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_ct = line_data_num{1}(1);
+        % Fin tip chord [m]    
+        case 'finTipChord'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finTipChord = lineDataNumeric{1}(1);
         
-        % fin thickness    
-        case 'fin_t'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_t = line_data_num{1}(1);
+        % Fin thickness [m]    
+        case 'finThickness'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finThickness = lineDataNumeric{1}(1);
             
-        % axial distance between the fin's leading edge root and tip        
-        case 'fin_xs'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_xs = line_data_num{1}(1);
+        % Axial distance between fin leading edge root and tip [m]        
+        case 'finSweepDistance'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finSweepDistance = lineDataNumeric{1}(1);
         
-        % Fins Leading edge 
-        case 'fin_L1'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_L1 = line_data_num{1}(1);    
-        % Fins Trailing edge 
-        case 'fin_L2'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.fin_L2 = line_data_num{1}(1); 
+        % Fin leading edge length [m]
+        case 'finLeadingEdgeLength'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finLeadingEdgeLength = lineDataNumeric{1}(1);    
+        
+        % Fin trailing edge length [m]
+        case 'finTrailingEdgeLength'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.finTrailingEdgeLength = lineDataNumeric{1}(1); 
             
-        % number of lugs    
-        case 'lug_n'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.lug_n = line_data_num{1}(1);    
+        % Number of launch lugs    
+        case 'numLaunchLugs'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.numLaunchLugs = lineDataNumeric{1}(1);    
         
-        % exposed lug surface    
-        case 'lug_S'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.lug_S = line_data_num{1}(1);
+        % Exposed lug surface area [m²]    
+        case 'lugSurfaceArea'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.lugSurfaceArea = lineDataNumeric{1}(1);
         
-        % rocket empty mass    
-        case 'rocket_m'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.rocket_m = line_data_num{1}(1);
+        % Rocket empty mass [kg]    
+        case 'emptyMass'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.emptyMass = lineDataNumeric{1}(1);
         
-        % rocket empty inertia    
-        case 'rocket_I'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.rocket_I = line_data_num{1}(1);
+        % Rocket empty inertia [kg·m²]    
+        case 'emptyInertia'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.emptyInertia = lineDataNumeric{1}(1);
         
-        % rocket center of mass for empty rocket (PL + rocket without
-        % motor)
-        case 'rocket_cm'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.rocket_cm = line_data_num{1}(1);
+        % Rocket center of mass for empty configuration [m from tip]
+        case 'emptyCenterOfMass'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.emptyCenterOfMass = lineDataNumeric{1}(1);
         
-        % position of airbrakes from rocket's tip    
-        case 'ab_x'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.ab_x = line_data_num{1}(1);
+        % Airbrakes position from rocket tip [m]    
+        case 'airbrakePosition'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.airbrakePosition = lineDataNumeric{1}(1);
         
-        % number of airbrake fins    
-        case 'ab_n'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.ab_n = line_data_num{1}(1);
+        % Number of airbrake fins    
+        case 'numAirbrakes'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.numAirbrakes = lineDataNumeric{1}(1);
         
-        % airbrake openeing angle    
-        case 'ab_phi'
-            line_data_num = textscan(line_data, '%f');
-            Rocket.ab_phi = line_data_num{1}(1);    
+        % Airbrake opening angle [deg]    
+        case 'airbrakeAngle'
+            lineDataNumeric = textscan(lineData, '%f');
+            Rocket.airbrakeAngle = lineDataNumeric{1}(1);    
         
-        % motor file name (with extension)  
-        %in case of a hybrid motor, is the propergol bloc
-	    % so the closest to the end of the rocket
-        case 'motor'
-            line_data_string = textscan(line_data,'%s');
-            Rocket.motor_ID = line_data_string{1}{1};
+        % Motor configuration file name  
+        case 'motorId'
+            lineDataString = textscan(lineData,'%s');
+            Rocket.motorId = lineDataString{1}{1};
             
-            
-        % is the tank fuel part of a hybrid motor, so
-	    %the furthest to the end of the rocket         
-	    % Second parameter is 
-	    %the distance of the valve between the 
-	    %propergol bloc and the tank fuel
-	    case 'hybr'
-	        line_data_string = textscan(line_data,'%s');
-	        Rocket.fuel_ID = line_data_string{1}{1};
-	        Rocket.intermotor_d = str2double(line_data_string{1}{2});
-	        Rocket.isHybrid = 1;    
+        % Hybrid motor configuration
+        case 'hybrid'
+            lineDataString = textscan(lineData,'%s');
+            Rocket.fuelTankId = lineDataString{1}{1};
+            Rocket.interMotorDistance = str2double(lineDataString{1}{2});
+            Rocket.isHybrid = true;    
         
-            
-            
-        % motor thrust multiplication factor    
-        case 'motor_fac'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.motor_fac = line_data_num{1}(1);    
+        % Motor thrust multiplication factor    
+        case 'motorThrustFactor'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.motorThrustFactor = lineDataNumeric{1}(1);    
         
-        % payload mass    
-        case 'pl_mass'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.pl_mass = line_data_num{1}(1);
+        % Payload mass [kg]    
+        case 'payloadMass'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.payloadMass = lineDataNumeric{1}(1);
         
-        % main parachute S*CD (area times drag coefficient)     
-        case 'para_main_SCD'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.para_main_SCD = line_data_num{1}(1);
+        % Main parachute drag area (S*CD) [m²]     
+        case 'mainParachuteDragArea'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.mainParachuteDragArea = lineDataNumeric{1}(1);
             
-        % drogue parachute S*CD (area times drag coefficient)    
-        case 'para_drogue_SCD'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.para_drogue_SCD = line_data_num{1}(1);
+        % Drogue parachute drag area (S*CD) [m²]    
+        case 'drogueParachuteDragArea'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.drogueParachuteDragArea = lineDataNumeric{1}(1);
            
-        % main parachute deployment event altitude    
-        case 'para_main_event'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.para_main_event = line_data_num{1}(1); 
+        % Main parachute deployment altitude [m]    
+        case 'mainParachuteDeploymentAltitude'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.mainParachuteDeploymentAltitude = lineDataNumeric{1}(1); 
         
-        % error factor on center of pressure position     
-        case 'cp_fac'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.cp_fac = line_data_num{1}(1);
+        % Center of pressure position error factor     
+        case 'centerOfPressureFactor'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.centerOfPressureFactor = lineDataNumeric{1}(1);
         
-        % error factor on normal lift coefficient derivative
-        case 'CNa_fac'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.CNa_fac = line_data_num{1}(1);
+        % Normal force coefficient derivative error factor
+        case 'normalForceCoefficientFactor'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.normalForceCoefficientFactor = lineDataNumeric{1}(1);
         
-        % error factor on drag coefficient    
-        case 'CD_fac'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.CD_fac = line_data_num{1}(1);
+        % Drag coefficient error factor    
+        case 'dragCoefficientFactor'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.dragCoefficientFactor = lineDataNumeric{1}(1);
         
-        % Read inertia matrix
-        case 'rocket_inertia'
-            line_data_num = textscan(line_data, '%f');
-            data = line_data_num{1}';
-            inertia = [data(1:3); data(4:6); data(7:9)];
-            Rocket.rocket_inertia = inertia;
+        % Inertia matrix [kg·m²]
+        case 'inertiaMatrix'
+            lineDataNumeric = textscan(lineData, '%f');
+            data = lineDataNumeric{1}';
+            inertiaMatrix = [data(1:3); data(4:6); data(7:9)];
+            Rocket.inertiaMatrix = inertiaMatrix;
         
-        % Read tank length
-        case 'tank_L'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.tank_L = line_data_num{1}(1);
+        % Fuel tank length [m]
+        case 'tankLength'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.tankLength = lineDataNumeric{1}(1);
         
-        % Read tank radius
-        case 'tank_r'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.tank_r = line_data_num{1}(1);
+        % Fuel tank radius [m]
+        case 'tankRadius'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.tankRadius = lineDataNumeric{1}(1);
         
-        % Read tank position (from the top of the rocket)
-        case 'tank_z'
-            line_data_num = textscan(line_data,'%f');
-            Rocket.tank_z = line_data_num{1}(1);
+        % Fuel tank position from rocket tip [m]
+        case 'tankPosition'
+            lineDataNumeric = textscan(lineData,'%f');
+            Rocket.tankPosition = lineDataNumeric{1}(1);
                         
         otherwise
-            display(['ERROR: In rocket definition, unknown line identifier: ' line_id]);
+            warning('In rocket definition, unknown line identifier: %s', lineIdentifier);
          
     end
-
 end    
-   
-% -------------------------------------------------------------------------
-% 2. Read Motor
-% -------------------------------------------------------------------------
 
-Rocket = motor2RocketReader(Rocket.motor_ID, Rocket);
+fclose(fileId);
 
 % -------------------------------------------------------------------------
-% 3. Checks
+% 2. Read Motor Configuration
 % -------------------------------------------------------------------------
 
-if checkStages(Rocket)
-    error('ERROR: Reading rocket definition file.')
+Rocket = motor2RocketReader(Rocket.motorId, Rocket);
+
+% -------------------------------------------------------------------------
+% 3. Validation Checks
+% -------------------------------------------------------------------------
+
+if validateStages(Rocket)
+    error('ERROR: Invalid rocket stage configuration.')
 end
 
-if ~(strcmp(Rocket.cone_mode, 'on') || strcmp(Rocket.cone_mode, 'off'))
-    error(['ERROR: Cone mode parameter ' Rocket.cone_mode ' unknown.']);
-end
-
-% -------------------------------------------------------------------------
-% 4. Intrinsic parameters
-% -------------------------------------------------------------------------
-
-% 4.1 Maximum body diameter
-Rocket.dm = Rocket.diameters(find(Rocket.diameters == max(Rocket.diameters), 1, 'first'));
-% 4.2 Fin cord
-Rocket.fin_c = (Rocket.fin_cr + Rocket.fin_ct)/2; 
-% 4.3 Maximum cross-sectional body area
-Rocket.Sm = pi*Rocket.dm^2/4; 
-% 4.4 Exposed planform fin area
-Rocket.fin_SE = (Rocket.fin_cr + Rocket.fin_ct )/2*Rocket.fin_s; 
-% 4.5 Body diameter at middle of fin station
-Rocket.fin_df = interp1(Rocket.stage_z, Rocket.diameters, Rocket.fin_xt+Rocket.fin_cr/2, 'linear'); 
-% 4.6 Virtual fin planform area
-Rocket.fin_SF = Rocket.fin_SE + 1/2*Rocket.fin_df*Rocket.fin_cr; 
-% 4.8 Rocket Length
-Rocket.L = Rocket.stage_z(end);
-
-% 4.9 Rocket inertia + motor and tank inertia
-[~, ~, ~, ~, I_L, ~, I_R, ~] = Mass_Properties(0, Rocket, 'Linear');
-if ~isfield(Rocket, 'rocket_inertia')
-    Rocket.rocket_inertia = [I_L, 0, 0; 0, I_L, 0; 0, 0, I_R];
+if ~(strcmp(Rocket.coneMode, 'on') || strcmp(Rocket.coneMode, 'off'))
+    error('ERROR: Cone mode parameter "%s" unknown. Use "on" or "off".', Rocket.coneMode);
 end
 
 % -------------------------------------------------------------------------
-% 5. Sub-routines
+% 4. Derived Parameters
 % -------------------------------------------------------------------------
 
-function flag = checkStages(Rocket)
-    flag = 0;
-    if ~(length(Rocket.diameters) == Rocket.stages && length(Rocket.stage_z) == Rocket.stages)
-        flag = 1;
-        display('ERROR: In rocket defintion, rocket diameters and/or stage_z are not equal in length to the announced stages.')
-    elseif ~(Rocket.diameters(1) == 0 && Rocket.stage_z(1) == 0)
-        flag = 1;
-        display('ERROR: In rocket defintion, rocket must start with a point (diameters(1) = 0, stage_z(1) = 0)');
+% 4.1 Maximum body diameter [m]
+Rocket.maxDiameter = Rocket.stageDiameters(find(Rocket.stageDiameters == max(Rocket.stageDiameters), 1, 'first'));
+
+% 4.2 Mean fin chord [m]
+Rocket.meanFinChord = (Rocket.finRootChord + Rocket.finTipChord) / 2; 
+
+% 4.3 Maximum cross-sectional body area [m²]
+Rocket.maxCrossSectionArea = pi * Rocket.maxDiameter^2 / 4; 
+
+% 4.4 Exposed planform fin area [m²]
+Rocket.exposedFinArea = (Rocket.finRootChord + Rocket.finTipChord) / 2 * Rocket.finSpan; 
+
+% 4.5 Body diameter at middle of fin station [m]
+Rocket.finBodyDiameter = interp1(Rocket.stagePositions, Rocket.stageDiameters, ...
+    Rocket.finRootPosition + Rocket.finRootChord / 2, 'linear', 'extrap'); 
+
+% 4.6 Virtual fin planform area [m²]
+Rocket.virtualFinArea = Rocket.exposedFinArea + 1/2 * Rocket.finBodyDiameter * Rocket.finRootChord; 
+
+% 4.7 Rocket total length [m]
+Rocket.totalLength = Rocket.stagePositions(end);
+
+% 4.8 Rocket inertia including motor and tank
+[~, ~, ~, ~, longitudinalInertia, ~, radialInertia, ~] = Mass_Properties(0, Rocket, 'Linear');
+if ~isfield(Rocket, 'inertiaMatrix')
+    Rocket.inertiaMatrix = [longitudinalInertia, 0, 0; 0, longitudinalInertia, 0; 0, 0, radialInertia];
+end
+
+end
+
+% -------------------------------------------------------------------------
+% Helper Functions
+% -------------------------------------------------------------------------
+
+function isInvalid = validateStages(Rocket)
+    isInvalid = false;
+    
+    if ~(length(Rocket.stageDiameters) == Rocket.numStages && ...
+         length(Rocket.stagePositions) == Rocket.numStages)
+        isInvalid = true;
+        display('ERROR: Rocket stageDiameters and/or stage positions length mismatch with declared stages.');
+    elseif ~(Rocket.stageDiameters(1) == 0 && Rocket.stagePositions(1) == 0)
+        isInvalid = true;
+        display('ERROR: Rocket must start with a point (diameter = 0, position = 0).');
     end
 end
-
-end
-

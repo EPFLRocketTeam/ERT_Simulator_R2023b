@@ -47,7 +47,7 @@ T = [0;Thrust(t,Rocket)];
 V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee
 CD_AB = drag_shuriken(Rocket,theta,abs(alpha),V,Nu); % Coef. Trainee des A?rofreins
 CD = drag(Rocket,abs(alpha),V,Nu,a);             % Coef. Trainee de la fus?e
-q = 1/2*rho*Rocket.Sm*V^2;                  % Pression dynamique
+q = 1/2*rho*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
 Ft = [0;-q*(CD+CD_AB)];                     % Force de train?e
 
 % Force Normale (E,F)

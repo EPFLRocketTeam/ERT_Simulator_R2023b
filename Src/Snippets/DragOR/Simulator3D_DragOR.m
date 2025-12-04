@@ -113,9 +113,9 @@ classdef Simulator3D_DragOR < handle
 
             % drag
             CD = drag(obj.Drag, obj.interp_type, t, x, v); % (TODO: make air-viscosity adaptable to temperature)
-            D = -0.5*rho*obj.Rocket.Sm*CD*v^2; % (TODO: define drag in wind coordinate system)
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*v^2; % (TODO: define drag in wind coordinate system)
 
-            F_tot = G + T*obj.Rocket.motor_fac + D;
+            F_tot = G + T*obj.Rocket.motorThrustFactor + D;
 
             % State derivatives
             
@@ -175,7 +175,7 @@ classdef Simulator3D_DragOR < handle
             % Total inertia
             %I = inertial_matrix(obj.Rocket, Cm, t);
             %disp(I)
-            I = obj.Rocket.rocket_inertia + motor_inertia;
+            I = obj.Rocket.emptyInertia + motor_inertia;
             %disp(I)
             %disp("==============================")
             I = C' * I * C; % Transfert to earth coordinates
@@ -249,20 +249,20 @@ classdef Simulator3D_DragOR < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*rho*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
             end
             % Drag
             % Drag coefficient
-            CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3))*obj.Rocket.CD_fac; 
+            CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3))*obj.Rocket.dragCoefficientFactor; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm ;
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*Vmag^2*Vnorm ;
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motor_fac +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force
@@ -277,7 +277,7 @@ classdef Simulator3D_DragOR < handle
             CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
                 dMdt, Cm, norm(W_pitch) , Vmag); 
             
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            MD = -0.5*rho*CDM*obj.Rocket.maxCrossSectionArea*Vmag^2*normalizeVect(W_pitch);
             
             M_tot = ...
                 MN...  ; % aerodynamic corrective moment
@@ -300,7 +300,7 @@ classdef Simulator3D_DragOR < handle
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
             
             % cache auxiliary result data
-            obj.tmp_Margin = margin/obj.Rocket.dm;
+            obj.tmp_Margin = margin/obj.Rocket.maxDiameter;
             obj.tmp_Alpha = alpha;
             obj.tmp_Cn_alpha = CNa;
             obj.tmp_Xcp = Xcp;
@@ -331,9 +331,9 @@ classdef Simulator3D_DragOR < handle
                 Environment.Turb_model,X(3));
 
             if Main
-                SCD = Rocket.para_main_SCD;
+                SCD = Rocket.mainParachuteDragArea;
             elseif Main == 0
-                SCD = Rocket.para_drogue_SCD;
+                SCD = Rocket.drogueParachuteDragArea;
             end
             D = 0.5*rho*SCD*norm(Vrel)*Vrel;
 
@@ -365,7 +365,7 @@ classdef Simulator3D_DragOR < handle
             [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.rocket_m;
+            M = Rocket.emptyMass;
 
             V_rel = V -...
                  ... % Wind as computed by windmodel
@@ -379,7 +379,7 @@ classdef Simulator3D_DragOR < handle
             % Drag coefficient
             CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3)); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
-            D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
+            D = -0.5*rho*Rocket.maxCrossSectionArea*CD*V_rel*norm(V_rel); 
             % Translational dynamics
             X_dot = V;
             V_dot = 1/M*(D + G);
@@ -406,7 +406,7 @@ classdef Simulator3D_DragOR < handle
             [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.rocket_m;
+            M = Rocket.emptyMass;
 
             V_rel = V -...
                  ... % Wind as computed by windmodel
@@ -420,7 +420,7 @@ classdef Simulator3D_DragOR < handle
             % Drag coefficient
             CD = Nose_drag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
-            D = -0.5*rho*Rocket.Sm*CD*V_rel*norm(V_rel); 
+            D = -0.5*rho*Rocket.maxCrossSectionArea*CD*V_rel*norm(V_rel); 
 
             % Translational dynamics
             X_dot = V;
@@ -469,7 +469,7 @@ classdef Simulator3D_DragOR < handle
             motor_inertia = inertia_fill_cylinder(M, ...
                 obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
             % Total inertia
-            I = obj.Rocket.rocket_inertia + motor_inertia;
+            I = obj.Rocket.emptyInertia + motor_inertia;
             I = C' * I * C; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
@@ -539,21 +539,21 @@ classdef Simulator3D_DragOR < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*rho*obj.Rocket.Sm*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*rho*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
             end
 
             % Drag
             % Drag coefficient
-            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.CD_fac; 
+            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
             if(t>obj.Rocket.Burn_Time)
-              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.ab_phi, alpha, Vmag, nu); 
+              CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force
-            D = -0.5*rho*obj.Rocket.Sm*CD*Vmag^2*Vnorm;
+            D = -0.5*rho*obj.Rocket.maxCrossSectionArea*CD*Vmag^2*Vnorm;
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motor_fac +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force
@@ -567,7 +567,7 @@ classdef Simulator3D_DragOR < handle
             W_pitch = W - dot(W,RA)*RA; % extract pitch and yaw angular velocity
             CDM = pitchDampingMoment(obj.Rocket, rho, CNa_bar, CP_bar, ...
                 dMdt, Cm, norm(W_pitch) , Vmag); 
-            MD = -0.5*rho*CDM*obj.Rocket.Sm*Vmag^2*normalizeVect(W_pitch);
+            MD = -0.5*rho*CDM*obj.Rocket.maxCrossSectionArea*Vmag^2*normalizeVect(W_pitch);
 
             M_tot = ...
                 MN...  ; % aerodynamic corrective moment
@@ -610,7 +610,7 @@ classdef Simulator3D_DragOR < handle
             [~, a, ~, rho, nu] = atmosphere(X(3)+Environment.Start_Altitude, Environment);
 
             % mass
-            M = Rocket.pl_mass;
+            M = Rocket.payloadMass;
 
             V_rel = V -...
                  ... % Wind as computed by windmodel
@@ -713,7 +713,7 @@ classdef Simulator3D_DragOR < handle
             S0 = [X0; V0];
 
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
             tspan = [T0, 5000];
@@ -735,7 +735,7 @@ classdef Simulator3D_DragOR < handle
             S0 = [X0; V0];
 
             % empty mass
-            M = obj.Rocket.rocket_m - obj.Rocket.pl_mass;
+            M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
             tspan = [T0, 5000];

@@ -16,12 +16,12 @@ SimOutputs = SimOutputReader('Simulation_outputs.txt');
 
 % parameter name
 param_struct = {'Rocket'};
-param_name = {'cp_fac'};
+param_name = {'centerOfPressureFactor'};
 param_mean = [1];
 param_std  = [0.1];
 
 % param_struct = {'Rocket'};
-% param_name = {'rocket_m'};
+% param_name = {'emptyMass'};
 % param_mean = [17.9];
 % param_std  = [2];
 

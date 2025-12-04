@@ -258,8 +258,8 @@ classdef dragTransonicTest < matlab.unittest.TestCase
         function testMachNumberBoundaries(testCase)
             % Test Mach numbers near critical boundaries
             % Calculate the drag divergence Mach for the test rocket
-            noseLength = testCase.TestRocket.stage_z(2);
-            maxDiameter = testCase.TestRocket.dm;
+            noseLength = testCase.TestRocket.stagePositions(2);
+            maxDiameter = testCase.TestRocket.maxDiameter;
             dragDivergenceMach = -0.0156 * (noseLength / maxDiameter)^2 + ...
                 0.136 * (noseLength / maxDiameter) + 0.6817;
             
@@ -293,32 +293,32 @@ classdef dragTransonicTest < matlab.unittest.TestCase
             rocket = struct();
             
             % Body geometry
-            rocket.stage_z = [0, 0.5, 2.0, 2.2, 2.3]; % Stage positions [m]
-            rocket.dm = 0.1; % Maximum diameter [m]
-            rocket.diameters = [0, rocket.dm, rocket.dm, 0.08, 0.07]; % Diameters at stages [m]
+            rocket.stagePositions = [0, 0.5, 2.0, 2.2, 2.3]; % Stage positions [m]
+            rocket.maxDiameter = 0.1; % Maximum diameter [m]
+            rocket.stageDiameters = [0, rocket.maxDiameter, rocket.maxDiameter, 0.08, 0.07]; % Diameters at stages [m]
             
             % Fin geometry
-            rocket.fin_cr = 0.15; % Root chord [m]
-            rocket.fin_ct = 0.10; % Tip chord [m]
-            rocket.fin_n = 4; % Number of fins
-            rocket.fin_t = 0.003; % Fin thickness [m]
-            rocket.fin_L1 = 0.05; % Distance to max thickness [m]
-            rocket.fin_SF = 0.06; % Fin wetted area [m²]
-            rocket.fin_xt = 1.8; % Fin leading edge position [m]
+            rocket.finRootChord = 0.15; % Root chord [m]
+            rocket.finTipChord = 0.10; % Tip chord [m]
+            rocket.numFins = 4; % Number of fins
+            rocket.finThickness = 0.003; % Fin thickness [m]
+            rocket.finLeadingEdgeLength = 0.05; % Distance to max thickness [m]
+            rocket.virtualFinArea = 0.06; % Fin wetted area [m²]
+            rocket.finRootPosition = 1.8; % Fin leading edge position [m]
         end
         
         function rocket = createLongNoseRocket()
             % Create a rocket with long nose (Ln/Le > 0.6)
             rocket = dragTransonicTest.createStandardRocket();
-            rocket.stage_z = [0, 1.8, 2.0, 2.2, 2.3]; % Very long nose
-            rocket.diameters = [0, rocket.dm, rocket.dm, 0.08, 0.07];
+            rocket.stagePositions = [0, 1.8, 2.0, 2.2, 2.3]; % Very long nose
+            rocket.stageDiameters = [0, rocket.maxDiameter, rocket.maxDiameter, 0.08, 0.07];
         end
         
         function rocket = createShortRocket()
             % Create a rocket with short body
             rocket = dragTransonicTest.createStandardRocket();
-            rocket.stage_z = [0, 0.3, 0.8, 1.0, 1.1]; % Short rocket
-            rocket.diameters = [0, rocket.dm, rocket.dm, 0.08, 0.07];
+            rocket.stagePositions = [0, 0.3, 0.8, 1.0, 1.1]; % Short rocket
+            rocket.stageDiameters = [0, rocket.maxDiameter, rocket.maxDiameter, 0.08, 0.07];
         end
     end
 end

@@ -1,4 +1,4 @@
-Rocket_maxHeight = S2(end,3)
+emptyMassaxHeight = S2(end,3)
 
 
 %%

@@ -31,7 +31,7 @@ display(['Max speed : ' num2str(maxi)]);
 display(['Max speed @t = ' num2str(T(index))]);
 [~,a,~,rho,nu] = stdAtmos(X(index,1),Environnement);
 C_Dab = drag_shuriken(Rocket, 0, 0, maxi, nu);
-F_Dab = 0.5*C_Dab*rho*pi*Rocket.dm^2/4*maxi^2;e) ➜ e) ➜  ~ matlab
+F_Dab = 0.5*C_Dab*rho*pi*Rocket.maxDiameter^2/4*maxi^2;e) ➜ e) ➜  ~ matlab
 Gtk-Message: 09:02:48.158: Failed to load module "canberra-gtk-module"
 
 

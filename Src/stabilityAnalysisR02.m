@@ -54,11 +54,11 @@ wNom = simObj.SimAuxResults.CM(1);
 for i = 1:length(cAlphaNom)
     cNa2ANom = cNa2ANom + cAlphaNom(i) * (cpNom(i) - wNom)^2;
 end
-dNom = max(rocket.diameters);
+dNom = max(rocket.stageDiameters);
 arNom = pi/4*dNom^2;
 c2ANom = rhoNom * vNom * arNom / 2 * cNa2ANom;
 [~,dMdtNom] = Mass_Non_Lin(t1Nom(end), rocket);
-lneNom = rocket.stage_z(end);
+lneNom = rocket.stagePositions(end);
 c2RNom = dMdtNom * (lneNom - wNom)^2;
 % c2A Aerodynamic Damping Moment Coefficient
 % c2R Propulsive Damping Moment Coefficient
@@ -135,11 +135,11 @@ wMax = simObj.SimAuxResults.CM(indexMax);
 for i = 1:length(cAlphaMax)
     cNa2AMax = cNa2AMax + cAlphaMax(i) * (cpMax(i) - wMax)^2;
 end
-dMax = max(rocket.diameters);
+dMax = max(rocket.stageDiameters);
 arMax = pi/4*dMax^2;
 c2AMax = rhoMax * norm(vMax) * arMax / 2 * cNa2AMax;
 [~,dMdtMax] = Mass_Non_Lin(t2Nom(indexMax), rocket);
-lneMax = rocket.stage_z(end);
+lneMax = rocket.stagePositions(end);
 c2RMax = dMdtMax * (lneMax - wMax)^2;
 % c2A Aerodynamic Damping Moment Coefficient
 % c2R Propulsive Damping Moment Coefficient
@@ -198,8 +198,8 @@ results.apogeeNom = s2Nom(end, 3);
 % ROCKET CHANGES
 % Copy Rocket
 rocketWcRail = rocket;
-rocketWcRail.rocket_cm = rocketWcRail.rocket_cm * 1.05;
-rocketWcRail.rocket_I = rocketWcRail.rocket_I * 1.15;
+rocketWcRail.emptyCenterOfMass = rocketWcRail.emptyCenterOfMass * 1.05;
+rocketWcRail.emptyInertia = rocketWcRail.emptyInertia * 1.15;
 % Speed off rail
 vWcRail = 20; % Initial speed off rail for worst case
 simObjWcRail = Simulator3D(rocketWcRail, environment, simOutputs);
@@ -233,11 +233,11 @@ wWcRail = simObjWcRail.SimAuxResults.CM(1);
 for i = 1:length(cAlphaWcRail)
     cNa2AWcRail = cNa2AWcRail + cAlphaWcRail(i) * (cpWcRail(i) - wWcRail)^2;
 end
-dWcRail = max(rocketWcRail.diameters);
+dWcRail = max(rocketWcRail.stageDiameters);
 arWcRail = pi/4*dWcRail^2;
 c2AWcRail = rhoWcRail * vWcRail * arWcRail / 2 * cNa2AWcRail;
 [~,dMdtWcRail] = Mass_Non_Lin(t1WcRail(end), rocketWcRail);
-lneWcRail = rocketWcRail.stage_z(end);
+lneWcRail = rocketWcRail.stagePositions(end);
 c2RWcRail = dMdtWcRail * (lneWcRail - wWcRail)^2;
 % c2A Aerodynamic Damping Moment Coefficient
 % c2R Propulsive Damping Moment Coefficient
@@ -318,11 +318,11 @@ wWcMax = simObjWcRail.SimAuxResults.CM(indexWcMax);
 for i = 1:length(cAlphaWcMax)
     cNa2AWcMax = cNa2AWcMax + cAlphaWcMax(i) * (cpWcMax(i) - wWcMax)^2;
 end
-dWcMax = max(simObjWcRail.Rocket.diameters);
+dWcMax = max(simObjWcRail.Rocket.stageDiameters);
 arWcMax = pi/4*dWcMax^2;
 c2AWcMax = rhoWcMax * norm(vWcMax) * arWcMax / 2 * cNa2AWcMax;
 [~,dMdtWcMax] = Mass_Non_Lin(t2WcRail(indexWcMax), simObjWcRail.Rocket);
-lneWcMax = simObjWcRail.Rocket.stage_z(end);
+lneWcMax = simObjWcRail.Rocket.stagePositions(end);
 c2RWcMax = dMdtWcMax * (lneWcMax - wWcMax)^2;
 % c2A Aerodynamic Damping Moment Coefficient
 % c2R Propulsive Damping Moment Coefficient
@@ -379,7 +379,7 @@ results.apogeeWc = s2WcRail(end, 3);
 % Extra values
 % =========================================================================
 % Nominal
-dCommon = max(rocket.diameters);
+dCommon = max(rocket.stageDiameters);
 stabilityNomFull = (simObj.SimAuxResults.Xcp - simObj.SimAuxResults.CM)./dCommon;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)

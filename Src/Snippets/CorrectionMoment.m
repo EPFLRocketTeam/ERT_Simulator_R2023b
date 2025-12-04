@@ -11,7 +11,7 @@ function C1 = CorrectionMoment(t,Rocket,CNa,Xp,Velocity,Environnement,Altitude)
 %--------------------------------------------------------------------------
 % 2 Total Damping Coefficient
 %--------------------------------------------------------------------------
-C1 = 1/2*rho*Rocket.Sm*Velocity^2*CNa*(Xp-Cm);
+C1 = 1/2*rho*Rocket.maxCrossSectionArea*Velocity^2*CNa*(Xp-Cm);
 
 end
 

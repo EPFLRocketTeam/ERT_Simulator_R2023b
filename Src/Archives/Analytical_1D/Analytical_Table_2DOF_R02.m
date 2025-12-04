@@ -56,7 +56,7 @@ apogee = 3048;
 x0_ext = kron(x0, ones(1, length(CDab)));
 CDab_ext = kron(ones(1, length(x0)), CDab);
 theta_ext = kron(ones(1, length(x0)), theta_tab);
-Vinf_ext = sqrt(2*Rocket.rocket_m*Env.g./Env.rho./Rocket.Sm./(CD0_body + CDab_ext));
+Vinf_ext = sqrt(2*Rocket.emptyMass*Env.g./Env.rho./Rocket.maxCrossSectionArea./(CD0_body + CDab_ext));
 v0_ext = Vinf_ext.*tan(acos(exp(Env.g./Vinf_ext.^2.*(x0_ext-apogee))));
 
 % -------------------------------------------------------------------------

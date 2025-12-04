@@ -45,25 +45,25 @@ classdef dragTest < matlab.unittest.TestCase
     methods (Access = private)
         function createStandardTestRocket(testCase)
             % Create a standard rocket configuration for testing
-            rocket.dm = 0.1; % maximum diameter [m]
-            rocket.Sm = pi * (rocket.dm/2)^2; % maximum cross-sectional area [m2]
-            rocket.fin_c = 0.15; % fin chord [m]
-            rocket.fin_SE = 0.02; % exposed planform fin area [m2]
-            rocket.fin_df = 0.1; % body diameter at fin station [m]
-            rocket.fin_SF = 0.025; % virtual fin planform area [m2]
-            rocket.stage_z = [0, 0.3, 1.0, 1.5]; % stage positions [m]
-            rocket.diameters = [0.05, 0.1, 0.1, 0.08]; % diameters at stage_z [m]
-            rocket.fin_n = 4; % number of fins
-            rocket.fin_t = 0.003; % fin thickness [m]
-            rocket.fin_s = 0.05; % fin span [m]
-            rocket.fin_cr = 0.1; % fin root chord [m]
-            rocket.fin_ct = 0.08; % fin tip chord [m]
-            rocket.fin_L1 = 0.12; % fin leading edge length [m]
-            rocket.fin_L2 = 0.1; % fin trailing edge length [m]
-            rocket.fin_xt = 1.2; % fin position from nose [m]
-            rocket.lug_n = 2; % number of launch lugs
-            rocket.lug_S = 0.001; % launch lug area [m2]
-            rocket.cone_mode = 'on'; % nosecone mode
+            rocket.maxDiameter = 0.1; % maximum diameter [m]
+            rocket.maxCrossSectionArea = pi * (rocket.maxDiameter/2)^2; % maximum cross-sectional area [m2]
+            rocket.meanFinChord = 0.15; % fin chord [m]
+            rocket.exposedFinArea = 0.02; % exposed planform fin area [m2]
+            rocket.finBodyDiameter = 0.1; % body diameter at fin station [m]
+            rocket.virtualFinArea = 0.025; % virtual fin planform area [m2]
+            rocket.stagePositions = [0, 0.3, 1.0, 1.5]; % stage positions [m]
+            rocket.stageDiameters = [0.05, 0.1, 0.1, 0.08]; % stageDiameters at stagePositions [m]
+            rocket.numFins = 4; % number of fins
+            rocket.finThickness = 0.003; % fin thickness [m]
+            rocket.finSpan = 0.05; % fin span [m]
+            rocket.finRootChord = 0.1; % fin root chord [m]
+            rocket.finTipChord = 0.08; % fin tip chord [m]
+            rocket.finLeadingEdgeLength = 0.12; % fin leading edge length [m]
+            rocket.finTrailingEdgeLength = 0.1; % fin trailing edge length [m]
+            rocket.finRootPosition = 1.2; % fin position from nose [m]
+            rocket.numLaunchLugs = 2; % number of launch lugs
+            rocket.lugSurfaceArea = 0.001; % launch lug area [m2]
+            rocket.coneMode = 'on'; % nosecone mode
             rocket.motor_state = 'off'; % motor state
             rocket.motor_dia = 0.04; % motor diameter [m]
             
@@ -185,17 +185,17 @@ classdef dragTest < matlab.unittest.TestCase
             
             % Variant 1: 3 fins
             rocket1 = rocket;
-            rocket1.fin_n = 3;
+            rocket1.numFins = 3;
             rocketVariants{1} = rocket1;
             
             % Variant 2: 6 fins  
             rocket2 = rocket;
-            rocket2.fin_n = 6;
+            rocket2.numFins = 6;
             rocketVariants{2} = rocket2;
             
             % Variant 3: No nosecone
             rocket3 = rocket;
-            rocket3.cone_mode = 'off';
+            rocket3.coneMode = 'off';
             rocketVariants{3} = rocket3;
             
             angleOfAttack = deg2rad(5);
@@ -329,10 +329,10 @@ classdef dragTest < matlab.unittest.TestCase
         function testRocketWithShortLength(testCase)
             % Test with unusually short rocket (triggering warning)
             rocket = testCase.TestRocket;
-            % rocket.stage_z = [0, 0.15, 0.3]; % Very short rocket [m]
-            % rocket.diameters = [0.05, 0.1, 0.08]; % [m]
-            rocket.stage_z = [0, 0.1, 0.2, 0.3];
-            rocket.diameters = [0.05, 0.1, 0.1, 0.08];
+            % rocket.stagePositions = [0, 0.15, 0.3]; % Very short rocket [m]
+            % rocket.stageDiameters = [0.05, 0.1, 0.08]; % [m]
+            rocket.stagePositions = [0, 0.1, 0.2, 0.3];
+            rocket.stageDiameters = [0.05, 0.1, 0.1, 0.08];
             
             angleOfAttack = 0;
             freestreamVelocity = 100;
@@ -349,25 +349,25 @@ classdef dragTest < matlab.unittest.TestCase
         end
          function testMinimalValidRocket(testCase)
             % Test with minimal valid rocket configuration
-            minimalRocket.dm = 0.1;
-            minimalRocket.Sm = pi * (0.1/2)^2;
-            minimalRocket.fin_c = 0.1;
-            minimalRocket.fin_SE = 0.01;
-            minimalRocket.fin_df = 0.1;
-            minimalRocket.fin_SF = 0.015;
-            minimalRocket.stage_z = [0, 0.2, 0.5, 0.7];
-            minimalRocket.diameters = [0.05, 0.1, 0.1, 0.09];
-            minimalRocket.fin_n = 3;
-            minimalRocket.fin_t = 0.002;
-            minimalRocket.fin_s = 0.04;
-            minimalRocket.fin_cr = 0.08;
-            minimalRocket.fin_ct = 0.06;
-            minimalRocket.fin_L1 = 0.1;
-            minimalRocket.fin_L2 = 0.08;
-            minimalRocket.fin_xt = 0.6; % ADDED: required field
-            minimalRocket.lug_n = 1;
-            minimalRocket.lug_S = 0.0005;
-            minimalRocket.cone_mode = 'on';
+            minimalRocket.maxDiameter = 0.1;
+            minimalRocket.maxCrossSectionArea = pi * (0.1/2)^2;
+            minimalRocket.meanFinChord = 0.1;
+            minimalRocket.exposedFinArea = 0.01;
+            minimalRocket.finBodyDiameter = 0.1;
+            minimalRocket.virtualFinArea = 0.015;
+            minimalRocket.stagePositions = [0, 0.2, 0.5, 0.7];
+            minimalRocket.stageDiameters = [0.05, 0.1, 0.1, 0.09];
+            minimalRocket.numFins = 3;
+            minimalRocket.finThickness = 0.002;
+            minimalRocket.finSpan = 0.04;
+            minimalRocket.finRootChord = 0.08;
+            minimalRocket.finTipChord = 0.06;
+            minimalRocket.finLeadingEdgeLength = 0.1;
+            minimalRocket.finTrailingEdgeLength = 0.08;
+            minimalRocket.finRootPosition = 0.6; % ADDED: required field
+            minimalRocket.numLaunchLugs = 1;
+            minimalRocket.lugSurfaceArea = 0.0005;
+            minimalRocket.coneMode = 'on';
             minimalRocket.motor_state = 'off';
             minimalRocket.motor_dia = 0.03;
             

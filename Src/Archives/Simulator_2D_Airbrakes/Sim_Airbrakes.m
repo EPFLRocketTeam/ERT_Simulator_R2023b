@@ -53,7 +53,7 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
 
     % Multiple Time Used Parameters
     V = sqrt(x(2)^2+2*x(2)*V_inf*sin(alpha)+V_inf^2); % Total Air flow Speed
-    q = 1/2*rho*Rocket.Sm*V^2; % Dynamic pressure
+    q = 1/2*rho*Rocket.maxCrossSectionArea*V^2; % Dynamic pressure
     CD = drag(Rocket,0,V,nu,a);  % Drag coefficient
 
     % Equation
@@ -116,7 +116,7 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
     V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee
     CD_AB = AB_drag(Rocket,theta,abs(alpha),V,nu); % Coef. Trainee des A?rofreins
     CD = drag(Rocket,abs(alpha),V,nu,a);             % Coef. Trainee de la fus?e
-    q = 1/2*rho*Rocket.Sm*V^2;                  % Pression dynamique
+    q = 1/2*rho*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
     Ft = [0;-q*(CD+CD_AB)];                     % Force de train?e
 
     % Force Normale (E,F)

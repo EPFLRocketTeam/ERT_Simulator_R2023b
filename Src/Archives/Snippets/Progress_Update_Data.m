@@ -19,18 +19,18 @@ kg_to_lbs = 2.20462262185;
 
 %% Rocket Information
 
-Airframe_Length_in = Rocket.L * m_to_in;
-Airframe_Diameter_in = Rocket.dm * m_to_in;
-Fin_span_in = Rocket.fin_s * m_to_in;
+Airframe_Length_in = Rocket.totalLength * m_to_in;
+Airframe_Diameter_in = Rocket.maxDiameter * m_to_in;
+Fin_span_in = Rocket.finSpan * m_to_in;
 % LV weight with casing and without payload
-Vehicle_wieght_lbs = (Rocket.rocket_m + Rocket.casing_mass - Payload_mass) * kg_to_lbs;
+Vehicle_wieght_lbs = (Rocket.emptyMass + Rocket.casing_mass - Payload_mass) * kg_to_lbs;
 Propellant_weight_lbs = Rocket.propel_mass * kg_to_lbs;
 Payload_weight_lbs = Payload_mass * kg_to_lbs;
 % Sum below is identical to un-commented calculation
 % Liftoff_weight_lbs = Vehicle_wieght_lbs + Propellant_weight_lbs + Payload_weight_lbs;
-Liftoff_weight_lbs = (Rocket.rocket_m + Rocket.motor_mass) * kg_to_lbs;
+Liftoff_weight_lbs = (Rocket.emptyMass + Rocket.motor_mass) * kg_to_lbs;
 
-Rocket_Information = [Airframe_Length_in;
+emptyInertianformation = [Airframe_Length_in;
     Airframe_Diameter_in;
     Fin_span_in;
     Vehicle_wieght_lbs;
@@ -68,7 +68,7 @@ warning('off','all')
 
 [T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
 
-%SimObj.Rocket.cone_mode = 'off';
+%SimObj.Rocket.coneMode = 'off';
 
 [T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
 
@@ -82,10 +82,10 @@ m_to_feet = 3.2808399;
 % Results
 
 % Considering peak thrust at liftoff
-Liftoff_thrust_to_weight_ratio = max(Rocket.Thrust_Force) / ((Rocket.rocket_m + Rocket.motor_mass) * g0);
+Liftoff_thrust_to_weight_ratio = max(Rocket.Thrust_Force) / ((Rocket.emptyMass + Rocket.motor_mass) * g0);
 Launch_rail_departure_velocity_ft = S1(end,2) * m_to_feet;
 
-Stability = (SimObj.SimAuxResults.Xcp - SimObj.SimAuxResults.CM)./Rocket.dm;
+Stability = (SimObj.SimAuxResults.Xcp - SimObj.SimAuxResults.CM)./Rocket.maxDiameter;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
 Stability = Stability(1:length(S2_1));

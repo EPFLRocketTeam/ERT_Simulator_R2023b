@@ -57,7 +57,7 @@ for i = 1:n_motors
         
         fprintf(', m = %f', test_masses(j));
         
-        Rocket.rocket_m = test_masses(j);
+        Rocket.emptyMass = test_masses(j);
         
         [T,X] = ode45(@(t,x) Rocket_Kinematic_R2(t,x,Rocket,Environnement,@drag_shuriken, -190.5),tspan,x_0,Option);
         app(i,j) = X(end, 1);

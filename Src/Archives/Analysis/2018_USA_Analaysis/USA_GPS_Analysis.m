@@ -80,10 +80,10 @@ SimX = (R*S2_1(:,1:3)')';
 
 %% Compute flight path from end of GPS data to apogee
 
-SimObj.Rocket.cone_mode = 'off';
-SimObj.Rocket.rocket_m = SimObj.Rocket.rocket_m-2.1;
-SimObj.Rocket.rocket_cm = 1.44;
-SimObj.Rocket.rocket_I = 5.68;
+SimObj.Rocket.coneMode = 'off';
+SimObj.Rocket.emptyMass = SimObj.Rocket.emptyMass-2.1;
+SimObj.Rocket.emptyCenterOfMass = 1.44;
+SimObj.Rocket.emptyInertia = 5.68;
 SimObj.Environment.V_inf = 2;
 
 V0 = [gps_v(end-1,1),gps_v(end-1,2), gps_v(end-1,3)]';

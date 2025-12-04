@@ -53,8 +53,8 @@ function CAN_COM(t,x,f,m,p,T,obj)
                 end
                   dlmwrite('angle.csv',[-1;-1;-1;-1]);
 
-                  obj.Rocket.ab_n = 7;
-                  obj.Rocket.ab_phi = IN; % rentrer -1 dans IN
+                  obj.Rocket.numAirbrakes = 7;
+                  obj.Rocket.airbrakeAngle = IN; % rentrer -1 dans IN
             end
             
         end

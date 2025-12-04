@@ -1,4 +1,4 @@
-%% Main_NS.m - Frédéric Berdoz - October 2020 
+%% Main_NS.m - FrÃ©dÃ©ric Berdoz - October 2020 
 %
 % Main runabale script for the analysis of the different ODDE solver applied to the ERT
 % simulator.
@@ -20,10 +20,10 @@ warning('off');
 N = 50;
 sigma = 0.05; % Relative size of the input domains (intervals)
 
-% missing fin_n, ab_n and lug_n.
-Xid = [ "dmin" "dd" "z1" "z12" "z23" "fin_xt" "fin_s" "fin_cr" "fin_ct" "fin_xs" ...
-        "fin_t" "lug_S" "rocket_m" "rocket_I" "rocket_cm" "ab_x" "ab_phi" ... 
-        "pl_mass" "para_main_SCD" "para_drogue_SCD" "para_main_event" "intermotor_d" "motor_diaP" ...
+% missing numFins, numAirbrakes and numLaunchLugs.
+Xid = [ "dmin" "dd" "z1" "z12" "z23" "finRootPosition" "finSpan" "finRootChord" "finTipChord" "finSweepDistance" ...
+        "finThickness" "lugSurfaceArea" "emptyMass" "emptyInertia" "emptyCenterOfMass" "airbrakePosition" "airbrakeAngle" ... 
+        "payloadMass" "mainParachuteDragArea" "drogueParachuteDragArea" "mainParachuteDeploymentAltitude" "interMotorDistance" "motor_diaP" ...
         "motor_lengthP" "propel_massP" "motor_massP" "motor_diaF" "motor_lengthF" "propel_massF" ...
         "motor_massF" "Burn_Time" "T1" "T2" "Temperature_Ground" "Pressure_Ground" "Humidity_Ground"  ... 
         "Start_Altitude" "dTdh" "Rail_Length" "Rail_Angle" "Rail_Azimuth"...
@@ -31,7 +31,7 @@ Xid = [ "dmin" "dd" "z1" "z12" "z23" "fin_xt" "fin_s" "fin_cr" "fin_ct" "fin_xs"
     
 
 %Less inputs for debugging
-%Xid = [ "dmin" "dd" "z1" "z12" "z23" "fin_xt"]'; 
+%Xid = [ "dmin" "dd" "z1" "z12" "z23" "finRootPosition"]'; 
 
 
 % Base input values

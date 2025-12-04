@@ -86,7 +86,7 @@ for i = ID_Angles_Attaque
     %% DRAG FORCE:
     % Data:
     Fd = -Fz/cos(AA); 
-    Cd = 2*Fd./(rho.*Rocket.Sm.*V.^2);
+    Cd = 2*Fd./(rho.*Rocket.maxCrossSectionArea.*V.^2);
     figure(1);
     plot(V,Fd,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);hold on;
     title('Drag force comparison');grid on;legend show;
@@ -97,11 +97,11 @@ for i = ID_Angles_Attaque
     for i = 1:length(V_model)
         Cd_model = [Cd_model,drag(Rocket, AA, V_model(i), 1.38e-5, 343)]; %% CHANGE VISCOSITY
     end
-    plot(V_model,Cd_model.*(rho.*Rocket.Sm.*V_model.^2)/2,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);
+    plot(V_model,Cd_model.*(rho.*Rocket.maxCrossSectionArea.*V_model.^2)/2,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);
      
     %% NORMAL FORCE:
     Fn = -Fy+Fd*sin(AA);
-    Cn = 2*Fn./(rho.*Rocket.Sm.*V.^2);
+    Cn = 2*Fn./(rho.*Rocket.maxCrossSectionArea.*V.^2);
     figure(11);
     plot(V,Fn,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);hold on;
     title('Normal force comparison');grid on;legend show;
@@ -141,7 +141,7 @@ end
 %    
 %     %% DRAG FORCE:
 %     Fd = Fz/cos(AA);
-%     Cd = 2*Fd./(rho.*Rocket.Sm.*V.^2);
+%     Cd = 2*Fd./(rho.*Rocket.maxCrossSectionArea.*V.^2);
 %     figure(2);
 %     plot(V,Cd,'DisplayName',['Angle of Airbreaks ' num2str(AB) '%']);hold on;
 %     title('Drag Coefficient Comparison');grid on;legend show;
@@ -149,7 +149,7 @@ end
 %     
 %     %% NORMAL FORCE:
 %     Fn = Fy-Fd*sin(AA);
-%     Cn = 2*Fn./(rho.*Rocket.Sm.*V.^2);
+%     Cn = 2*Fn./(rho.*Rocket.maxCrossSectionArea.*V.^2);
 %     figure(12);
 %     plot(V,Fn,'DisplayName',['Angle of Airbreak: ' num2str(AB) '%']);hold on;
 %     title('Normal Coefficient Comparison');grid on;legend show;

@@ -25,11 +25,11 @@ function dragCoefficient = dragTransonic(rocket, angleOfAttack, freestreamVeloci
     machNumber = freestreamVelocity / speedOfSound;
     
     % Rocket geometry
-    totalLength = rocket.stage_z(end);
-    noseLength = rocket.stage_z(2);
-    maxDiameter = rocket.dm;
+    totalLength = rocket.stagePositions(end);
+    noseLength = rocket.stagePositions(2);
+    maxDiameter = rocket.maxDiameter;
     maxRadius = maxDiameter / 2;
-    baseDiameter = rocket.diameters(end);
+    baseDiameter = rocket.stageDiameters(end);
     
     % Body lengths
     aftBodyLength = totalLength - noseLength;  % Length aft of maximum diameter position
@@ -37,16 +37,16 @@ function dragCoefficient = dragTransonic(rocket, angleOfAttack, freestreamVeloci
     effectiveLength = totalLength;             % Effective length of rocket
     
     % Fin geometry
-    rootChord = rocket.fin_cr;
-    tipChord = rocket.fin_ct;
-    finCount = rocket.fin_n;
-    maxFinThickness = rocket.fin_t;
-    maxThicknessDistance = rocket.fin_L1;      % Distance from fin leading edge to maximum thickness
+    rootChord = rocket.finRootChord;
+    tipChord = rocket.finTipChord;
+    finCount = rocket.numFins;
+    maxFinThickness = rocket.finThickness;
+    maxThicknessDistance = rocket.finLeadingEdgeLength;      % Distance from fin leading edge to maximum thickness
     
     % Derived parameters
     bodyWettedArea = 2 * pi * maxDiameter / 2 * (totalLength - noseLength) + ...
                      pi * maxDiameter / 2 * sqrt(noseLength^2 + maxDiameter^2 / 4);
-    finWettedArea = rocket.fin_SF;
+    finWettedArea = rocket.virtualFinArea;
     totalWettedArea = bodyWettedArea + finWettedArea;
     normalizedThicknessDistance = maxThicknessDistance / rootChord;
     
@@ -55,7 +55,7 @@ function dragCoefficient = dragTransonic(rocket, angleOfAttack, freestreamVeloci
     finRoughnessCoefficient = 2.032e-5;
     
     % Additional fin parameters (may be useful)
-    finLeadingEdgePosition = rocket.fin_xt;
+    finLeadingEdgePosition = rocket.finRootPosition;
     
     % Model limitation check
     if noseLength / effectiveLength > 0.6

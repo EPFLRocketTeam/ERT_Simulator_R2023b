@@ -29,15 +29,15 @@ for i=1:k
     
     switch id
         case "dmin"
-            XX(i,1) = SimObj.Rocket.("diameters")(end);
+            XX(i,1) = SimObj.Rocket.("stageDiameters")(end);
         case "dd"
-            XX(i,1) = max(SimObj.Rocket.("diameters")) - SimObj.Rocket.("diameters")(end);
+            XX(i,1) = max(SimObj.Rocket.("stageDiameters")) - SimObj.Rocket.("stageDiameters")(end);
         case "z1"
-            XX(i,1) = SimObj.Rocket.("stage_z")(2);
+            XX(i,1) = SimObj.Rocket.("stagePositions")(2);
         case "z12"
-            XX(i,1) = SimObj.Rocket.("stage_z")(3) - SimObj.Rocket.("stage_z")(2);
+            XX(i,1) = SimObj.Rocket.("stagePositions")(3) - SimObj.Rocket.("stagePositions")(2);
         case "z23"
-            XX(i,1) = SimObj.Rocket.("stage_z")(4) - SimObj.Rocket.("stage_z")(3); 
+            XX(i,1) = SimObj.Rocket.("stagePositions")(4) - SimObj.Rocket.("stagePositions")(3); 
         case "T1"
             XX(i,1) = SimObj.Rocket.("Thrust_Force")(2); 
         case "T2"
@@ -82,9 +82,9 @@ XX(:,2) = (1-s)*XX(:,1);
 XX(:,3) = (1+s)*XX(:,1);
 
 % Checking the physical conditions
-if SimObj.Rocket.stage_z(3)*(1-s) < (SimObj.Rocket.fin_cr + SimObj.Rocket.fin_xt)*(1+s)
+if SimObj.Rocket.stagePositions(3)*(1-s) < (SimObj.Rocket.finRootChord + SimObj.Rocket.finRootPosition)*(1+s)
     disp("Warning: the fins might be two far back compared to the length of the rocket (unrealistic configuration). Decrease sigma.");
-if SimObj.Rocket.stage_z(3)*(1-s) < SimObj.Rocket.ab_x*(1+s)
+if SimObj.Rocket.stagePositions(3)*(1-s) < SimObj.Rocket.airbrakePosition*(1+s)
     disp("Warning: the airbrakes might be two far back compared to the length of the rocket (unrealistic configuration). Decrease sigma."); 
 end
 

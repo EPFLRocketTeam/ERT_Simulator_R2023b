@@ -1,6 +1,9 @@
 classdef inertialCouplingTest < matlab.unittest.TestCase
     % Simple test suite to verify inertial coupling simulation runs without errors
     % To run: results = runtests('inertialCouplingTest');
+    % Please try running inertialCoupling as described in
+    % inertialCoupling.m as it is meant to be run after Main.m, this test
+    % only tries to emulate and isn't the best way to do so
     
     properties (Access = private)
         OriginalWarningState

@@ -19,15 +19,15 @@ altitude total speed and drag coefficient
 The drag folder must be added to the folder "Declarations". This folder 
 will contain the .csv file from the corresponding OpenRocket simulation.
 
-   3. Main_DragOR.m
-The file "Main.m" has to be replaced by the the file "Main\_DragOR.m".
+   3. mainDragOR.m
+The file "Main.m" has to be replaced by the the file "mainDragOR.m".
 
    4. Simulator3D_DragOR.m
-The file "Simulator3D.m" has to be replaced by the the file 
-"Simulator3D\DragOR.m".
+The file "Simulator3D.m" has to be replaced by the file 
+"Simulator3D_DragOR.m".
 
    5. drag_OR.m
-The file "drag\OR.m" has to be placed in the folder "Functions\Models".
+The file "drag_OR.m" has to be placed in the folder "Functions\Models".
 
 ### Organization
 After all the modification, the repository should look something like this:
@@ -35,7 +35,7 @@ After all the modification, the repository should look something like this:
 ERT_simulator_R2023b
     README.md
     Main.m
-    **Main_dragOR.m**
+    **mainDragOR.m**
     stability_analysis_R02.m
     .gitignore
 ├── Test
@@ -61,7 +61,7 @@ ERT_simulator_R2023b
 ```
 
 #### User guide
-On "Main_DragOR.m"
+On "mainDragOR.m"
 
 Select the file that was previously exported from OpenRocket that 
 corresponds to the conditions of the simulation of the ERTSim.

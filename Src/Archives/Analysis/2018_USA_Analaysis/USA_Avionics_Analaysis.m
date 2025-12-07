@@ -77,10 +77,10 @@ display(['Launch rail departure velocity : ' num2str(S1(end,2))]);
 % 6DOF Boost Simulation
 %--------------------------------------------------------------------------
 
-SimObj.Rocket.cone_mode = 'off';
-SimObj.Rocket.rocket_m = SimObj.Rocket.rocket_m-2.1;
-SimObj.Rocket.rocket_cm = 1.44;
-SimObj.Rocket.rocket_I = 5.68;
+SimObj.Rocket.coneMode = 'off';
+SimObj.Rocket.emptyMass = SimObj.Rocket.emptyMass-2.1;
+SimObj.Rocket.emptyCenterOfMass = 1.44;
+SimObj.Rocket.emptyInertia = 5.68;
 
 [T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end,1:3)', S2_1(end,4:6)', S2_1(end,7:10)', S2_1(end,11:13)');
 

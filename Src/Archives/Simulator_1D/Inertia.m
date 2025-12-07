@@ -17,18 +17,18 @@ R_e = Rocket.motor_dia/2; % Diametre exterieur grains
 
 I_L_Casing = Rocket.casing_mass*(Rocket.motor_length^2/12 + R_e^2/2); 
 
-Grain_Mass = M-Rocket.rocket_m-Rocket.casing_mass; % Masse des grains
+Grain_Mass = M-Rocket.emptyMass-Rocket.casing_mass; % Masse des grains
 I_L_Grain = Grain_Mass*(Rocket.motor_length^2/12 + (R_e^2+R_i^2)/4);
 
-I_L = Rocket.rocket_I + I_L_Casing + I_L_Grain + ...
+I_L = Rocket.emptyInertia + I_L_Casing + I_L_Grain + ...
     (Grain_Mass+Rocket.casing_mass)*...
-    (Rocket.L-cm-Rocket.motor_length/2)^2; % I + ... + Steiner
+    (Rocket.totalLength-cm-Rocket.motor_length/2)^2; % I + ... + Steiner
 
 % dI_L/dt:
 dI_L_Grain = dMdt*(Rocket.motor_length^2/12 + (R_e^2+R_i^2)/4);
 
-dI_Ldt = dI_L_Grain+dMdt*(Rocket.L-cm-Rocket.motor_length/2)^2+...
-    2*(Grain_Mass+Rocket.casing_mass)*(Rocket.L-cm-Rocket.motor_length/2)*...
+dI_Ldt = dI_L_Grain+dMdt*(Rocket.totalLength-cm-Rocket.motor_length/2)^2+...
+    2*(Grain_Mass+Rocket.casing_mass)*(Rocket.totalLength-cm-Rocket.motor_length/2)*...
     dcmdt;
 
 % I_R:

@@ -141,7 +141,7 @@ for i = ID_Angles_Attaque
 %     
 %     V_model = linspace(20,80,30);Fd_model = [];
 %     for i = 1:length(V_model)
-%         Fd_model = [Fd_model drag(Rocket,AA,V_model(i),Nu,343)*0.5*rho*Rocket.Sm*V_model(i)^2];
+%         Fd_model = [Fd_model drag(Rocket,AA,V_model(i),Nu,343)*0.5*rho*Rocket.maxCrossSectionArea*V_model(i)^2];
 %     end
 %     plot(V_model,Fd_model,'LineStyle','none','Marker','*','DisplayName',['Matlab - yaw: ' num2str(AA/pi*180) 'deg']);
 %     legend show;xlabel('Wind Speed [m/s]');ylabel('F_D [N]');
@@ -155,7 +155,7 @@ for i = ID_Angles_Attaque
 %     V_model = linspace(20,80,30);Fn_model = [];
 %     for i = 1:length(V_model)
 %         [CNa, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, AA, 1.1, V_model(i)/343, 0, 1);
-%         Fn_model = [Fn_model CNa*AA*0.5*rho*Rocket.Sm*V_model(i)^2];
+%         Fn_model = [Fn_model CNa*AA*0.5*rho*Rocket.maxCrossSectionArea*V_model(i)^2];
 %     end
 %     plot(V_model,Fn_model,'LineStyle','none','Marker','*','DisplayName',['Pred. - \alpha: ' num2str(AA/pi*180) 'deg']);
 %     legend show;xlabel('Wind Speed [m/s]');ylabel('F_N [N]');
@@ -168,7 +168,7 @@ for i = ID_Angles_Attaque
     V_model = linspace(20,80,30);Fy_model = [];
     for i = 1:length(V_model)
         [CNa, Xp] = normalLift(Rocket,AA,1.1,V_model(i)/346,0,1);
-        Fy_model = [Fy_model (CNa*AA+sin(AA)*drag(Rocket,AA,V_model(i),Nu,343))*0.5*rho*Rocket.Sm*V_model(i)^2];
+        Fy_model = [Fy_model (CNa*AA+sin(AA)*drag(Rocket,AA,V_model(i),Nu,343))*0.5*rho*Rocket.maxCrossSectionArea*V_model(i)^2];
     end
     plot(V_model,Fy_model,'LineStyle','none','Marker','*','DisplayName',['Matlab - Fy: ' num2str(AA/pi*180) 'deg']);
     legend show;xlabel('Wind Speed [m/s]');ylabel('Fy [N]');
@@ -254,7 +254,7 @@ for i = ID_Aerofreins
     
     V_model = linspace(20,80,30);Fd_model = [];
     for i = 1:length(V_model)
-        Fd_model = [Fd_model drag(Rocket,0,V_model(i),Nu,343)*0.5*rho*Rocket.Sm*V_model(i)^2];
+        Fd_model = [Fd_model drag(Rocket,0,V_model(i),Nu,343)*0.5*rho*Rocket.maxCrossSectionArea*V_model(i)^2];
     end
     plot(V_model,Fd_model,'LineStyle','none','Marker','*','DisplayName',['Pred. - Airbreak: ' num2str(AB) '%']);
     legend show;

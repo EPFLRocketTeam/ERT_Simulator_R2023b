@@ -58,7 +58,7 @@ W = x_cg(j);
 for i = 1:length(Calpha(j,:))
     CNa2A(j) = CNa2A(j) + Calpha(j,i) * (CP(j,i) - W)^2;
 end
-d = max(Rocket.diameters);
+d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
 C2A(j) = rho * veloc(j) * Ar / 2 * CNa2A(j);

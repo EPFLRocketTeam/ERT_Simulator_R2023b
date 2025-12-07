@@ -17,7 +17,7 @@ g = 9.81;               % Gravity []
 
 % Multiple Time Used Parameters
 V = sqrt(x(2)^2+2*x(2)*V_inf*sin(alpha)+V_inf^2); % Total Air flow Speed
-q = 1/2*rho*Rocket.Sm*V^2; % Dynamic pressure
+q = 1/2*rho*Rocket.maxCrossSectionArea*V^2; % Dynamic pressure
 CD = drag(Rocket,0,V,Nu,a);  % Drag coefficient
 
 % Equation

@@ -18,8 +18,8 @@ w = 0.106; % width [m]
 b = 0.089; % flap length [m]
 S = w*b; % flap surface [m2]
 U = abs(Uinf*cos(alpha));
-Rex = Rocket.ab_x*U/nu;
-delta = 0.37*Rocket.ab_x/Rex^0.2;
+Rex = Rocket.airbrakePosition*U/nu;
+delta = 0.37*Rocket.airbrakePosition/Rex^0.2;
 
 % drag coefficient
 if phi<asind(delta/w)
@@ -27,6 +27,6 @@ if phi<asind(delta/w)
 else
     qr = 1 - 2/9*(delta/w/sind(phi));
 end
-CD = Rocket.ab_n*CD0*qr*S/Rocket.Sm*sind(phi)^3;
+CD = Rocket.numAirbrakes*CD0*qr*S/Rocket.maxCrossSectionArea*sind(phi)^3;
 
 end

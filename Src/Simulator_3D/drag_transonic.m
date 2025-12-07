@@ -36,23 +36,23 @@ function Value = drag_transonic(Rocket, alpha, Uinf, nu, a)
     M = Uinf/a; % Mach number
     
     % Geometry of the rocket (inches, deg)
-    L = Rocket.stage_z(end) * 39.3701;                 % Lenght of the rocket
-    Ln = Rocket.stage_z(2) * 39.3701;     % Length of the rocket's nose
-    d = Rocket.dm * 39.3701;           % Maximum rocket diameter
+    L = Rocket.stagePositions(end) * 39.3701;                 % Lenght of the rocket
+    Ln = Rocket.stagePositions(2) * 39.3701;     % Length of the rocket's nose
+    d = Rocket.maxDiameter * 39.3701;           % Maximum rocket diameter
     r = d / 2;                                       % Maximum rocket radius
-    db = Rocket.diameters(end) * 39.3701;             % Base diameter of rocket at aft end
+    db = Rocket.stageDiameters(end) * 39.3701;             % Base diameter of rocket at aft end
     Lo = L - Ln;                                     % Rocket length to body ratio, where the length is taken aft of the maximum body-diameter position: Assuming no boatrails TODO: calculate for boatrails presence
     Lb = L;                                          % Base position ATTENTION PEUT ETRE FAUX
     Le = L;                                          % Effective length of rocket ATTENTION PEUT ETRE FAUX
-    Cr = Rocket.fin_cr * 39.3701;                % Root chord of fin
-    Ct = Rocket.fin_ct * 39.3701;                % Tip chord of fin
-    Nf = Rocket.fin_n;                      % Fin number
-    t = Rocket.fin_t* 39.3701;          % Maximum thickness of fin
-    Xtc = Rocket.fin_L1;                                         % Distance from fin leading edge to maximum thickness
+    Cr = Rocket.finRootChord * 39.3701;                % Root chord of fin
+    Ct = Rocket.finTipChord * 39.3701;                % Tip chord of fin
+    Nf = Rocket.numFins;                      % Fin number
+    t = Rocket.finThickness* 39.3701;          % Maximum thickness of fin
+    Xtc = Rocket.finLeadingEdgeLength;                                         % Distance from fin leading edge to maximum thickness
     
     % First useful parameters
     SB = 2 * pi * d / 2 * (L - Ln) + pi * d / 2 * Ln; % Total wetted surface area of body ATTENTION ICI PAS EXACTE
-    Sf = Rocket.fin_SF;       % Total wetted surface area of fins % Other possible calculation: bs2*(L-Lf+Cr-bs2/np.tan(np.deg2rad(Thetaf)))
+    Sf = Rocket.virtualFinArea;       % Total wetted surface area of fins % Other possible calculation: bs2*(L-Lf+Cr-bs2/np.tan(np.deg2rad(Thetaf)))
     Sr = SB + Sf;                                    % Total wetted surface area of rocket
     Xtcbar = Xtc / Cr;                               % Normalized distance from fin leading edge to maximum thickness
     
@@ -61,9 +61,9 @@ function Value = drag_transonic(Rocket, alpha, Uinf, nu, a)
     KF = 0.0008;
     
     % May be of use
-    Lf = Rocket.fin_xt * 39.3701; %Position of LE of fin
-    % Thetaf = atan((Rocket.get_fin_xs)/(Rocket.get_fin_span)) % Sweep angle (deg)
-    % bs2 = Rocket.get_fin_span * 39.3701 % Lenght of fin
+    Lf = Rocket.finRootPosition * 39.3701; %Position of LE of fin
+    % Thetaf = atan((Rocket.get_finSweepDistance)/(Rocket.get_finSpanpan)) % Sweep angle (deg)
+    % bs2 = Rocket.get_finSpanpan * 39.3701 % Lenght of fin
 
     % Limitation of model
     if Ln/Le > 0.6

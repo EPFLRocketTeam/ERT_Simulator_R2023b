@@ -12,11 +12,11 @@ function I = inertial_matrix(rocket, Cm, t)
         delta_z = z_propel - Cm;
     
         % Compute I of propelant
-        I = rocket.rocket_inertia + ...
+        I = rocket.emptyInertianertia + ...
             inertial_fill_cylinder(propelant_mass, z_propel, rocket.tank_r);% + ...
             %huygens_steiner_matrix(propelant_mass, 0, 0, delta_z);
     else
-        I = rocket.rocket_inertia;
+        I = rocket.emptyInertianertia;
     end
 end
 

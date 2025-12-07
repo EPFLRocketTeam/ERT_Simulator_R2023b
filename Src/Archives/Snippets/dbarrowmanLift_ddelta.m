@@ -5,7 +5,7 @@ function dCalpha = dbarrowmanLift_ddelta(Rocket, alpha, M, theta)
 
     % reference area
 
-    Aref = pi*Rocket.diameters(2)^2/4;
+    Aref = pi*Rocket.stageDiameters(2)^2/4;
     
     % cone
     if alpha == 0
@@ -14,14 +14,14 @@ function dCalpha = dbarrowmanLift_ddelta(Rocket, alpha, M, theta)
         dCNa_cone = 2*(cos(alpha)/alpha-1/alpha^2*sin(alpha));
     end
     
-    % stages
-    dCNa_stage = zeros(1, Rocket.stages-2);
-    CP_stage = zeros(1, Rocket.stages-2);
-    for i = 1:(Rocket.stages-2)
+    % numStages
+    dCNa_stage = zeros(1, Rocket.numStages-2);
+    CP_stage = zeros(1, Rocket.numStages-2);
+    for i = 1:(Rocket.numStages-2)
         if alpha == 0
-            dCNa_stage(i) = (Rocket.diameters(i+2)^2-Rocket.diameters(i+1)^2)*pi/Aref/2;
+            dCNa_stage(i) = (Rocket.stageDiameters(i+2)^2-Rocket.stageDiameters(i+1)^2)*pi/Aref/2;
         else
-            dCNa_stage(i) = (Rocket.diameters(i+2)^2-Rocket.diameters(i+1)^2)*pi/Aref/2*(cos(alpha)/alpha-1/alpha^2*sin(alpha));
+            dCNa_stage(i) = (Rocket.stageDiameters(i+2)^2-Rocket.stageDiameters(i+1)^2)*pi/Aref/2*(cos(alpha)/alpha-1/alpha^2*sin(alpha));
         end 
     end
     

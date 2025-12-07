@@ -1,29 +1,29 @@
-stages 4
-diameters 0 0.156 0.156 0.135
-stage_z 0 0.677 3.26 3.36
-fin_n 4
-fin_xt 3.01
-fin_s 0.175
-fin_cr 0.28
-fin_ct 0.125
-fin_xs 0.107
-fin_t 0.004
-lug_n 2
-lug_S 1.81e-4
-rocket_m 20.39 //mass of empty rocket without tank and combustion chamber
-rocket_I 31.924 //to change?
-rocket_cm 2.01
-ab_x 280
-ab_n 0
-ab_phi 0.0
-pl_mass 4.0
-para_main_SCD 18.84
-para_drogue_SCD 1.235
-para_main_event 400
-motor Euroc_motor_final.txt
+numStages 4
+stageDiameters 0 0.156 0.156 0.135
+stagePositions 0 0.677 3.26 3.36
+numFins 4
+finRootPosition 3.01
+finSpan 0.175
+finRootChord 0.28
+finTipChord 0.125
+finSweepDistance 0.107
+finThickness 0.004
+numLaunchLugs 2
+lugSurfaceArea 1.81e-4
+emptyMass 20.39 //mass of empty rocket without tank and combustion chamber
+emptyInertia 31.924 //to change?
+emptyCenterOfMass 2.01
+airbrakePosition 280
+numAirbrakes 0
+airbrakeAngle 0.0
+payloadMass 4.0
+mainParachuteDragArea 18.84
+drogueParachuteDragArea 1.235
+mainParachuteDeploymentAltitude 400
+motorId Euroc_motor_final.txt
 hybr Euroc_oxydiser_final.txt 0.38
-motor_fac 1
-cone_mode on
-cp_fac 1
-CNa_fac 1
-CD_fac 1
+motorThrustFactor 1
+coneMode on
+centerOfPressureFactor 1
+normalForceCoefficientFactor 1
+dragCoefficientFactor 1

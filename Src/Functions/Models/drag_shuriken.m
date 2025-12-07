@@ -12,8 +12,8 @@ function CD = drag_shuriken(Rocket, theta, alpha, Uinf, nu)
 
     CD0 = 1.17;
     U = abs(Uinf*cos(alpha));
-    Rex = Rocket.ab_x*U/nu;
-    delta = 0.37*Rocket.ab_x/Rex^0.2;
+    Rex = Rocket.airbrakePosition*U/nu;
+    delta = 0.37*Rocket.airbrakePosition/Rex^0.2;
 
 % =========================== Compute values ==============================
     % surface and height
@@ -25,7 +25,7 @@ function CD = drag_shuriken(Rocket, theta, alpha, Uinf, nu)
     else
         qr = 1 - 4/9*delta/h+1/8*(delta/h)^2;
     end
-    CD = Rocket.ab_n*CD0*qr*S/Rocket.Sm;
+    CD = Rocket.numAirbrakes*CD0*qr*S/Rocket.maxCrossSectionArea;
 end
 
 function [f, h] = surface(theta)

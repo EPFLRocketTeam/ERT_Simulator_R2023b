@@ -183,7 +183,7 @@ figure('Name', 'Stability Analysis', ...
 hold on; grid on; box on;
 
 % Calculate stability margin (calibers)
-stabilityMargin = (XCP - Rocket.rocket_cm) / Rocket.dm;
+stabilityMargin = (XCP - Rocket.emptyCenterOfMass) / Rocket.maxDiameter;
 
 plot(rad2deg(angleOfAttackRange), stabilityMargin, ...
      'LineWidth', 2, 'Color', 'r', 'Marker', 's', 'MarkerSize', 6);

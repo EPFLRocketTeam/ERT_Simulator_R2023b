@@ -27,14 +27,14 @@ Xid = [ "dmin" "dd" "z1" "z12" "z23" "finRootPosition" "finSpan" "finRootChord" 
          "finThickness" "lugSurfaceArea" "emptyMass" "emptyInertia" "emptyCenterOfMass" "airbrakePosition" "airbrakeAngle" ... 
          "payloadMass" "mainParachuteDragArea" "drogueParachuteDragArea" "mainParachuteDeploymentAltitude" "interMotorDistance" "motor_diaP" ...
          "motor_lengthP" "propel_massP" "motor_massP" "motor_diaF" "motor_lengthF" "propel_massF" ...
-         "motor_massF" "Burn_Time" "T1" "T2" "Temperature_Ground" "Pressure_Ground" "Humidity_Ground"  ... 
-         "Start_Altitude" "dTdh" "Rail_Length" "Rail_Angle" "Rail_Azimuth"...
+         "motor_massF" "Burn_Time" "railTime" "flightTime" "groundTemperature" "groundPressure" "groundHumidity"  ... 
+         "startAltitude" "dTdh" "railLength" "railAngle" "railAzimuth"...
          "Vi1" "Vi2" "Vi3" "Vi4" "Vi5" "Vi6" "ai1" "ai2" "ai3" "ai4" "ai5" "ai6"]';
     
 
 
 %Less inputs for debugging
-%Xid = ["finRootPosition" "finSpan" "finRootChord" "finTipChord" "finSweepDistance" "finThickness" "Burn_Time" "T1"]; 
+%Xid = ["finRootPosition" "finSpan" "finRootChord" "finTipChord" "finSweepDistance" "finThickness" "Burn_Time" "railTime"]; 
 
 Yid = ["Veor" "apogee" "t@apogee" "Vmax" "Vmax@t" "Cdmax" "a_max" "margin_min" "CNa_min" "MarCNa_min" "MarCNa_av" "landing_azi" "landing_drift"];
 
@@ -42,21 +42,21 @@ Yid = ["Veor" "apogee" "t@apogee" "Vmax" "Vmax@t" "Cdmax" "a_max" "margin_min" "
 % Base input values
 Rocket = rocketReader('BL2_H3.txt'); 
 Environment = environnementReader('Environment/Environnement_Definition_SA.txt'); %with exactly 6 windlayers
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
  
 % Base simulator object
-SimObj = multilayerwindSimulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs);
 
 %% Sobol analysis
 
-XX = baseValues(SimObj, Xid, sigma);
+XX = baseValues(simulatior3D, Xid, sigma);
 k = length(Xid);
 o = length(Yid);
 
 % Sampling
 X = SOsampling(Xid, XX, N, scheme);
 disp("Computing f(X):");
-Y_X = SimAPI(SimObj, Xid, Yid, X); 
+Y_X = SimAPI(simulatior3D, Xid, Yid, X); 
 
 if ~ONLYDLR
     Z = SOsampling(Xid, XX, N, scheme);
@@ -64,7 +64,7 @@ if ~ONLYDLR
     % Evaluating the simulator at each sample
     disp("---------------------------------------");
     disp("Computing f(Z):");
-    Y_Z = SimAPI(SimObj, Xid, Yid, Z); 
+    Y_Z = SimAPI(simulatior3D, Xid, Yid, Z); 
     % Looping over each input
     E = eye(k); %Easy way of getting basis vectors
     Y_is = NaN(o, N, k); %Array storing the outputs when keeping only x_i the same
@@ -75,10 +75,10 @@ if ~ONLYDLR
         e_i = E(:, i);
         disp("---------------------------------------");
         disp("Computing f(Z + (X-Z)e_i) for i = " + num2str(i) + "/" + num2str(k) + ":");
-        Y_is(:,:,i) =  SimAPI(SimObj, Xid, Yid, Z + (X-Z).*e_i);
+        Y_is(:,:,i) =  SimAPI(simulatior3D, Xid, Yid, Z + (X-Z).*e_i);
         disp("---------------------------------------");
         disp("Computing f(X + (Z-X)e_i) for i = " + num2str(i) + "/" + num2str(k) + ":");
-        Y_nis(:,:,i) = SimAPI(SimObj, Xid, Yid, X + (Z-X).*e_i);
+        Y_nis(:,:,i) = SimAPI(simulatior3D, Xid, Yid, X + (Z-X).*e_i);
 
     end
 end

@@ -43,14 +43,14 @@ s2Nom = [s2_1Nom; s2_2Nom(2:end, :)];
 % Speed off rail
 vNom = s1Nom(end, 2);
 % Local speed of sound and density of air
-[~,aNom,~,rhoNom] = stdAtmos(environment.Start_Altitude + s2Nom(1, 3), environment);
+[~,aNom,~,rhoNom] = stdAtmos(environment.startAltitude + s2Nom(1, 3), environment);
 % Mach number
 mNom = vNom / aNom;
 alphaNom = 0;
 thetaNom = 0;
 [cAlphaNom, cpNom] = barrowmanLift(rocket, alphaNom, mNom, thetaNom);
 cNa2ANom = 0;
-wNom = simObj.SimAuxResults.CM(1);
+wNom = simObj.simAuxResults.CM(1);
 for i = 1:length(cAlphaNom)
     cNa2ANom = cNa2ANom + cAlphaNom(i) * (cpNom(i) - wNom)^2;
 end
@@ -65,9 +65,9 @@ c2RNom = dMdtNom * (lneNom - wNom)^2;
 % c2 Damping Moment Coefficient
 c2Nom = c2ANom + c2RNom;
 cNaNom = sum(cAlphaNom);
-pNom = simObj.SimAuxResults.Xcp(1);
+pNom = simObj.simAuxResults.Xcp(1);
 c1Nom = rhoNom / 2 * vNom^2 * arNom * cNaNom * (pNom - wNom);
-ilNom = simObj.SimAuxResults.Il(1);
+ilNom = simObj.simAuxResults.Il(1);
 % Damping ratio
 epsilonNom = c2Nom / (2 * sqrt(c1Nom * ilNom));
 % Display Nominal Case results
@@ -118,7 +118,7 @@ results.pNom = pNom;
 xMax = s2Nom(indexMax, 1:3);
 vMax = s2Nom(indexMax, 4:6);
 % Local speed of sound and density of air
-[~,aMax,~,rhoMax] = stdAtmos(environment.Start_Altitude + s2Nom(indexMax, 3), environment);
+[~,aMax,~,rhoMax] = stdAtmos(environment.startAltitude + s2Nom(indexMax, 3), environment);
 % Mach number
 mMax = norm(vMax) / aMax;
 cMax = quat2rotmat(normalizeVect(s2Nom(indexMax, 7:10)'));
@@ -131,7 +131,7 @@ angleMax = rot2anglemat(cMax);
 thetaMax = angleMax(3);
 [cAlphaMax, cpMax] = barrowmanLift(rocket, alphaMax, mMax, thetaMax);
 cNa2AMax = 0;
-wMax = simObj.SimAuxResults.CM(indexMax);
+wMax = simObj.simAuxResults.CM(indexMax);
 for i = 1:length(cAlphaMax)
     cNa2AMax = cNa2AMax + cAlphaMax(i) * (cpMax(i) - wMax)^2;
 end
@@ -146,9 +146,9 @@ c2RMax = dMdtMax * (lneMax - wMax)^2;
 % c2 Damping Moment Coefficient
 c2Max = c2AMax + c2RMax;
 cNaMax = sum(cAlphaMax);
-pMax = simObj.SimAuxResults.Xcp(indexMax);
+pMax = simObj.simAuxResults.Xcp(indexMax);
 c1Max = rhoMax / 2 * norm(vMax)^2 * arMax * cNaMax * (pMax - wMax);
-ilMax = simObj.SimAuxResults.Il(indexMax);
+ilMax = simObj.simAuxResults.Il(indexMax);
 % Damping ratio
 epsilonMax = c2Max / (2 * sqrt(c1Max * ilMax));
 % Display Max Speed results
@@ -218,7 +218,7 @@ s2WcRail = [s2_1WcRail; s2_2WcRail(2:end, :)];
 % Results - Worst case (Rail Exit)
 % -------------------------------------------------------------------------
 % Local speed of sound and density of air
-[~,aWcRail,~,rhoWcRailInitial] = stdAtmos(environment.Start_Altitude + s2WcRail(1, 3), environment);
+[~,aWcRail,~,rhoWcRailInitial] = stdAtmos(environment.startAltitude + s2WcRail(1, 3), environment);
 % CHANGE DENSITY
 rhoWcRail = rhoWcRailInitial * 0.99;
 % Mach number
@@ -229,7 +229,7 @@ thetaWcRail = 0;
 % CHANGE CN_alpha FOR THE FINS
 cAlphaWcRail(end) = cAlphaWcRail(end)*0.95;
 cNa2AWcRail = 0;
-wWcRail = simObjWcRail.SimAuxResults.CM(1);
+wWcRail = simObjWcRail.simAuxResults.CM(1);
 for i = 1:length(cAlphaWcRail)
     cNa2AWcRail = cNa2AWcRail + cAlphaWcRail(i) * (cpWcRail(i) - wWcRail)^2;
 end
@@ -244,9 +244,9 @@ c2RWcRail = dMdtWcRail * (lneWcRail - wWcRail)^2;
 % c2 Damping Moment Coefficient
 c2WcRail = c2AWcRail + c2RWcRail;
 cNaWcRail = sum(cAlphaWcRail);
-pWcRail = simObjWcRail.SimAuxResults.Xcp(1);
+pWcRail = simObjWcRail.simAuxResults.Xcp(1);
 c1WcRail = rhoWcRail / 2 * vWcRail^2 * arWcRail * cNaWcRail * (pWcRail - wWcRail);
-ilWcRail = simObjWcRail.SimAuxResults.Il(1);
+ilWcRail = simObjWcRail.simAuxResults.Il(1);
 % Damping ratio
 epsilonWcRail = c2WcRail / (2 * sqrt(c1WcRail * ilWcRail));
 % Display Worst Case (Rail Exit) results
@@ -297,7 +297,7 @@ results.pWcRail = pWcRail;
 xWcMax = s2WcRail(indexWcMax, 1:3);
 vWcMax = s2WcRail(indexWcMax, 4:6);
 % Local speed of sound and density of air
-[~,aWcMax,~,rhoWcMaxInitial] = stdAtmos(environment.Start_Altitude + s2WcRail(indexWcMax, 3), environment);
+[~,aWcMax,~,rhoWcMaxInitial] = stdAtmos(environment.startAltitude + s2WcRail(indexWcMax, 3), environment);
 % CHANGE DENSITY
 rhoWcMax = rhoWcMaxInitial * 0.85;
 % Mach number
@@ -314,7 +314,7 @@ thetaWcMax = angleWcMax(3);
 % CHANGE CN_alpha FOR THE FINS
 cAlphaWcMax(end) = cAlphaWcMax(end)*0.95;
 cNa2AWcMax = 0;
-wWcMax = simObjWcRail.SimAuxResults.CM(indexWcMax);
+wWcMax = simObjWcRail.simAuxResults.CM(indexWcMax);
 for i = 1:length(cAlphaWcMax)
     cNa2AWcMax = cNa2AWcMax + cAlphaWcMax(i) * (cpWcMax(i) - wWcMax)^2;
 end
@@ -329,9 +329,9 @@ c2RWcMax = dMdtWcMax * (lneWcMax - wWcMax)^2;
 % c2 Damping Moment Coefficient
 c2WcMax = c2AWcMax + c2RWcMax;
 cNaWcMax = sum(cAlphaWcMax);
-pWcMax = simObjWcRail.SimAuxResults.Xcp(indexWcMax);
+pWcMax = simObjWcRail.simAuxResults.Xcp(indexWcMax);
 c1WcMax = rhoWcMax / 2 * norm(vWcMax)^2 * arWcMax * cNaWcMax * (pWcMax - wWcMax);
-ilWcMax = simObjWcRail.SimAuxResults.Il(indexWcMax);
+ilWcMax = simObjWcRail.simAuxResults.Il(indexWcMax);
 % Damping ratio
 epsilonWcMax = c2WcMax / (2 * sqrt(c1WcMax * ilWcMax));
 % Display Worst Case Max Speed results
@@ -380,14 +380,14 @@ results.apogeeWc = s2WcRail(end, 3);
 % =========================================================================
 % Nominal
 dCommon = max(rocket.stageDiameters);
-stabilityNomFull = (simObj.SimAuxResults.Xcp - simObj.SimAuxResults.CM)./dCommon;
+stabilityNomFull = (simObj.simAuxResults.Xcp - simObj.simAuxResults.CM)./dCommon;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
 stabilityNomCut = stabilityNomFull(1:length(s2_1Nom) + find(s2_2Nom(:,6) < 50,1));
 results.minStabilityNom = min(stabilityNomCut);
 results.maxStabilityNom = max(stabilityNomFull);
 % Worst Case
-stabilityWcFull = (simObjWcRail.SimAuxResults.Xcp - simObjWcRail.SimAuxResults.CM)./dCommon;
+stabilityWcFull = (simObjWcRail.simAuxResults.Xcp - simObjWcRail.simAuxResults.CM)./dCommon;
 stabilityWcCut = stabilityWcFull(1:length(s2_1WcRail) + find(s2_2WcRail(:,6) < 50,1));
 results.minStabilityWc = min(stabilityWcCut);
 results.maxStabilityWc = max(stabilityWcFull);

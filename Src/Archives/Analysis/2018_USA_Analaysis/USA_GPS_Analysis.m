@@ -57,34 +57,34 @@ angle = atand(p(1));
 % Rocket Definition
 Rocket = rocketReader('Rocket_Definition_Final.txt');
 Environment = environnementReader('Environnement_Definition_USA.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
 R = rotmat(-pi/2, 3);
 
-SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
 
 % ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
-display(['Launch rail departure velocity : ' num2str(S1(end,2))]);
+display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
 
 % ------------------------------------------------------------------------
 % 6DOF Boost Simulation
 %--------------------------------------------------------------------------
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Thrust_Time(end)], S1(end,2));
+[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
 
-SimX = (R*S2_1(:,1:3)')';
+SimX = (R*burnState(:,1:3)')';
 
 %% Compute flight path from end of GPS data to apogee
 
-SimObj.Rocket.coneMode = 'off';
-SimObj.Rocket.emptyMass = SimObj.Rocket.emptyMass-2.1;
-SimObj.Rocket.emptyCenterOfMass = 1.44;
-SimObj.Rocket.emptyInertia = 5.68;
-SimObj.Environment.V_inf = 2;
+simulatior3D.Rocket.coneMode = 'off';
+simulatior3D.Rocket.emptyMass = simulatior3D.Rocket.emptyMass-2.1;
+simulatior3D.Rocket.emptyCenterOfMass = 1.44;
+simulatior3D.Rocket.emptyInertia = 5.68;
+simulatior3D.Environment.V_inf = 2;
 
 V0 = [gps_v(end-1,1),gps_v(end-1,2), gps_v(end-1,3)]';
 phi = atan2(norm(cross(V0, [0;0;1])), dot(V0, [0;0;1]));
@@ -92,7 +92,7 @@ n = cross(V0, [0;0;1]); n = n/norm(n);
 Q0 = [n*sin(phi/2); cos(phi/2)];
 W = [0, 0, 0]';
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([SimObj.Rocket.Thrust_Time 40],...
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([simulatior3D.Rocket.Thrust_Time 40],...
     [gps_x(end), gps_y(end), gps_h(end)]',...
     V0,...
     Q0,...
@@ -100,26 +100,26 @@ W = [0, 0, 0]';
 
 %% Compute payload flight path
 
-T0 = T2_2(end);
-X0 = S2_2(end, 1:3)';
-V0 = S2_2(end, 4:6)';
+T0 = coastTime(end);
+X0 = coastState(end, 1:3)';
+V0 = coastState(end, 4:6)';
 
-[T6, S6] = SimObj.PayloadCrashSim(T0, X0, V0);
+[T6, S6] = simulatior3D.PayloadCrashSim(T0, X0, V0);
 
 %% Compute flight path from burnout to apogee
 
-% [T2_3, S2_3, T2_3E, S2_3E, I2_3E] = SimObj.FlightSim([T2_2(end) 40],...
-%     S2_2(end, 1:3)',...
-%     S2_2(end, 4:6)',...
-%     S2_2(end, 7:10)',...
-%     S2_2(end, 11:13)');
+% [T2_3, S2_3, T2_3E, S2_3E, I2_3E] = simulatior3D.FlightSim([coastTime(end) 40],...
+%     coastState(end, 1:3)',...
+%     coastState(end, 4:6)',...
+%     coastState(end, 7:10)',...
+%     coastState(end, 11:13)');
 
 %% Plot 3D trajectory
 figure; hold on;
 plot3(gps_x, gps_y, nose_alt_int, 'DisplayName', 'GPS - Baro');
 plot3(gps_x, gps_y, gps_h, 'DisplayName', 'GPS - GPS');
 plot3(SimX(:,1), SimX(:,2), SimX(:,3), 'DisplayName', 'Simulation Start');
-plot3(S2_2(:,1), S2_2(:,2), S2_2(:,3), 'DisplayName', 'Simulation To Apogee');
+plot3(coastState(:,1), coastState(:,2), coastState(:,3), 'DisplayName', 'Simulation To Apogee');
 plot3(S6(:,1), S6(:,2), S6(:,3), 'DisplayName', 'Payload Crash Simulation');
 quiver3(gps_x(1:end-1), gps_y(1:end-1), gps_h(1:end-1), gps_v(:,1),gps_v(:,2), gps_v(:,3), 'DisplayName', 'GPS - Velocity');
 daspect([1,1,1]); pbaspect([0.5, 0.5, 1]);
@@ -128,9 +128,9 @@ xlabel('N'); ylabel('W');
 
 
 display('Apogee location:');
-display(['N: ', num2str(S2_2(end,1)), ', W: ', num2str(S2_2(end,2))]);
-display(['Distance : ', num2str(sqrt(S2_2(end,1)^2 + S2_2(end,2)^2))]);
-display(['Angle : ', num2str(atand(S2_2(end,2)/S2_2(end,1)))]);
+display(['N: ', num2str(coastState(end,1)), ', W: ', num2str(coastState(end,2))]);
+display(['Distance : ', num2str(sqrt(coastState(end,1)^2 + coastState(end,2)^2))]);
+display(['Angle : ', num2str(atand(coastState(end,2)/coastState(end,1)))]);
 
 display('Payload landing location:');
 display(['N: ', num2str(S6(end,1)), ', W: ', num2str(S6(end,2))]);

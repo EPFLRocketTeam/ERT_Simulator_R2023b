@@ -13,17 +13,17 @@
 % out   T : The temperature at this altitude
 % out   a : speed of sound
 % out   p : pressure
-% out   rho : density
+% out   density : density
 % out   nu : viscosity
 
-function [T, a, p, rho, nu] = atmosphere(alt, env)
+function [T, a, p, density, nu] = atmosphere(alt, env)
     % Constant
     R_star = 287.04;                % [J / (kg K)] Real gas constant of air (R0 / M_air)
     gamma = 1.4;                    % [-] Specific heat coefficient of air
 
     % Initial
     p0 = 101325;                    % [Pa] Pressure at sea level
-    T0 = env.Temperature_Ground;    % [K] Temperature at sea level
+    T0 = env.groundTemperature;    % [K] Temperature at sea level
     g = 9.80665;                    % [m/sec^2] Gravity at sea level
     
     % Evaluate temperature using ISA and the Temperature Lapse Rate [K/m]
@@ -41,12 +41,12 @@ function [T, a, p, rho, nu] = atmosphere(alt, env)
     end
 
     % Density (ideal gas law)
-    x = env.Saturation_Vapor_Ratio*env.Humidity_Ground;
-    rho = p / (T * R_star) * (1 + x) / (1 + 1.609 * x);
+    x = env.Saturation_Vapor_Ratio*env.groundHumidity;
+    density = p / (T * R_star) * (1 + x) / (1 + 1.609 * x);
     
     % Viscosity
     mu = 1.715e-5 * (T/T0)^1.5 * (T0 + 110.4) / (T + 110.4);    % Dynamic viscosity
-    nu = mu / rho;                                              % Kinematic viscosity
+    nu = mu / density;                                              % Kinematic viscosity
 end
 
 
@@ -68,7 +68,7 @@ function [T, I] = atmosphere_temperature_integral(alt, env)
     % Table of the International Atmospheric Model
     % Source : https://en.wikipedia.org/wiki/International_Standard_Atmosphere
     table_isa_alt = [0,      11000,  20000,  32000,  47000,  51000,  71000,  86000];
-    table_isa_tem = [floor(env.Temperature_Ground), 216.65, ...
+    table_isa_tem = [floor(env.groundTemperature), 216.65, ...
         216.65, 228.65, 270.65, 270.65, 214.15, 186.95];
 
     % Initialize the integral
@@ -94,13 +94,13 @@ function [T, I] = atmosphere_temperature_integral(alt, env)
         % Interpolate the temperature
         alt1 =  table_isa_alt(index);
         alt2 =  table_isa_alt(index+1);
-        T1 =    table_isa_tem(index);
-        T2 =    table_isa_tem(index+1);
+        railTime =    table_isa_tem(index);
+        flightTime =    table_isa_tem(index+1);
         
-        T = T1 + (alt - alt1) * (T2 - T1)/(alt2 - alt1);
+        T = railTime + (alt - alt1) * (flightTime - railTime)/(alt2 - alt1);
 
         % Integrate until the altitude of the rocket (add the last layer)
-        I = I + integral_dh_T(alt1, alt, T1, T);
+        I = I + integral_dh_T(alt1, alt, railTime, T);
     end
 end
 

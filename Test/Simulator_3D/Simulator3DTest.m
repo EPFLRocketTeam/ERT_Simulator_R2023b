@@ -50,11 +50,11 @@ classdef Simulator3DTest < matlab.unittest.TestCase
             
             % Create test environment
             testCase.TestEnvironment = struct();
-            testCase.TestEnvironment.Rail_Length = 10;
-            testCase.TestEnvironment.Rail_Angle = deg2rad(2);
-            testCase.TestEnvironment.Rail_Azimuth = deg2rad(0);
-            testCase.TestEnvironment.Start_Altitude = 1000;
-            testCase.TestEnvironment.Temperature_Ground = 288.15;
+            testCase.TestEnvironment.railLength = 10;
+            testCase.TestEnvironment.railAngle = deg2rad(2);
+            testCase.TestEnvironment.railAzimuth = deg2rad(0);
+            testCase.TestEnvironment.startAltitude = 1000;
+            testCase.TestEnvironment.groundTemperature = 288.15;
             testCase.TestEnvironment.V_inf = [0; 0; 0];
             testCase.TestEnvironment.V_dir = [1; 0; 0];
             testCase.TestEnvironment.Turb_I = 0;

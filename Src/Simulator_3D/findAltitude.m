@@ -9,7 +9,7 @@ function value=findAltitude(X,Y,Environnement)
 % Output:
 % - value: an array of z coordinates of the same shape as X,
 %   corresponding to the altitude of the terrain at the specified
-%   x,y coordinates (from X,Y), relative to Environnement.Start_Altitude
+%   x,y coordinates (from X,Y), relative to Environnement.startAltitude
 
 % X and Y should be of the same dimensions; if not, issue a warning
 % our code will still work if Y has more elements than X,
@@ -32,16 +32,16 @@ for i=1:numel(X)
 
     if(isempty(mapPosRow))
         % if no indices were found, assume the altitude is
-        % the same as Environnement.Start_Altitude
-        map_z=Environnement.Start_Altitude;
+        % the same as Environnement.startAltitude
+        map_z=Environnement.startAltitude;
     else 
         % if indices were found, set the altitude to the
         % altitude specified in the map by the first [row,col] index pair
         map_z=Environnement.map_z(mapPosRow(1),mapPosCol(1));
     end
 
-    % subtract Environnement.Start_Altitude to get the relative altitude
-    Z(i)=map_z-Environnement.Start_Altitude;
+    % subtract Environnement.startAltitude to get the relative altitude
+    Z(i)=map_z-Environnement.startAltitude;
 end
 value=Z;
 end

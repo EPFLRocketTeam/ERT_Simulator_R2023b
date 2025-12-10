@@ -59,12 +59,12 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expectedZ = [10,3]-Environment.Start_Altitude;
+            expectedZ = [10,3]-Environment.startAltitude;
 
             % Verify
             Z = findAltitude(X,Y,Environment);
@@ -83,12 +83,12 @@ classdef findAltitudeTest < matlab.unittest.TestCase
             Environment.map_z =...
             [];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expectedZ = [0,0]-Environment.Start_Altitude;
+            expectedZ = [0,0]-Environment.startAltitude;
 
             % Verify
             Z = findAltitude(X,Y,Environment);
@@ -116,7 +116,7 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y and expected Z
             X = [];
@@ -149,12 +149,12 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set a non-zero start altitude
-            Environment.Start_Altitude = 53;
+            Environment.startAltitude = 53;
 
             % Define X,Y and expected Z
             X = [4,10];
             Y = [6,12];
-            expectedZ = [10,3]-Environment.Start_Altitude;
+            expectedZ = [10,3]-Environment.startAltitude;
 
             % Verify
             Z = findAltitude(X,Y,Environment);
@@ -183,14 +183,14 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y, where numel(X) > numel(Y)
             X = [4,8;10,2];
             Y = [6,12,13];
             % X should be truncated to [4,10,8]
             % Define expected Z
-            expectedZ = [10,3,3]-Environment.Start_Altitude;
+            expectedZ = [10,3,3]-Environment.startAltitude;
 
             % Verify
             Z = findAltitude(X,Y,Environment);
@@ -234,7 +234,7 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y with coordinates not within 1 of
             % values of the map
@@ -253,7 +253,7 @@ classdef findAltitudeTest < matlab.unittest.TestCase
 
             % Verify with a different start altitude to make sure
             % we did not get lucky
-            Environment.Start_Altitude = 53;
+            Environment.startAltitude = 53;
             Z = findAltitude(X,Y,Environment);
             testCase.verifyThat(Z, ...
                 matlab.unittest.constraints.IsEqualTo(expectedZ, ...
@@ -281,7 +281,7 @@ classdef findAltitudeTest < matlab.unittest.TestCase
              9, 10,11,12;
              13,14,15,16];
             % Set the start altitude to 0
-            Environment.Start_Altitude = 0;
+            Environment.startAltitude = 0;
 
             % Define X,Y and expected Z
             X = [2,3];

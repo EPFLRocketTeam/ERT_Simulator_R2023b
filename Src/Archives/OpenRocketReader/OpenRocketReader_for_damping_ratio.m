@@ -13,7 +13,7 @@ addpath(genpath('../Declarations'),...
 % Rocket Definition
  Rocket = rocketReader('Wildhorn.txt');
 Environment = environnementReader('Environment/Environnement_Definition_EUROC.txt');
-% SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+% simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
 warning('off','all')
 %% For csv : time[s],altitude[ft],acc[m/s^2],stability margin [calib],mach
@@ -46,7 +46,7 @@ t_apo1 = time(i_apo1);
 
 for j=1:length(time)
 % Local speed of sound and density of air
-[~,a(j),~,rho] = stdAtmos(Environment.Start_Altitude + altitude(j), Environment);
+[~,a(j),~,density] = stdAtmos(Environment.startAltitude + altitude(j), Environment);
 
 M(j) = veloc(j)/a(j); %mach number
 alpha = attack_angle(j)*pi/180; %angle of attack
@@ -61,7 +61,7 @@ end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A(j) = rho * veloc(j) * Ar / 2 * CNa2A(j);
+C2A(j) = density * veloc(j) * Ar / 2 * CNa2A(j);
 
 dMdt = -gradient(Mass)./gradient(time); %change in rocket mass
 Lne = 2.75; %distance tip of rocket to nozzle
@@ -76,7 +76,7 @@ C2(j) = C2A(j) + C2R(j);
 CNa(j) = sum(Calpha(j,:));
 P = x_cp(j);
 
-C1(j) = rho / 2 * veloc(j)^2 * Ar * CNa(j) * (P - W);
+C1(j) = density / 2 * veloc(j)^2 * Ar * CNa(j) * (P - W);
 
 % Damping ratio
 epsilon(j) = C2(j) / (2 * sqrt(C1(j) * Il(j)));

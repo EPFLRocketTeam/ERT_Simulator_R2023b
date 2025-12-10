@@ -1,7 +1,7 @@
-function Y = SimAPI(SimObj, Xid, Yid, X)
+function Y = SimAPI(simulatior3D, Xid, Yid, X)
 %SIMAPI evaluates the simulator using the given parameters.
 %   INPUTS: 
-%       SimObj      Simulator object containing the base values of the parameters
+%       simulatior3D      Simulator object containing the base values of the parameters
 %       Xid         IDs of the parameters that will change during the SA.
 %       Yid         IDs of the desired outputs
 %       X           Values of the parameter corresponding to Xid (one sample per column)
@@ -28,29 +28,29 @@ parfor idx_sim = 1:N
     t_s0 = tic;
 
     % Set parameters
-    SimObj_i = setParam(SimObj, Xid, X(:, idx_sim));
+    simulationObj_i = setParam(simulatior3D, Xid, X(:, idx_sim));
     
     % Rail simulation
-    [T1, S1] = SimObj_i.RailSim();
+    [railTime, railState] = simulationObj_i.RailSim();
     
     if any(ismember(Yid, Yimp_apogee)) || any(ismember(Yid, Yimp_landing))
         % Thrust phase
-        [T2_1, S2_1, ~, ~, ~] = SimObj_i.FlightSim([T1(end) SimObj_i.Rocket.Burn_Time(end)], S1(end, 2));
+        [burnTime, burnState, ~, ~, ~] = simulationObj_i.FlightSim([railTime(end) simulationObj_i.Rocket.Burn_Time(end)], railState(end, 2));
         
         % Ballistic phase
-        [T2_2, S2_2, ~, ~, ~] = SimObj_i.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
+        [coastTime, coastState, ~, ~, ~] = simulationObj_i.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
         
-        T2 = [T2_1; T2_2(2:end)];
-        S2 = [S2_1; S2_2(2:end, :)];
-        T_1_2 = [T1;T2];
-        S_1_2 = [S1;S2(:,3) S2(:,6)];
+        flightTime = [burnTime; coastTime(2:end)];
+        flightState = [burnState; coastState(2:end, :)];
+        combinedRailFlightTime = [railTime;flightTime];
+        combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
     end
     
     if any(ismember(Yid, Yimp_landing))
         % Drogue parachut descent 
-        [T3, S3, ~, ~, ~] = SimObj_i.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+        [T3, S3, ~, ~, ~] = simulationObj_i.DrogueParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
         % Main parachute descent
-        [~, S4, ~, ~, ~] = SimObj_i.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
+        [~, mainChuteState, ~, ~, ~] = simulationObj_i.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
     end
     
     % Extracting the outputs into the output matrix
@@ -58,35 +58,35 @@ parfor idx_sim = 1:N
         id = Yid(i);
         switch id
             case "Veor"
-                Y(i,idx_sim) = S1(end,2);
+                Y(i,idx_sim) = railState(end,2);
             case "apogee" 
-                Y(i,idx_sim) = S2(end,3);
+                Y(i,idx_sim) = flightState(end,3);
             case "t@apogee" 
-                Y(i,idx_sim) = T2(end);
+                Y(i,idx_sim) = flightTime(end);
             case "Vmax" 
-                Y(i,idx_sim) = max(S2(:,6));
+                Y(i,idx_sim) = max(flightState(:,6));
             case "Vmax@t" 
-                [~, tvmax] = max(S2(:,6));
+                [~, tvmax] = max(flightState(:,6));
                 Y(i,idx_sim) = tvmax;
             case "Cdmax" 
-                Y(i,idx_sim) = max(SimObj_i.SimAuxResults.Cd);
+                Y(i,idx_sim) = max(simulationObj_i.simAuxResults.Cd);
             case "a_max" 
-                Y(i,idx_sim) = max(diff(S_1_2(:,2))./diff(T_1_2));
+                Y(i,idx_sim) = max(diff(combinedRailFlightState(:,2))./diff(combinedRailFlightTime));
             case "margin_min" 
-                Y(i,idx_sim) = min(SimObj_i.SimAuxResults.Margin);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Margin);
             case "CNa_min"
-                Y(i,idx_sim) = min(SimObj_i.SimAuxResults.Cn_alpha);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Cn_alpha);
             case "MarCNa_min"
-                Y(i,idx_sim) = min(SimObj_i.SimAuxResults.Margin.*SimObj_i.SimAuxResults.Cn_alpha);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Margin.*simulationObj_i.simAuxResults.Cn_alpha);
             case "MarCNa_av"
-                Y(i,idx_sim) = mean(SimObj_i.SimAuxResults.Margin.*SimObj_i.SimAuxResults.Cn_alpha);
+                Y(i,idx_sim) = mean(simulationObj_i.simAuxResults.Margin.*simulationObj_i.simAuxResults.Cn_alpha);
             case "landing_drift"
-                Y(i,idx_sim) = sqrt(S4(end,1).^2 + S4(end,2).^2);
+                Y(i,idx_sim) = sqrt(mainChuteState(end,1).^2 + mainChuteState(end,2).^2);
             case "landing_azi"
-                if (S4(:,1) == 0)
-                    Y(i,idx_sim) = mod(sign(S4(end,2)) * 90, 360);
+                if (mainChuteState(:,1) == 0)
+                    Y(i,idx_sim) = mod(sign(mainChuteState(end,2)) * 90, 360);
                 else
-                    Y(i,idx_sim) = mod(atand(S4(end,2)/S4(end,1)) - 90*(sign(S4(end,1)) - 1) + 180, 360);
+                    Y(i,idx_sim) = mod(atand(mainChuteState(end,2)/mainChuteState(end,1)) - 90*(sign(mainChuteState(end,1)) - 1) + 180, 360);
                 end
             otherwise
                 error("Error: the output " + id + " is not implemented");

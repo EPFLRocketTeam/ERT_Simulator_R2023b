@@ -84,7 +84,7 @@ fprintf('\nComputing aerodynamic coefficients...\n');
 % Initialize coefficient matrices
 dragCoefficientMatrix = zeros(length(velocityRange), length(angleOfAttackRange));  % Drag coefficient matrix
 CNa = zeros(1, length(angleOfAttackRange));                      % Normal force slope
-XCP = zeros(1, length(angleOfAttackRange));                      % Center of pressure
+centerOfPressure = zeros(1, length(angleOfAttackRange));                      % Center of pressure
 
 % 4.1 Drag Coefficient Calculation (dragCoefficientMatrix vs Mach, for different alpha)
 fprintf('  Calculating drag coefficients...\n');
@@ -108,7 +108,7 @@ for j = 1:length(angleOfAttackRange)
     % Calculate normal force coefficient slope and center of pressure
     % Parameters: Rocket, alpha, airbrake deployment, Mach, roll rate, 
     %             useNonlinear flag
-    [CNa(j), XCP(j)] = normalLift(Rocket, angleOfAttackRange(j), 1.1, 0, 0, 1);
+    [CNa(j), centerOfPressure(j)] = normalLift(Rocket, angleOfAttackRange(j), 1.1, 0, 0, 1);
 end
 
 fprintf('Aerodynamic calculations complete.\n\n');
@@ -183,7 +183,7 @@ figure('Name', 'Stability Analysis', ...
 hold on; grid on; box on;
 
 % Calculate stability margin (calibers)
-stabilityMargin = (XCP - Rocket.emptyCenterOfMass) / Rocket.maxDiameter;
+stabilityMargin = (centerOfPressure - Rocket.emptyCenterOfMass) / Rocket.maxDiameter;
 
 plot(rad2deg(angleOfAttackRange), stabilityMargin, ...
      'LineWidth', 2, 'Color', 'r', 'Marker', 's', 'MarkerSize', 6);
@@ -221,11 +221,11 @@ fprintf('  Plot 3: Stability margin generated.\n');
 % if exportData
 %     % Save workspace variables
 %     save('AeroPlot_Results.mat', 'Rocket', 'velocityRange', 'angleOfAttackRange', ...
-%          'dragCoefficientMatrix', 'CNa', 'XCP', 'stabilityMargin');
+%          'dragCoefficientMatrix', 'CNa', 'centerOfPressure', 'stabilityMargin');
 %     
 %     % Export to CSV for external analysis
-%     resultsTable = table(angleOfAttackRange', CNa', XCP', stabilityMargin', ...
-%                          'VariableNames', {'Alpha_rad', 'CNa', 'XCP', 'Stability_Calibers'});
+%     resultsTable = table(angleOfAttackRange', CNa', centerOfPressure', stabilityMargin', ...
+%                          'VariableNames', {'Alpha_rad', 'CNa', 'centerOfPressure', 'Stability_Calibers'});
 %     writetable(resultsTable, 'AeroPlot_Results.csv');
 %     fprintf('\nResults exported to AeroPlot_Results.mat and AeroPlot_Results.csv\n');
 % end

@@ -56,40 +56,40 @@ nose_t_force = nose_data(nose_t_force_i, nose_time);
 % Rocket Definition
 Rocket = rocketReader('Rocket/Rocket_Definition_Final.txt');
 Environment = environnementReader('Environment/Environnement_Definition.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
-SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
 
 % ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
-display(['Launch rail departure velocity : ' num2str(S1(end,2))]);
-
-% ------------------------------------------------------------------------
-% 6DOF Boost Simulation
-%--------------------------------------------------------------------------
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Thrust_Time(end)], S1(end,2));
+display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
 
 % ------------------------------------------------------------------------
 % 6DOF Boost Simulation
 %--------------------------------------------------------------------------
+[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
 
-SimObj.Rocket.coneMode = 'off';
-SimObj.Rocket.emptyMass = SimObj.Rocket.emptyMass-2.1;
-SimObj.Rocket.emptyCenterOfMass = 1.44;
-SimObj.Rocket.emptyInertia = 5.68;
+% ------------------------------------------------------------------------
+% 6DOF Boost Simulation
+%--------------------------------------------------------------------------
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end,1:3)', S2_1(end,4:6)', S2_1(end,7:10)', S2_1(end,11:13)');
+simulatior3D.Rocket.coneMode = 'off';
+simulatior3D.Rocket.emptyMass = simulatior3D.Rocket.emptyMass-2.1;
+simulatior3D.Rocket.emptyCenterOfMass = 1.44;
+simulatior3D.Rocket.emptyInertia = 5.68;
 
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1;S2_2(2:end, :)];
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end,1:3)', burnState(end,4:6)', burnState(end,7:10)', burnState(end,11:13)');
 
-display(['Apogee AGL : ' num2str(S2(end,3))]);
-display(['Max speed : ' num2str(max(S2(:,6)))]);
-display(['Max acceleration : ' num2str(max(diff(S2(:,6))./diff(T2)))]);
+flightTime = [burnTime; coastTime(2:end)];
+flightState = [burnState;coastState(2:end, :)];
+
+display(['Apogee AGL : ' num2str(flightState(end,3))]);
+display(['Max speed : ' num2str(max(flightState(:,6)))]);
+display(['Max acceleration : ' num2str(max(diff(flightState(:,6))./diff(flightTime)))]);
 
 %% plot data
 
@@ -104,7 +104,7 @@ plot(nose_data(:, nose_time), nose_data(:, nose_alt), '-', 'DisplayName', 'Cone'
 plot(nose_t_ab*ones(1,2), ylim, '--' ,'DisplayName', 'First Airbrake Command');
 plot(nose_t_force*ones(1,2), ylim, '--', 'DisplayName', 'Acceleration Inversion');
 % simulation data
-plot(T2, S2(:,3), '-', 'DisplayName', 'Simulation');
+plot(flightTime, flightState(:,3), '-', 'DisplayName', 'Simulation');
 legend show; xlabel 'time [s]'; ylabel 'altitude [m]';
 title('Altitude vs time');
 set(gca, 'FontSize', 16);
@@ -120,7 +120,7 @@ title('Acceleration vs. time');
 grid on;
 
 % Figure 3 : interp and averaged raven
-T = 0:0.1:ceil(T2(end));
+T = 0:0.1:ceil(flightTime(end));
 filter_average = 1/5*ones(1,5);
 
 raven1_alt_filt = filter(filter_average,1,raven1_alt(:,2));
@@ -143,7 +143,7 @@ plot(T,raven1_alt_filt_interp,'DisplayName', 'Raven1 avg')
 plot(T,raven1_alt_filt_interp2, 'DisplayName', 'Raven1 interp')
 plot(T,raven2_alt_filt_interp, 'DisplayName', 'Raven2 avg')
 plot(T,raven2_alt_filt_interp2, 'DisplayName', 'Raven2 interp')
-plot(T2,S2(:,3), 'DisplayName', 'Simulation altitude')
+plot(flightTime,flightState(:,3), 'DisplayName', 'Simulation altitude')
 legend show; xlabel 'time [s]'; ylabel 'altitude [m]';
 title('Interpolated Raven altitude vs. time');
 grid on;
@@ -152,7 +152,7 @@ grid on;
 filter_average = 1/3*ones(1,3);
 T_vel = 0:0.5:23;
 
-sim_vel = interp1(T2,S2(:,6),T,'spline');
+sim_vel = interp1(flightTime,flightState(:,6),T,'spline');
 tmp_rav = circshift(raven1_alt_filt_interp2,-1);
 tmp_T = circshift(T,-1);
 raven1_vel = (tmp_rav(1:end-1)-raven1_alt_filt_interp2(1:end-1)) ./ ...

@@ -39,7 +39,7 @@ Option = odeset('Events', @FlightEventFunc);
 
 % integration
 [T, S, TE, SE, IE] = ode45(@(t,s) Dynamics_6DOF(t,s,Rocket,Environnement),tspan,S0, Option);
-[T1, S1, TE1, SE1, IE1] = ode45(@(t,s) Dynamics_3DOF(t,s,Rocket,Environnement),tspan,S0(1:6), Option);
+[railTime, railState, TE1, SE1, IE1] = ode45(@(t,s) Dynamics_3DOF(t,s,Rocket,Environnement),tspan,S0(1:6), Option);
 %% ------------------------------------------------------------------------
 % 6DOF Result Analysis
 %--------------------------------------------------------------------------
@@ -48,13 +48,13 @@ Option = odeset('Events', @FlightEventFunc);
 C = quat2rotmat(S(:, 7:10));
 %figure; 
 hold on;
-direcv = zeros(length(C),3);
+directionVectors = zeros(length(C),3);
 for i  = 1:length(C)
-    direcv(i,:) = C(:,:,i)*[0;0;1];
+    directionVectors(i,:) = C(:,:,i)*[0;0;1];
 end
 plot(S(:,1), S(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '6DOF']);
-plot(S1(:,1), S1(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '3DOF']);
-%quiver(S(:,1), S(:,3), direcv(:,1), direcv(:,3));
+plot(railState(:,1), railState(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '3DOF']);
+%quiver(S(:,1), S(:,3), directionVectors(:,1), directionVectors(:,3));
 title 'Altitude vs. drift'
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 %daspect([1 1 1]); pbaspect([1 1 1])

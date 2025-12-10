@@ -34,7 +34,7 @@ classdef inertialCouplingTest < matlab.unittest.TestCase
             
             % Clean up workspace
             if testCase.TestDataCreated
-                clear S2 T2;
+                clear flightState flightTime;
             end
         end
     end
@@ -42,38 +42,38 @@ classdef inertialCouplingTest < matlab.unittest.TestCase
     methods (Access = private)
         function createTestData(testCase)
             % Create minimal dummy data that the script expects
-            % The script needs S2 and T2 variables in the workspace
+            % The script needs flightState and flightTime variables in the workspace
             
             % Create time vector
-            T2 = linspace(0, 10, 100)';
+            flightTime = linspace(0, 10, 100)';
             
-            % Create state matrix S2 with correct dimensions:
+            % Create state matrix flightState with correct dimensions:
             % [x, y, z, vx, vy, vz, q1, q2, q3, q4, ωx, ωy, ωz]
-            S2 = zeros(100, 13);
+            flightState = zeros(100, 13);
             
             % Position (simple upward trajectory)
-            S2(:, 3) = 50 * T2;  % z position increases
+            flightState(:, 3) = 50 * flightTime;  % z position increases
             
             % Velocity (constant upward)
-            S2(:, 6) = 50;  % vz = 50 m/s
+            flightState(:, 6) = 50;  % vz = 50 m/s
             
             % Quaternion (identity quaternion - no rotation)
-            S2(:, 7) = 1;  % q1 = 1
-            S2(:, 8:10) = 0;  % q2 = q3 = q4 = 0
+            flightState(:, 7) = 1;  % q1 = 1
+            flightState(:, 8:10) = 0;  % q2 = q3 = q4 = 0
             
             % Angular velocity (small perturbations)
-            S2(:, 11) = 0.01 * sin(2*pi*T2/10);  % ωx
-            S2(:, 12) = 0.02 * sin(2*pi*T2/5);   % ωy
-            S2(:, 13) = 0.005;                   % ωz (small roll)
+            flightState(:, 11) = 0.01 * sin(2*pi*flightTime/10);  % ωx
+            flightState(:, 12) = 0.02 * sin(2*pi*flightTime/5);   % ωy
+            flightState(:, 13) = 0.005;                   % ωz (small roll)
             
             % Make variables available in base workspace
-            assignin('base', 'S2', S2);
-            assignin('base', 'T2', T2);
+            assignin('base', 'flightState', flightState);
+            assignin('base', 'flightTime', flightTime);
             
             testCase.TestDataCreated = true;
             
-            fprintf('Created test data: S2 (%dx%d), T2 (%dx%d)\n', ...
-                size(S2, 1), size(S2, 2), size(T2, 1), size(T2, 2));
+            fprintf('Created test data: flightState (%dx%d), flightTime (%dx%d)\n', ...
+                size(flightState, 1), size(flightState, 2), size(flightTime, 1), size(flightTime, 2));
         end
     end
     
@@ -150,24 +150,24 @@ classdef inertialCouplingTest < matlab.unittest.TestCase
             
             fprintf('\n=== Checking required variables ===\n');
             
-            % Check if S2 exists
-            if evalin('base', 'exist(''S2'', ''var'')')
-                S2 = evalin('base', 'S2');
-                fprintf('✓ S2 exists: %dx%d matrix\n', size(S2, 1), size(S2, 2));
-                testCase.verifySize(S2, [100, 13], 'S2 should be 100x13');
+            % Check if flightState exists
+            if evalin('base', 'exist(''flightState'', ''var'')')
+                flightState = evalin('base', 'flightState');
+                fprintf('✓ flightState exists: %dx%d matrix\n', size(flightState, 1), size(flightState, 2));
+                testCase.verifySize(flightState, [100, 13], 'flightState should be 100x13');
             else
-                fprintf('✗ S2 does not exist\n');
-                testCase.verifyFail('S2 variable missing');
+                fprintf('✗ flightState does not exist\n');
+                testCase.verifyFail('flightState variable missing');
             end
             
-            % Check if T2 exists
-            if evalin('base', 'exist(''T2'', ''var'')')
-                T2 = evalin('base', 'T2');
-                fprintf('✓ T2 exists: %dx%d vector\n', size(T2, 1), size(T2, 2));
-                testCase.verifySize(T2, [100, 1], 'T2 should be 100x1');
+            % Check if flightTime exists
+            if evalin('base', 'exist(''flightTime'', ''var'')')
+                flightTime = evalin('base', 'flightTime');
+                fprintf('✓ flightTime exists: %dx%d vector\n', size(flightTime, 1), size(flightTime, 2));
+                testCase.verifySize(flightTime, [100, 1], 'flightTime should be 100x1');
             else
-                fprintf('✗ T2 does not exist\n');
-                testCase.verifyFail('T2 variable missing');
+                fprintf('✗ flightTime does not exist\n');
+                testCase.verifyFail('flightTime variable missing');
             end
             
             % Check initial frame index
@@ -242,8 +242,8 @@ classdef inertialCouplingTest < matlab.unittest.TestCase
             testScript = [
                 '%% Minimal test simulation\n' ...
                 'id_initial = 1;\n' ...
-                'S_simu = S2(1:10,:);\n' ...
-                't_simu = T2(1:10);\n' ...
+                'S_simu = flightState(1:10,:);\n' ...
+                't_simu = flightTime(1:10);\n' ...
                 'X_simu = S_simu(:,1:3);\n' ...
                 'V_simu = S_simu(:,4:6);\n' ...
                 'Q_simu = S_simu(:,7:10);\n' ...

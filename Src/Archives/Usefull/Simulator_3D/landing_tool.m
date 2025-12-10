@@ -1,4 +1,4 @@
-function [aire ,r_ellipse,r_ellipse1, X0, Y0, data] = landing_tool(n_sim, angle1, azimuth, Rocket_0, SimOutputs, name_of_environnment) 
+function [aire ,r_ellipse,r_ellipse1, X0, Y0, data] = landing_tool(n_sim, angle1, azimuth, Rocket_0, simulationOutputs, name_of_environnment) 
 coordsx = 1:n_sim;
 coordsy = 1:n_sim;
 for i = 1 : n_sim
@@ -11,16 +11,16 @@ for i = 1 : n_sim
     Rocket = setfield(Rocket, 'motorThrustFactor' , b(1));
     Environment =environnementReader(name_of_environnment);
     if(azimuth ~= -1)
-        Environment = setfield(Environment, 'Rail_Azimuth', azimuth);
+        Environment = setfield(Environment, 'railAzimuth', azimuth);
     end
-    SimObj = multilayerwindSimulator3D(Rocket, Environment, SimOutputs);
-    [T1, S1] = SimObj.RailSim();
-    [T2_1, S2_1, ~, ~, ~] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
-    [T2_2, S2_2, ~, ~, ~] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
-    T2 = [T2_1; T2_2(2:end)];
-    S2 = [S2_1; S2_2(2:end, :)];
-    [T3, S3, ~, ~, ~] = SimObj.MainParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
-    %[~, S4, ~, ~, ~] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
+    simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs);
+    [railTime, railState] = simulatior3D.RailSim();
+    [burnTime, burnState, ~, ~, ~] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+    [coastTime, coastState, ~, ~, ~] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+    flightTime = [burnTime; coastTime(2:end)];
+    flightState = [burnState; coastState(2:end, :)];
+    [T3, S3, ~, ~, ~] = simulatior3D.MainParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
+    %[~, mainChuteState, ~, ~, ~] = simulatior3D.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
     coordsx(i)=S3(end,1);  
     coordsy(i)=S3(end,2);
 end

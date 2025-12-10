@@ -62,7 +62,7 @@ classdef MainTest < matlab.unittest.TestCase
             try
                 Environment = environnementReader(envFile);
                 testCase.verifyTrue(isstruct(Environment), 'Environment should be a struct');
-                testCase.verifyTrue(isfield(Environment, 'Start_Latitude'), 'Environment should have Start_Latitude field');
+                testCase.verifyTrue(isfield(Environment, 'startLatitude'), 'Environment should have startLatitude field');
             catch ME
                 testCase.verifyFail(sprintf('Failed to load environment: %s', ME.message));
             end

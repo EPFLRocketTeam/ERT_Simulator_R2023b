@@ -29,20 +29,20 @@ fclose(fid);
 
 
 Rocket_0 = rocketReader('WASSERFALLEN_FRANKENSTEIN.txt');
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 name_of_environnment = 'Environment/Environnement_Definition_Wasserfallen.txt';
 
 Environment = environnementReader(name_of_environnment);
-SimObj = Simulator3D_CAN_COM(Rocket_0, Environment, SimOutputs);
-[T1, S1] = SimObj.RailSim();
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1; S2_2(2:end, :)];
-T_1_2 = [T1;T2];
-S_1_2 = [S1;S2(:,3) S2(:,6)];
-[T3, S3, T3E, S3E, I3E] = SimObj.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
-[T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
+simulatior3D = Simulator3D_CAN_COM(Rocket_0, Environment, simulationOutputs);
+[railTime, railState] = simulatior3D.RailSim();
+[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+flightTime = [burnTime; coastTime(2:end)];
+flightState = [burnState; coastState(2:end, :)];
+combinedRailFlightTime = [railTime;flightTime];
+combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
+[drogueTime, drogueState, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = simulatior3D.DrogueParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
+[mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = simulatior3D.MainParaSim(drogueTime(end), drogueState(end,1:3)', drogueState(end, 4:6)');
 
 T = readtable('test.csv', 'HeaderLines',1);
 max = T{end,1};
@@ -67,7 +67,7 @@ fid = fopen('result.csv','w');
 fprintf(fid,'%s\n',textHeader);
 fclose(fid);
 
-[t,~,p,~, ~] = stdAtmos(Environment.Start_Altitude, Environment);
+[t,~,p,~, ~] = stdAtmos(Environment.startAltitude, Environment);
 
 
 to_output = transpose([ 0.0: 0.01 : 19.99 ; 0*ones(1,2000) ; 0*ones(1,2000); 000*ones(1,2000);

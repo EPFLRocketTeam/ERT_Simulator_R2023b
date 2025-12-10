@@ -20,7 +20,7 @@ function [tab, path] = Table_1D_Generator_R3(Rocket, Environment, H_target, drag
  theta_AB = linspace(phi_span(1), phi_span(2), N_AB); % [deg]
 
 % rail length
-x_rail = Environment.Rail_Length;
+x_rail = Environment.railLength;
 
 % -------------------------------------------------------------------------
 % Forward simulation; x1 and x2 for �10% of thrust error

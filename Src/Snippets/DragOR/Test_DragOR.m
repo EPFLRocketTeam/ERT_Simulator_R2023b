@@ -12,9 +12,9 @@ Drag = 'Drag/dragOK_N1332.csv';
 
 interp_type = 'time';
 
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
-SimObj = Simulator3D(Rocket, Environment, Drag, interp_type, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, Drag, interp_type, simulationOutputs);
 
 %%
 
@@ -36,6 +36,6 @@ t = 28;
 x = 3000;
 v = 20;
 
-display(SimObj.Drag)
+display(simulatior3D.Drag)
 
-CD = drag(SimObj.Drag, SimObj.interp_type, t, x, v);
+CD = drag(simulatior3D.Drag, simulatior3D.interp_type, t, x, v);

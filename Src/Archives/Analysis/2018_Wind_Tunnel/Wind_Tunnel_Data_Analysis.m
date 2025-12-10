@@ -72,8 +72,8 @@ for i = ID_Angles_Attaque
     %Mx = filter(b_balance,a_balance,Current_Exp(:,Pos_Mx));
     %My = filter(b_balance,a_balance,Current_Exp(:,Pos_My));
     %Mz = filter(b_balance,a_balance,Current_Exp(:,Pos_Mz));
-    rho = filter(b_rho,a_rho,Current_Exp(Data_pos,Pos_Density));
-    rho = mean(rho); % Keep only average value
+    density = filter(b_rho,a_rho,Current_Exp(Data_pos,Pos_Density));
+    density = mean(density); % Keep only average value
     
     % Angle of attack:
     AA = Current_Exp(1,Pos_Attack_Angle)/180*pi; % DEG 2 RAD
@@ -86,7 +86,7 @@ for i = ID_Angles_Attaque
     %% DRAG FORCE:
     % Data:
     Fd = -Fz/cos(AA); 
-    Cd = 2*Fd./(rho.*Rocket.maxCrossSectionArea.*V.^2);
+    Cd = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
     figure(1);
     plot(V,Fd,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);hold on;
     title('Drag force comparison');grid on;legend show;
@@ -97,11 +97,11 @@ for i = ID_Angles_Attaque
     for i = 1:length(V_model)
         Cd_model = [Cd_model,drag(Rocket, AA, V_model(i), 1.38e-5, 343)]; %% CHANGE VISCOSITY
     end
-    plot(V_model,Cd_model.*(rho.*Rocket.maxCrossSectionArea.*V_model.^2)/2,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);
+    plot(V_model,Cd_model.*(density.*Rocket.maxCrossSectionArea.*V_model.^2)/2,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);
      
     %% NORMAL FORCE:
     Fn = -Fy+Fd*sin(AA);
-    Cn = 2*Fn./(rho.*Rocket.maxCrossSectionArea.*V.^2);
+    Cn = 2*Fn./(density.*Rocket.maxCrossSectionArea.*V.^2);
     figure(11);
     plot(V,Fn,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);hold on;
     title('Normal force comparison');grid on;legend show;
@@ -128,7 +128,7 @@ end
 %     Mx = filter(b_balance, a_balance,Current_Exp(Data_pos,Pos_Mx));
 %     My = filter(b_balance, a_balance,Current_Exp(Data_pos,Pos_My));
 %     Mz = filter(b_balance, a_balance,Current_Exp(Data_pos,Pos_Mz));
-%     rho = filter(b_rho,a_rho,Current_Exp(Data_pos,Pos_Density));
+%     density = filter(b_rho,a_rho,Current_Exp(Data_pos,Pos_Density));
 %     
 %     % Angle of Airbreak:
 %     AB = Current_Exp(1,Pos_AirBreak); % PERCENT OR DEG
@@ -141,7 +141,7 @@ end
 %    
 %     %% DRAG FORCE:
 %     Fd = Fz/cos(AA);
-%     Cd = 2*Fd./(rho.*Rocket.maxCrossSectionArea.*V.^2);
+%     Cd = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
 %     figure(2);
 %     plot(V,Cd,'DisplayName',['Angle of Airbreaks ' num2str(AB) '%']);hold on;
 %     title('Drag Coefficient Comparison');grid on;legend show;
@@ -149,7 +149,7 @@ end
 %     
 %     %% NORMAL FORCE:
 %     Fn = Fy-Fd*sin(AA);
-%     Cn = 2*Fn./(rho.*Rocket.maxCrossSectionArea.*V.^2);
+%     Cn = 2*Fn./(density.*Rocket.maxCrossSectionArea.*V.^2);
 %     figure(12);
 %     plot(V,Fn,'DisplayName',['Angle of Airbreak: ' num2str(AB) '%']);hold on;
 %     title('Normal Coefficient Comparison');grid on;legend show;

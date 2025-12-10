@@ -1,4 +1,4 @@
-% function [T, a, p, rho, Nu] = stdAtmos(alt,Env)
+% function [T, a, p, density, Nu] = stdAtmos(alt,Env)
 % stdAtmos
 %
 % INPUT:    - alt   : altitude [m]
@@ -7,12 +7,12 @@
 % OUPTUT:   - T     : local standard temperature [K]
 %           - a     : local speed of sound [m/s]
 %           - p     : local standard pressure [Pa]
-%           - rho   : local standard density [kg/m^3]
+%           - density   : local standard density [kg/m^3]
 %           - Nu    : local kinematic viscosity of air [m^2/s]
 %
 % ASSUMPTIONS:
 % - hydrostatic approximation of atmosphere
-% - linear temperature variation with altitude with a slope of -9.5°C/km-->
+% - linear temperature variation with altitude with a slope of -9.5Â°C/km-->
 % comes from result of radiosonde data
 % - homogenous composition
 %
@@ -39,11 +39,11 @@ a0 = 340.294; %[m/sec] sound speed at sea level
 g0 = 9.80665; %[m/sec^2] gravity at sea level
 
 %GRAVITY EXPRESSION: ACCELERATION DUE TO GRAVITY (IEC 60193)
-% g=9.7803*(1+0.0053*(sin(Environnement.Start_Latitude))^2)-3*10^(-6)*alt;
+% g=9.7803*(1+0.0053*(sin(Environnement.startLatitude))^2)-3*10^(-6)*alt;
 Env.date=20210419;
 Env.time=17;
-Env.Start_Latitude=47;
-Env.Start_Longitude=8;
+Env.startLatitude=47;
+Env.startLongitude=8;
 alt=3000;
 
 
@@ -52,8 +52,8 @@ url=append('https://nomads.ncep.noaa.gov/dods/gfs_0p25/gfs',num2str(Env.date),'/
 
 
 % first find lattude, longitude and level indexes
-lat_index= Env.Start_Latitude/0.25 + 90/0.25 + 1;    %lattitude starts as -90° and matlab indexes start at 1 and increments of 0.25
-lon_index= round(Env.Start_Longitude/0.25)+1 ; %lattitude starts as 0° and matlab indexes start at 1
+lat_index= Env.startLatitude/0.25 + 90/0.25 + 1;    %lattitude starts as -90Â° and matlab indexes start at 1 and increments of 0.25
+lon_index= round(Env.startLongitude/0.25)+1 ; %lattitude starts as 0Â° and matlab indexes start at 1
 time_index= mod(round((mod(floor(Env.time/6)*6 ,24) - round(Env.time))/6),3);   %time index in the data array
 
 levels= ncread(url,'lev',1,Inf);    %array of altitudes given in mbar
@@ -104,19 +104,19 @@ T=ncread(url,'tmpprs',[lon_index lat_index level_index time_index],[1 1 1 1]);%[
 % grid on
 
 % TEMPERATURE MODEL
-% T = Env.Temperature_Ground + Env.dTdh*(alt-Env.Start_Altitude)/1000; %en [K]
+% T = Env.groundTemperature + Env.dTdh*(alt-Env.startAltitude)/1000; %en [K]
 
 % PRESSURE MODEL
-% if Env.Start_Latitude==32.942380 && Env.Start_Longitude== -106.91428
-%     p = p0*(1+Env.dTdh/1000*(alt-Env.Start_Altitude)/T0).^(-g0/R/Env.dTdh*1000);
+% if Env.startLatitude==32.942380 && Env.startLongitude== -106.91428
+%     p = p0*(1+Env.dTdh/1000*(alt-Env.startAltitude)/T0).^(-g0/R/Env.dTdh*1000);
 % else
 %     p = p0*(1+Env.dTdh/1000*(alt)/T0).^(-g0/R/Env.dTdh*1000);
 % 
 % end
 
 % DENSITY MODEL
-% x = Env.Saturation_Vapor_Ratio*Env.Humidity_Ground;
-% rho = p./R./T*(1+x)/(1+1.609*x);
+% x = Env.Saturation_Vapor_Ratio*Env.groundHumidity;
+% density = p./R./T*(1+x)/(1+1.609*x);
 
 % % SPEED OF SOUND
 a = sqrt(gamma*R*T);

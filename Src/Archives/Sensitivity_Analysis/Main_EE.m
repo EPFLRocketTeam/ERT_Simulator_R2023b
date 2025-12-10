@@ -25,8 +25,8 @@ Xid = [ "dmin" "dd" "z1" "z12" "z23" "finRootPosition" "finSpan" "finRootChord" 
         "finThickness" "lugSurfaceArea" "emptyMass" "emptyInertia" "emptyCenterOfMass" "airbrakePosition" "airbrakeAngle" ... 
         "payloadMass" "mainParachuteDragArea" "drogueParachuteDragArea" "mainParachuteDeploymentAltitude" "interMotorDistance" "motor_diaP" ...
         "motor_lengthP" "propel_massP" "motor_massP" "motor_diaF" "motor_lengthF" "propel_massF" ...
-        "motor_massF" "Burn_Time" "T1" "T2" "Temperature_Ground" "Pressure_Ground" "Humidity_Ground"  ... 
-        "Start_Altitude" "dTdh" "Rail_Length" "Rail_Angle" "Rail_Azimuth"...
+        "motor_massF" "Burn_Time" "railTime" "flightTime" "groundTemperature" "groundPressure" "groundHumidity"  ... 
+        "startAltitude" "dTdh" "railLength" "railAngle" "railAzimuth"...
         "Vi1" "Vi2" "Vi3" "Vi4" "Vi5" "Vi6" "ai1" "ai2" "ai3" "ai4" "ai5" "ai6"]';
     
 Yid = ["Veor" "apogee" "t@apogee" "Vmax" "Vmax@t" "Cdmax" "a_max" "margin_min" "CNa_min" "MarCNa_min" "MarCNa_av" "landing_azi" "landing_drift"];
@@ -38,13 +38,13 @@ Yid = ["Veor" "apogee" "t@apogee" "Vmax" "Vmax@t" "Cdmax" "a_max" "margin_min" "
 % Base input values
 Rocket = rocketReader('BL2_H3.txt'); 
 Environment = environnementReader('Environment/Environnement_Definition_SA.txt'); %with exactly 6 windlayers
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
  
 % Base simulator object
-SimObj = multilayerwindSimulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs);
 
 %% EE analysis
-XX = baseValues(SimObj, Xid, sigma);
+XX = baseValues(simulatior3D, Xid, sigma);
 Delta = p/(2*(p-1));
 k = length(Xid);
 o = length(Yid);
@@ -62,7 +62,7 @@ for l = 1:r
     X = B_l'.*(XX(:,3) - XX(:,2)) + XX(:,2);
     
     % Evaluating the simulator at each sample
-    Y_l = SimAPI(SimObj, Xid, Yid, X); 
+    Y_l = SimAPI(simulatior3D, Xid, Yid, X); 
     
     % Computing the elemetary effects
     d(l, :, :) = (Y_l(:,EEid(2,:)) - Y_l(:,EEid(1,:)))';

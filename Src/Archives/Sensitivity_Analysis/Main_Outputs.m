@@ -1,4 +1,4 @@
- %% Main_Outputs.m - Frédéric Berdoz - October 2020 
+ %% Main_Outputs.m - FrÃ©dÃ©ric Berdoz - October 2020 
 %
 % Main runabale script for visualizing the outpus
 % 
@@ -18,39 +18,39 @@ warning('off');
 % Rocket Definition
 Rocket = rocketReader('BL2_H3.txt');
 Environment = environnementReader('Environment/Environnement_Definition_SA.txt');
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
-SimObj = multilayerwindSimulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs);
 
 %% Simulation
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
+[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
 
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1; S2_2(2:end, :)];
+flightTime = [burnTime; coastTime(2:end)];
+flightState = [burnState; coastState(2:end, :)];
 
-T_1_2 = [T1;T2];
-S_1_2 = [S1;S2(:,3) S2(:,6)];
+combinedRailFlightTime = [railTime;flightTime];
+combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
 
-[T3, S3, T3E, S3E, I3E] = SimObj.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+[drogueTime, drogueState, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = simulatior3D.DrogueParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
 
-[T4, S4, T4E, S4E, I4E] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
+[mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = simulatior3D.MainParaSim(drogueTime(end), drogueState(end,1:3)', drogueState(end, 4:6)');
 
-[T5, S5, T5E, S5E, I5E] = SimObj.CrashSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+[crashTime, crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = simulatior3D.CrashSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
 
 %% Margin plot
 figure('Name','Static Margin'); hold on;
 title 'Static Margin';
 yyaxis left;
-plot(T2, SimObj.SimAuxResults.CM, 'DisplayName', 'X_{CM}');
-plot(T2, SimObj.SimAuxResults.Xcp, 'DisplayName', 'X_{CP}');
+plot(flightTime, simulatior3D.simAuxResults.CM, 'DisplayName', 'X_{CM}');
+plot(flightTime, simulatior3D.simAuxResults.Xcp, 'DisplayName', 'X_{CP}');
 ylabel 'X_{CM}, X_{CP} [cm]'
 yyaxis right;
-plot(T2, SimObj.SimAuxResults.Margin, 'DisplayName', 'Margin');
+plot(flightTime, simulatior3D.simAuxResults.Margin, 'DisplayName', 'Margin');
 xlabel 'Time [s]';
 ylabel 'Margin [-]';
 legend show;
@@ -61,13 +61,13 @@ figure('Name','Simulator Outputs');
 subplot(1,2,1)
 hold on;
 title 'Stability Margin'
-xline(T2(1), '-', {'End of Rail'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'green', 'LineWidth', 1.2, 'DisplayName', 'End of Rail');
-xline(SimObj.Rocket.Burn_Time,  '-', {'End of Propulsion'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'red', 'LineWidth', 1.2, 'DisplayName', 'End of Propulsion');
-xline(T2(end),  '-', {'Apogee'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'magenta', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
+xline(flightTime(1), '-', {'End of Rail'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'green', 'LineWidth', 1.2, 'DisplayName', 'End of Rail');
+xline(simulatior3D.Rocket.Burn_Time,  '-', {'End of Propulsion'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'red', 'LineWidth', 1.2, 'DisplayName', 'End of Propulsion');
+xline(flightTime(end),  '-', {'Apogee'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'magenta', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
 legend show;
 
 yyaxis left
-plot(T2,SimObj.SimAuxResults.Cn_alpha.*SimObj.SimAuxResults.Margin, 'LineWidth', 1.2, 'DisplayName', 'Stability')
+plot(flightTime,simulatior3D.simAuxResults.Cn_alpha.*simulatior3D.simAuxResults.Margin, 'LineWidth', 1.2, 'DisplayName', 'Stability')
 xlabel 'Time [s]';
 ylabel 'MS{\times}C_{N{\alpha}} [-]';
 grid on
@@ -75,21 +75,21 @@ ylim([0 50]);
 
 yyaxis right
 ylabel 'V [m/s]';
-plot(T2,sqrt(S2(:,4).^2 + S2(:,5).^2 + S2(:,6).^2) , 'LineWidth', 1.2, 'DisplayName', 'Velocity')
+plot(flightTime,sqrt(flightState(:,4).^2 + flightState(:,5).^2 + flightState(:,6).^2) , 'LineWidth', 1.2, 'DisplayName', 'Velocity')
 
 % Altitude vs. drift
 subplot(1,2,2)
 title 'Altitude vs Drift'; 
 hold on; grid on
-plot(sqrt(S2(:,1).^2 + S2(:,2).^2), S2(:,3), 'DisplayName', 'Ascent', 'LineWidth', 1.2);
-plot(sqrt(S3(:,1).^2 + S3(:,2).^2), S3(:,3), 'DisplayName', 'Drogue', 'LineWidth', 1.2);
-plot(sqrt(S4(:,1).^2 + S4(:,2).^2), S4(:,3), 'DisplayName', 'Main', 'LineWidth', 1.2);
-plot(sqrt(S5(:,1).^2 + S5(:,2).^2), S5(:,3), 'd', 'DisplayName', 'CrashSim', 'LineWidth', 1.2);
+plot(sqrt(flightState(:,1).^2 + flightState(:,2).^2), flightState(:,3), 'DisplayName', 'Ascent', 'LineWidth', 1.2);
+plot(sqrt(drogueState(:,1).^2 + drogueState(:,2).^2), drogueState(:,3), 'DisplayName', 'Drogue', 'LineWidth', 1.2);
+plot(sqrt(mainChuteState(:,1).^2 + mainChuteState(:,2).^2), mainChuteState(:,3), 'DisplayName', 'Main', 'LineWidth', 1.2);
+plot(sqrt(crashState(:,1).^2 + crashState(:,2).^2), crashState(:,3), 'd', 'DisplayName', 'CrashSim', 'LineWidth', 1.2);
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 
-ymax = ceil(S2(end,3)/1000)*1000;
+ymax = ceil(flightState(end,3)/1000)*1000;
 ylim([0 ymax]);
-xmax = ceil(sqrt(S5(end,1).^2 + S5(end,2).^2)/100)*100;
+xmax = ceil(sqrt(crashState(end,1).^2 + crashState(end,2).^2)/100)*100;
 xlim([0,xmax]);
 
 legend show;
@@ -115,9 +115,9 @@ xl = [-10 15];
 xlim(xl);
 yl = [0 4000];
 ylim(yl);
-plt1 = plot(SimObj.Environment.Vspeed, axis, 'DisplayName', 'Wind Model', 'LineWidth', 1.2);
+plt1 = plot(simulatior3D.Environment.Vspeed, axis, 'DisplayName', 'Wind Model', 'LineWidth', 1.2);
 plt2 = plot(Vspeed, alt, 'd', 'DisplayName', 'Data Points', 'LineWidth', 1.5);
-yline(S2(end,3), '--', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
+yline(flightState(end,3), '--', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
 
 for i = 1:10
     

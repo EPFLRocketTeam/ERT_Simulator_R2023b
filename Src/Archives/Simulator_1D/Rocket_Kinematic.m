@@ -11,9 +11,9 @@ xdot = zeros(2,1);
 % Call Function:
 [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'Linear');
 % <<<<<<< HEAD
-% [Temp, a, p, rho] = stdAtmos(x(1));
+% [Temp, a, p, density] = stdAtmos(x(1));
 % =======
-[Temp, a, p, rho, Nu] = stdAtmos(x(1),Environnement);
+[Temp, a, p, density, Nu] = stdAtmos(x(1),Environnement);
 % >>>>>>> origin/master
 T = Thrust(t,Rocket);
 g = 9.81; %[m/s2] Gravity
@@ -22,7 +22,7 @@ CD_AB = drag_shuriken(Rocket,theta,0,x(2),Nu);
 
 % Behaviour Equation:
 xdot(1) = x(2);
-xdot(2) = Amplifier*T/M-g-x(2)*dMdt/M-0.5*rho*Rocket.maxCrossSectionArea*x(2).^2*(CD+CD_AB)/M;
+xdot(2) = Amplifier*T/M-g-x(2)*dMdt/M-0.5*density*Rocket.maxCrossSectionArea*x(2).^2*(CD+CD_AB)/M;
 
 end
 

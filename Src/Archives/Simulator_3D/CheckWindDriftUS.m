@@ -9,7 +9,7 @@ addpath(genpath('../Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('Rocket_Definition_Final.txt');
 Environment = environnementReader('Environnement_Definition.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
 %% Simulate and plot trajectories
 
@@ -24,49 +24,49 @@ for v = V
 
     Environment.V_inf = v;
     
-    SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+    simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
     
     %% ------------------------------------------------------------------------
     % 6DOF Rail Simulation
     %--------------------------------------------------------------------------
 
-    [T1, S1] = SimObj.RailSim();
+    [railTime, railState] = simulatior3D.RailSim();
 
     %% ------------------------------------------------------------------------
     % 6DOF Flight Simulation
     %--------------------------------------------------------------------------
 
-    [T2, S2] = SimObj.FlightSim(T1(end), S1(end,2));
+    [flightTime, flightState] = simulatior3D.FlightSim(railTime(end), railState(end,2));
 
     %% ------------------------------------------------------------------------
     % 3DOF Recovery Drogue
     %--------------------------------------------------------------------------
 
-    [T3, S3] = SimObj.DrogueParaSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+    [drogueTime, drogueState] = simulatior3D.DrogueParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
 
     %% ------------------------------------------------------------------------
     % 3DOF Recovery Main
     %--------------------------------------------------------------------------
 
-    [T4, S4] = SimObj.MainParaSim(T3(end), S3(end,1:3)', S3(end, 4:6)');
+    [mainChuteTime, mainChuteState] = simulatior3D.MainParaSim(drogueTime(end), drogueState(end,1:3)', drogueState(end, 4:6)');
     
     %% ------------------------------------------------------------------------
     % 3DOF Crash Simulation
     %--------------------------------------------------------------------------
 
-    [T5, S5, T5E, S5E, I5E] = SimObj.CrashSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+    [crashTime, crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = simulatior3D.CrashSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
 
-    plot3(ax1, [S2(:,1);S3(:,1);S4(:,1)], [S2(:,2);S3(:,2);S4(:,2)], [S2(:,3);S3(:,3);S4(:,3)], 'DisplayName', ['Trajectoire, v = ' num2str(V)]);
-    plot3(ax2, [S2(:,1);S5(:,1)], [S2(:,2);S5(:,2)], [S2(:,3);S5(:,3)], 'DisplayName', ['Trajectoire, v = ' num2str(V)]);
+    plot3(ax1, [flightState(:,1);drogueState(:,1);mainChuteState(:,1)], [flightState(:,2);drogueState(:,2);mainChuteState(:,2)], [flightState(:,3);drogueState(:,3);mainChuteState(:,3)], 'DisplayName', ['Trajectoire, v = ' num2str(V)]);
+    plot3(ax2, [flightState(:,1);crashState(:,1)], [flightState(:,2);crashState(:,2)], [flightState(:,3);crashState(:,3)], 'DisplayName', ['Trajectoire, v = ' num2str(V)]);
     
-    X_Para = [X_Para, S4(end,1)];
-    X_NoPara = [X_NoPara, S5(end,1)];
+    X_Para = [X_Para, mainChuteState(end,1)];
+    X_NoPara = [X_NoPara, crashState(end,1)];
 end
 
 %% Plot map
 axes(ax1);
 daspect([1 1 1]); pbaspect([0.5, 0.5, 1]); view(30, 50);
-% [XX, YY, M, Mcolor] = get_google_map(Environment.Start_Latitude, Environment.Start_Longitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
+% [XX, YY, M, Mcolor] = get_google_map(Environment.startLatitude, Environment.startLongitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
 xImage = [xlim',xlim'];
 yImage = [ylim;ylim];
 zImage = zeros(2);
@@ -79,7 +79,7 @@ zImage = zeros(2);
 
 axes(ax2);
 daspect([1 1 1]); pbaspect([0.5, 0.5, 1]); view(30, 50);
-% [XX, YY, M, Mcolor] = get_google_map(Environment.Start_Latitude, Environment.Start_Longitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
+% [XX, YY, M, Mcolor] = get_google_map(Environment.startLatitude, Environment.startLongitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
 xImage = [xlim',xlim'];
 yImage = [ylim;ylim];
 zImage = zeros(2);

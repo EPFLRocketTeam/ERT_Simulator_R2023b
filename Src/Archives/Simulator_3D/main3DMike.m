@@ -10,27 +10,27 @@ addpath(genpath('../Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('BL2_H2_AB.txt');
 Environment = environnementReader('Environment/Environnement_Definition_2021.txt');
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
-SimObj = SimuMike3D(Rocket, Environment, SimOutputs);
+simulatior3D = SimuMike3D(Rocket, Environment, simulationOutputs);
 
 %% ------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
 
-display(['Launch rail departure velocity : ' num2str(S1(end,2))]);
-display(['Launch rail departure time : ' num2str(T1(end))]);
+display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
+display(['Launch rail departure time : ' num2str(railTime(end))]);
 display(['Burn Time : ' num2str(Rocket.Burn_Time(end))]);
 
 %% ------------------------------------------------------------------------
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-marge = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
-marge1 = SimObj.FlightSim([Rocket.Burn_Time(end),0], S1(end, 2));
+marge = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+marge1 = simulatior3D.FlightSim([Rocket.Burn_Time(end),0], railState(end, 2));
 min= ones(1,91);
 minsafe = 2* ones(1,91) ;
 max = 6 * ones(1,91);

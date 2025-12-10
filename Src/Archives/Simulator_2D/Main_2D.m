@@ -20,17 +20,17 @@ tspan = [0 Rocket.Burn_Time];
 
 % Simulation
 Option = odeset('Events', @myEventRail);
-[T1,X1] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket,Environnement),tspan,x_0,Option);
+[railTime,X1] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket,Environnement),tspan,x_0,Option);
  
 %--------------------------------------------------------------------------
 % Fly Simulation
 %--------------------------------------------------------------------------
-Rail_Angle = Environnement.Rail_Angle;
-Rail_L = Environnement.Rail_Length;
+railAngle = Environnement.railAngle;
+Rail_L = Environnement.railLength;
 
 % Initial Conditions
-x_0 = [Rail_L*sin(Rail_Angle);X1(end,2)*sin(Rail_Angle);Rail_L*cos(Rail_Angle);X1(end,2)*cos(Rail_Angle);Rail_Angle;0]; % No speed, no height, no angle
-tspan = [T1(end) 28];
+x_0 = [Rail_L*sin(railAngle);X1(end,2)*sin(railAngle);Rail_L*cos(railAngle);X1(end,2)*cos(railAngle);railAngle;0]; % No speed, no height, no angle
+tspan = [railTime(end) 28];
 
 % Simulation
 Option = odeset('Events', @myEventApogee);

@@ -62,10 +62,10 @@ for i = 1:n_motors
         [T,X] = ode45(@(t,x) Rocket_Kinematic_R2(t,x,Rocket,Environnement,@drag_shuriken, -190.5),tspan,x_0,Option);
         app(i,j) = X(end, 1);
         [v_max(i,j), ind_v_max] = max(X(:,2));
-        [~, a, ~, ~, ~] = stdAtmos(Environnement.Start_Altitude+X(ind_v_max, 1), Environnement);
+        [~, a, ~, ~, ~] = stdAtmos(Environnement.startAltitude+X(ind_v_max, 1), Environnement);
         M_max(i,j) = v_max(i,j)/a;
         
-        v_rail(i,j) = interp1(X(find(X(:,1)>0),1), X(find(X(:,1)>0),2), Environnement.Rail_Length);
+        v_rail(i,j) = interp1(X(find(X(:,1)>0),1), X(find(X(:,1)>0),2), Environnement.railLength);
          
     end
     
@@ -111,7 +111,7 @@ figure;
 plot(test_masses, v_rail', 'LineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
-title(['Departure velocity vs. dry mass ( Rail Length = ' num2str(Environnement.Rail_Length) 'm )']);
+title(['Departure velocity vs. dry mass ( Rail Length = ' num2str(Environnement.railLength) 'm )']);
 xlabel 'Mass [kg]'; ylabel 'v_{rail} [m/s]';
 set(gca, 'FontSize', 14);
 

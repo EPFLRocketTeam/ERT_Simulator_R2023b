@@ -22,7 +22,7 @@ alt = linspace(10, 1e4, len);
 T = (1:len);
 a = (1:len);
 p = (1:len);
-rho = (1:len);
+density = (1:len);
 nu = (1:len);
 
 len_ = 1e5;
@@ -36,7 +36,7 @@ nu_ = (1:len_);
 
 % Compute values with stdAtmos
 for k = 1:length(alt)
-    [T(k), a(k), p(k), rho(k), nu(k)] = stdAtmos(alt(k), env);
+    [T(k), a(k), p(k), density(k), nu(k)] = stdAtmos(alt(k), env);
 end
 
 for k = 1:length(alt_)
@@ -47,7 +47,7 @@ for k = 1:length(alt_)
 end
 
 % Show results
-Plot(T, a, p, rho, nu, alt, 1)
+Plot(T, a, p, density, nu, alt, 1)
 Plot(T_, a_, p_, rho_, nu_, alt_, 1)
 
 
@@ -56,11 +56,11 @@ Plot(T_, a_, p_, rho_, nu_, alt_, 1)
 alt_compare = linspace(1000, 30000, 11);
 [~, ~, ~, rho0, ~] = atmosphere(0, env);
 for k = 1:length(alt_compare)
-    [T, a, p, rho, nu] = atmosphere(alt_compare(k), env);
-    disp(["z:" alt_compare(k) "T:" num2str(T) ", p:" num2str(p) ", rho:" num2str(rho/rho0), ", c:" num2str(a)])
+    [T, a, p, density, nu] = atmosphere(alt_compare(k), env);
+    disp(["z:" alt_compare(k) "T:" num2str(T) ", p:" num2str(p) ", density:" num2str(density/rho0), ", c:" num2str(a)])
 end
 
-function Plot(T, a, p, rho, nu, alt, fig_nbr)
+function Plot(T, a, p, density, nu, alt, fig_nbr)
     alt = alt/1e3;
 
     figure(fig_nbr)
@@ -94,10 +94,10 @@ function Plot(T, a, p, rho, nu, alt, fig_nbr)
     subplot(2,3,4)
     hold on
     title("Density")
-    plot(rho, alt, LineWidth=1.5)
+    plot(density, alt, LineWidth=1.5)
     grid on
     box on
-    xlabel("$\rho$ [kg/m$^3$]")
+    xlabel("$\density$ [kg/m$^3$]")
     ylabel("$h$ [km]")
 
     subplot(2,3,5)

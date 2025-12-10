@@ -1,5 +1,5 @@
 % Equations from Mandell
-rho =  1.2; % density 
+density =  1.2; % density 
 mu =  1.8e-5;  % dynamic viscosity 
 C = 340; %speed of sound dry air 15C sea level
 V = 200;   %ms-1 Mag of  characteristic velocity at center of pressure location 
@@ -77,7 +77,7 @@ A_fp = A_fe + 0.5*d_f*fin.basechord;
 
 %% ------Viscous Friction------
 % Viscous friction ROCKET FORBODY Cf
-Re  = rho*V*l_b/mu;
+Re  = density*V*l_b/mu;
 B = Re_cb(0.074/Re^(0.2) - 1.328/sqrt(Re));
 
 if (Re < Re_cb)
@@ -87,7 +87,7 @@ else
 end
 
 %  Viscous friction ROCKET FINS Cf_f
-Re_f  = rho*V*fin.c/mu;  %Note the V is at the cop not the fin need to recalculate for better results 
+Re_f  = density*V*fin.c/mu;  %Note the V is at the cop not the fin need to recalculate for better results 
 
 B_f = Re_cf*(0.074/Re_f^(0.2) - 1.328/sqrt(Re_f));
 

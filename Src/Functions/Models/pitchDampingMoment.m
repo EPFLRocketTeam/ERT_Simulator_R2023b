@@ -1,4 +1,4 @@
-function CDM = pitchDampingMoment(Rocket, rho, Calpha, CP, dMdt, CM, w, V)
+function CDM = pitchDampingMoment(Rocket, density, Calpha, CP, dMdt, CM, w, V)
 % PITCHDAMPINGMOMENT computes the pitch damping moment coefficient of the
 % rocket. It also applies to yaw damping, but not to roll!
 % Damping is based on the rocket's geometry i.e the air resistance opposing
@@ -11,7 +11,7 @@ function CDM = pitchDampingMoment(Rocket, rho, Calpha, CP, dMdt, CM, w, V)
         % Thrust damping
         % -------------------------------------------------------------------------
 
-        CDM_thrust = dMdt*(Rocket.totalLength-CM).^2*w*2/V^2/rho/Rocket.maxCrossSectionArea;
+        CDM_thrust = dMdt*(Rocket.totalLength-CM).^2*w*2/V^2/density/Rocket.maxCrossSectionArea;
 
         % -------------------------------------------------------------------------
         % Aerdynamic damping

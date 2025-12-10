@@ -1,15 +1,15 @@
 %% === Inertial Coupling Simulation ===
 
 % This script performs inertial coupling simulation using data from a previous simulation.
-% Ensure you have run a simulation and have S2, T2 variables in the workspace.
+% Ensure you have run a simulation and have flightState, flightTime variables in the workspace.
 
 % Index of the frame to begin with
 initialFrameId = 100;
 
 % Use previous simulation data
 % State vector format: S_dot = [X_dot; V_dot; Q_dot; W_dot];
-statePrevious = S2;
-timePrevious = T2;
+statePrevious = flightState;
+timePrevious = flightTime;
 positionPrevious = statePrevious(:, 1:3);
 velocityPrevious = statePrevious(:, 4:6);
 quaternionPrevious = statePrevious(:, 7:10);

@@ -12,7 +12,7 @@ addpath(genpath('../Declarations'),...
 % load definitions
 Rocket_Payerne = rocketReader('BL_H3.txt');
 Environment_Payerne = environnementReader('Environnement_Definition_USA.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
 % Parameter
 Wind_Azim = [0, 90, 180, 270];
@@ -25,19 +25,19 @@ for i = 1:length(Wind_Azim)
    
     Environment_Payerne.V_dir = [cosd(Wind_Azim(i)); sind(Wind_Azim(i));0];
     
-    SimObj = Simulator3D(Rocket_Payerne, Environment_Payerne, SimOutputs);
-    [T1, S1] = SimObj.RailSim();
-    [T2, S2] = SimObj.FlightSim(T1(end), S1(end,2));
-    [T3, S3] = SimObj.CrashSim(T2(end), S2(end,1:3)', S2(end, 4:6)');
+    simulatior3D = Simulator3D(Rocket_Payerne, Environment_Payerne, simulationOutputs);
+    [railTime, railState] = simulatior3D.RailSim();
+    [flightTime, flightState] = simulatior3D.FlightSim(railTime(end), railState(end,2));
+    [drogueTime, drogueState] = simulatior3D.CrashSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
     
     % plot trajectory
-    plot3([S2(:,1);S3(:,1)], [S2(:,2);S3(:,2)], [S2(:,3);S3(:,3)], 'DisplayName', ['Azimuth = ' num2str(Wind_Azim(i))]);
+    plot3([flightState(:,1);drogueState(:,1)], [flightState(:,2);drogueState(:,2)], [flightState(:,3);drogueState(:,3)], 'DisplayName', ['Azimuth = ' num2str(Wind_Azim(i))]);
     
 end
 
 %% Plot map
 daspect([1 1 1]); pbaspect([1, 1, 1]); view(30, 50);
-[XX, YY, M, Mcolor] = get_google_map(Environment_Payerne.Start_Latitude, Environment_Payerne.Start_Longitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
+[XX, YY, M, Mcolor] = get_google_map(Environment_Payerne.startLatitude, Environment_Payerne.startLongitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
 xImage = [xlim',xlim'];
 yImage = [ylim;ylim];
 zImage = zeros(2);

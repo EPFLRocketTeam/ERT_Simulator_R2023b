@@ -50,9 +50,9 @@ display(['Liftoff_weight_lbs = ' num2str(Liftoff_weight_lbs)]);
 
 % Rocket Definition
 Environment = environnementReader('Environment/Environnement_Definition_USA.txt');
-SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
-SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
 
 warning('off','all')
 
@@ -60,20 +60,20 @@ warning('off','all')
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
 %--------------------------------------------------------------------------
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
+[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
-%SimObj.Rocket.coneMode = 'off';
+%simulatior3D.Rocket.coneMode = 'off';
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
 
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1; S2_2(2:end, :)];
+flightTime = [burnTime; coastTime(2:end)];
+flightState = [burnState; coastState(2:end, :)];
 
 % Constants
 g0 = 9.80665; %[m/sec^2] gravity at sea level
@@ -83,20 +83,20 @@ m_to_feet = 3.2808399;
 
 % Considering peak thrust at liftoff
 Liftoff_thrust_to_weight_ratio = max(Rocket.Thrust_Force) / ((Rocket.emptyMass + Rocket.motor_mass) * g0);
-Launch_rail_departure_velocity_ft = S1(end,2) * m_to_feet;
+Launch_rail_departure_velocity_ft = railState(end,2) * m_to_feet;
 
-Stability = (SimObj.SimAuxResults.Xcp - SimObj.SimAuxResults.CM)./Rocket.maxDiameter;
+Stability = (simulatior3D.simAuxResults.Xcp - simulatior3D.simAuxResults.CM)./Rocket.maxDiameter;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
-Stability = Stability(1:length(S2_1));
+Stability = Stability(1:length(burnState));
 
 Min_static_margin_during_boost = min(Stability);
 
-Max_acceleration_g = max(diff(S2(:,6))./diff(T2)) / g0;
+Max_acceleration_g = max(diff(flightState(:,6))./diff(flightTime)) / g0;
 
-Max_speed_ft = max(S2(:,6)) * m_to_feet;
+Max_speed_ft = max(flightState(:,6)) * m_to_feet;
 
-Predicted_apogee_ft = S2(end,3) * m_to_feet;
+Predicted_apogee_ft = flightState(end,3) * m_to_feet;
 
 Predicted_Flight_Data_and_Analysis = [Liftoff_thrust_to_weight_ratio;
     Launch_rail_departure_velocity_ft;

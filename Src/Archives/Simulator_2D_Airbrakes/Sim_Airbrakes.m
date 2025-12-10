@@ -1,4 +1,4 @@
-function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_tab, AB_target, KP, UpTime, control_flag)
+function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_tab, AB_target, KP, UpTime, control_flag)
 
     % define global simulation parameters
     theta = min(AB_tab(:,3));
@@ -13,21 +13,21 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
 
     % Simulation
     Option = odeset('Events', @myEventRail);
-    [T1,X1] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket,Environment),tspan,x_0,Option);
+    [railTime,X1] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket,Environment),tspan,x_0,Option);
     
     %--------------------------------------------------------------------------
     % Fly Simulation
     %--------------------------------------------------------------------------
-    Rail_Angle = Environment.Rail_Angle;
-    Rail_L = Environment.Rail_Length;
+    railAngle = Environment.railAngle;
+    Rail_L = Environment.railLength;
 
     % Initial Conditions
-    x_0 = [Rail_L*sin(Rail_Angle);X1(end,2)*sin(Rail_Angle);Rail_L*cos(Rail_Angle);X1(end,2)*cos(Rail_Angle);Rail_Angle;0]; % No speed, no height, no angle
-    tspan = T1(end):UpTime:28;
+    x_0 = [Rail_L*sin(railAngle);X1(end,2)*sin(railAngle);Rail_L*cos(railAngle);X1(end,2)*cos(railAngle);railAngle;0]; % No speed, no height, no angle
+    tspan = railTime(end):UpTime:28;
 
     % Simulation
     Option = odeset('Events', @myEventApogee, 'OutputFcn', @(t,x,flag) output(t,x,flag,Rocket));
-    [T2,X2] = ode45(@(t,x) Rocket_Kinematic_2D(t,x,Rocket,Environment),tspan,x_0,Option);
+    [flightTime,X2] = ode45(@(t,x) Rocket_Kinematic_2D(t,x,Rocket,Environment),tspan,x_0,Option);
     
     %--------------------------------------------------------------------------
     % Rocket dynamics
@@ -42,18 +42,18 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
 
     % Environnemental Parameters
     nu = Environment.Nu;
-    alpha = Environment.Rail_Angle;
+    alpha = Environment.railAngle;
     V_inf = Environment.V_inf;
 
     % Necessary function calls
     [M,dMdt] = Mass_Non_Lin(t,Rocket);  % Rocket Mass information
-    [Temp, a, p, rho] = stdAtmos(x(1)); % Atmosphere information
+    [Temp, a, p, density] = stdAtmos(x(1)); % Atmosphere information
     T = Thrust(t,Rocket);   % Motor thrust
     g = 9.81;               % Gravity []
 
     % Multiple Time Used Parameters
     V = sqrt(x(2)^2+2*x(2)*V_inf*sin(alpha)+V_inf^2); % Total Air flow Speed
-    q = 1/2*rho*Rocket.maxCrossSectionArea*V^2; % Dynamic pressure
+    q = 1/2*density*Rocket.maxCrossSectionArea*V^2; % Dynamic pressure
     CD = drag(Rocket,0,V,nu,a);  % Drag coefficient
 
     % Equation
@@ -88,7 +88,7 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
 
     % Appels des fonctions necessaires
     [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'Linear');
-    [Temp, a, p, rho] = stdAtmos(x(3)); % Atmosphere [K,m/s,Pa,kg/m3]
+    [Temp, a, p, density] = stdAtmos(x(3)); % Atmosphere [K,m/s,Pa,kg/m3]
     g = 9.81;                           % Gravite [m2/s]
 
     % Decalage de protection
@@ -116,7 +116,7 @@ function [T2,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_drag, AB_ta
     V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee
     CD_AB = AB_drag(Rocket,theta,abs(alpha),V,nu); % Coef. Trainee des A?rofreins
     CD = drag(Rocket,abs(alpha),V,nu,a);             % Coef. Trainee de la fus?e
-    q = 1/2*rho*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
+    q = 1/2*density*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
     Ft = [0;-q*(CD+CD_AB)];                     % Force de train?e
 
     % Force Normale (E,F)

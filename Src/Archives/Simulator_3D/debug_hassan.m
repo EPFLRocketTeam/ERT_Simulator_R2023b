@@ -1,12 +1,12 @@
-emptyMassaxHeight = S2(end,3)
+emptyMassaxHeight = flightState(end,3)
 
 
 %%
-nominalTrag= [T2, S2(:,1:3)];
+nominalTrag= [flightTime, flightState(:,1:3)];
 save('nominalTrag','nominalTrag')
 %%
-x =T2;
-y=S2(:,3);
+x =flightTime;
+y=flightState(:,3);
 e = 160/3.1883e+03*y;
 lo = y - e;
 hi = y + e;
@@ -17,7 +17,7 @@ hl = line(x,y);
 
 set(hp, 'facecolor', [1 0.8 0.8], 'edgecolor', 'none');
 set(hl, 'color', 'r');
-%boundedline(T2,S2(:,3),T2)
+%boundedline(flightTime,flightState(:,3),flightTime)
 xlabel('Time (s)')
 ylabel('Height (m)')
 title('Variance in apogee due to parameter uncertainty')

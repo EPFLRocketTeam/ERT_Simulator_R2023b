@@ -19,7 +19,7 @@ V_inf = Environnement.V_inf;        % Vitesse du vent [m/s]
 
 % Appels des fonctions necessaires
 [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'NonLinear');
-[Temp, a, p, rho, Nu] = stdAtmos(x(3)+Environnement.Start_Altitude,Environnement); % Atmosphere [K,m/s,Pa,kg/m3]
+[Temp, a, p, density, Nu] = stdAtmos(x(3)+Environnement.startAltitude,Environnement); % Atmosphere [K,m/s,Pa,kg/m3]
 g = 9.81;                           % Gravite [m2/s]
 
 % Decalage de protection
@@ -47,7 +47,7 @@ T = [0;Thrust(t,Rocket)];
 V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee
 CD_AB = drag_shuriken(Rocket,theta,abs(alpha),V,Nu); % Coef. Trainee des Aerofreins
 CD = drag(Rocket,abs(alpha),V,Nu,a);             % Coef. Trainee de la fusee
-q = 1/2*rho*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
+q = 1/2*density*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
 Ft = [0;-q*(CD+CD_AB)];                     % Force de trainee
 
 % Force Normale (E,F)

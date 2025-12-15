@@ -3,9 +3,33 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
     properties
         AbsTol = 1e-10;
+        AddedPath
     end
 
     methods (Test)
+
+        function addFunctionPath(testCase)
+            % This function temporarily adds the directory of the
+            % massProperties function to the MATLAB path so the tests can find it
+
+            % 1. Get the path of the current test file directory
+            % (e.g., ...\ERT_Simulator_R2023b\Test\Functions\Models)
+            testDir = fileparts(mfilename('fullpath'));
+
+            % 2. Move up two directories to reach the root folder
+            % (e.g., ...\ERT_Simulator_R2023b)
+            rootPath = fileparts(fileparts(fileparts(testDir)));
+
+            % 3. Construct the path to the function file's directory
+            % (e.g., ...\ERT_Simulator_R2023b\Src\Simulator_3D)
+            functionPath = fullfile(rootPath, 'Src', 'Functions', 'Models');
+
+            % 4. Add the paths to MATLAB's search path
+            addpath(functionPath);
+
+            % 5. Store the paths so we can remove it later in TestClassTeardown
+            testCase.AddedPath = {functionPath};
+        end
 
         %% -------------------------------------------------------------
         %   HYBRID = 0  (STANDARD MOTOR)
@@ -16,8 +40,8 @@ classdef massPropertiesTest < matlab.unittest.TestCase
             t = 0;
             [M,dMdt] = massProperties(t,R,'Linear');
 
-            exp_dMdt = R.propel_mass / R.Burn_Time;
-            exp_M = R.rocket_m;
+            exp_dMdt = R.propelMass / R.burnTime;
+            exp_M = R.emptyMass;
 
             testCase.verifyEqual(dMdt,exp_dMdt,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
@@ -25,12 +49,12 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testLinear_nonHybrid_midBurn(testCase)
             R = rocketNonHybrid();
-            t = R.Burn_Time/2;
+            t = R.burnTime/2;
 
             [M,dMdt] = massProperties(t,R,'Linear');
 
-            exp_dMdt = R.propel_mass / R.Burn_Time;
-            exp_M = R.rocket_m + R.motor_mass - t*exp_dMdt;
+            exp_dMdt = R.propelMass / R.burnTime;
+            exp_M = R.emptyMass + R.motorMass - t*exp_dMdt;
 
             testCase.verifyEqual(dMdt,exp_dMdt,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
@@ -38,11 +62,11 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testLinear_nonHybrid_afterBurn(testCase)
             R = rocketNonHybrid();
-            t = R.Burn_Time + 1;
+            t = R.burnTime + 1;
 
             [M,dMdt] = massProperties(t,R,'Linear');
 
-            exp_M = R.rocket_m + R.casing_mass;
+            exp_M = R.emptyMass + R.casingMass;
 
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(dMdt,0,'AbsTol',testCase.AbsTol);
@@ -50,11 +74,11 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testNonLinear_nonHybrid_afterBurn(testCase)
             R = rocketNonHybrid();
-            t = R.Burn_Time + 1;
+            t = R.burnTime + 1;
 
             [M,dMdt] = massProperties(t,R,'NonLinear');
 
-            exp_M = R.rocket_m + R.motor_mass - R.propel_mass;
+            exp_M = R.emptyMass + R.motorMass - R.propelMass;
 
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(dMdt,0,'AbsTol',testCase.AbsTol);
@@ -71,8 +95,8 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
             [M,dMdt] = massProperties(t,R,'Linear');
 
-            exp_dMdt = R.propel_mass / R.Burn_Time;
-            exp_M    = R.rocket_m;
+            exp_dMdt = R.propelMass / R.burnTime;
+            exp_M    = R.emptyMass;
 
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(dMdt,exp_dMdt,'AbsTol',testCase.AbsTol);
@@ -80,11 +104,11 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testLinear_hybrid_afterBurn(testCase)
             R = rocketHybrid();
-            t = R.Burn_Time + 1;
+            t = R.burnTime + 1;
 
             [M,dMdt] = massProperties(t,R,'Linear');
 
-            exp_M = R.rocket_m + R.casing_mass;
+            exp_M = R.emptyMass + R.casingMass;
 
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(dMdt,0,'AbsTol',testCase.AbsTol);
@@ -92,11 +116,11 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testNonLinear_hybrid_afterBurn(testCase)
             R = rocketHybrid();
-            t = R.Burn_Time + 1;
+            t = R.burnTime + 1;
 
             [M,dMdt] = massProperties(t,R,'NonLinear');
 
-            exp_M = R.rocket_m + R.casing_mass;
+            exp_M = R.emptyMass + R.casingMass;
 
             testCase.verifyEqual(M,exp_M,'AbsTol',testCase.AbsTol);
             testCase.verifyEqual(dMdt,0,'AbsTol',testCase.AbsTol);
@@ -106,9 +130,21 @@ classdef massPropertiesTest < matlab.unittest.TestCase
         %   GENERAL SANITY CHECKS
         %% -------------------------------------------------------------
 
-        function testInertias(testCase)
+        function testInertias_t0(testCase)
             R = rocketNonHybrid();
-            t = linspace(0, R.Burn_Time, 1000);
+            t = 0;
+
+            [~,~,~,~,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,R,'NonLinear');
+
+            testCase.verifyGreaterThanOrEqual(I_L,0);
+            testCase.verifyGreaterThanOrEqual(I_R,0);
+            testCase.verifyLessThanOrEqual(dI_Rdt,0);
+            testCase.verifyLessThanOrEqual(dI_Ldt,0);
+        end
+
+        function testInertias_MidBurn(testCase)
+            R = rocketNonHybrid();
+            t = R.burnTime/2;
 
             [~,~,~,~,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,R,'NonLinear');
 
@@ -120,16 +156,34 @@ classdef massPropertiesTest < matlab.unittest.TestCase
 
         function testMass(testCase)
             R = rocketNonHybrid();
-            t = linspace(0, R.Burn_Time, 1000);
+            t = R.burnTime + 1;
             [M,dMdt,~,~,~,~,~,~] = massProperties(t,R,'NonLinear');
             testCase.verifyGreaterThanOrEqual(M,0);
             testCase.verifyLessThanOrEqual(dMdt,0);
             testCase.verifyFinite(M)
         end
 
-        function testCm(testCase)
+        function testCm_t0(testCase)
             R = rocketNonHybrid();
-            t = linspace(0, R.Burn_Time, 1000);
+            t = 0;
+            [~,~,Cm,dCmdt,~,~,~,~] = massProperties(t,R,'NonLinear');
+            testCase.verifyGreaterThanOrEqual(Cm,0);
+            testCase.verifyLessThanOrEqual(Cm,R.L);
+            testCase.verifyFinite(dCmdt)
+        end
+
+        function testCm_midBurn(testCase)
+            R = rocketNonHybrid();
+            t = R.burnTime/2;
+            [~,~,Cm,dCmdt,~,~,~,~] = massProperties(t,R,'NonLinear');
+            testCase.verifyGreaterThanOrEqual(Cm,0);
+            testCase.verifyLessThanOrEqual(Cm,R.L);
+            testCase.verifyFinite(dCmdt)
+        end
+
+        function testCm_afterBurn(testCase)
+            R = rocketNonHybrid();
+            t = R.burnTime + 1;
             [~,~,Cm,dCmdt,~,~,~,~] = massProperties(t,R,'NonLinear');
             testCase.verifyGreaterThanOrEqual(Cm,0);
             testCase.verifyLessThanOrEqual(Cm,R.L);
@@ -145,39 +199,44 @@ end
 
 function R = rocketNonHybrid()
     R.isHybrid = 0;
-    R.propel_mass = 10;
-    R.Burn_Time = 5;
-    R.rocket_m = 50;
-    R.motor_mass = 20;
-    R.casing_mass = 5;
-    R.rocket_cm = 1.0;
-    R.motor_length = 0.4;
-    R.motor_dia = 0.12;
-    R.L = 2.5;
-    R.rocket_I = 0.3;
-    R.Thrust2dMass_Ratio = 0.02;
+    R.propelMass = 10;
+    R.burnTime = 5;
+    R.emptyMass = 50;
+    R.motorMass = 20;
+    R.casingMass = 5;
+    R.emptyCenterOfMass = 1.0;
+    R.motorLength = 0.4;
+    R.motorDiameter = 0.12;
+    R.length= 2.5;
+    R.emptyInertia = 0.3;
+    R.thrust2dMassRatio = 0.02;
+    R.thrustTime = [0 1.5 1.6 4.5 5];
+    R.thrustForce = [0 2500 2500 2400 1200];
+
 end
 
 function R = rocketHybrid()
     R.isHybrid = 1;
-    R.propel_mass = 8;
-    R.Burn_Time = 6;
-    R.rocket_m = 55;
-    R.casing_mass = 4;
-    R.motor_mass = 18;
-    R.rocket_cm = 1.0;
-    R.motor_length = 0.45;
-    R.motor_lengthP = 0.25;
-    R.motor_lengthF = 0.15;
-    R.motor_massP = 10;
-    R.motor_massF = 8;
-    R.propel_massP = 4;
-    R.propel_massF = 4;
-    R.intermotor_d = 0.02;
-    R.motor_dia = 0.11;
-    R.L = 2.6;
-    R.rocket_I = 0.25;
-    R.Thrust2dMass_Ratio = 0.02;
+    R.propelMass = 8;
+    R.burnTime = 6;
+    R.emptyMass = 55;
+    R.casingMass = 4;
+    R.motorMass = 18;
+    R.emptyCenterOfMass = 1.0;
+    R.motorLength = 0.45;
+    R.motorLengthPropel = 0.25;
+    R.motorLengthFuel = 0.15;
+    R.motorMassPropel = 10;
+    R.motorMassFuel = 8;
+    R.massPropel = 4;
+    R.massFuel = 4;
+    R.distanceInterMotors = 0.02;
+    R.motorDiameter = 0.11;
+    R.length= 2.6;
+    R.emptyInertia = 0.25;
+    R.thrust2dMassRatio = 0.02;
+    R.thrustTime = [0 1.5 1.6 4.5 6];
+    R.thrustForce = [0 2500 2500 2400 1200];
 end
 
 %% ========================================================================
@@ -185,8 +244,8 @@ end
 %% ========================================================================
 function y = Thrust(t, Rocket)
     % Deterministic thrust curve:  simply T = 1000*N*sin(t)
-    if t<Rocket.Burn_Time
-        y = 1000*sin(pi*t/Rocket.Burn_Time);
+    if t<Rocket.burnTime
+        y = 1000*sin(pi*t/Rocket.burnTime);
     else
         y=0;
     end

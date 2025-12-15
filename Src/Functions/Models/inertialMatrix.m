@@ -1,22 +1,22 @@
 
 
-function I = inertial_matrix(rocket, Cm, t)
-    if t < rocket.Burn_Time
+function I = inertialMatrix(rocket, Cm, t)
+    if t < rocket.burnTime
         % Find position of the CM of the propelant 
-        z_propel = rocket.tank_z + (1 - t / rocket.Burn_Time) * rocket.tank_L;
+        zPropel = rocket.tankZ + (1 - t / rocket.burnTime) * rocket.tankL;
 
         % Evaluate the mass of propelant
-        propelant_mass = rocket.propel_mass * (1 - t / rocket.Burn_Time);
+        propelantMass = rocket.propelMass * (1 - t / rocket.burnTime);
 
         % Find the distance between rocket CM and propelant CM
-        delta_z = z_propel - Cm;
+        deltaZ = zPropel - Cm;
     
         % Compute I of propelant
-        I = rocket.rocket_inertia + ...
-            inertial_fill_cylinder(propelant_mass, z_propel, rocket.tank_r);% + ...
-            %huygens_steiner_matrix(propelant_mass, 0, 0, delta_z);
+        I = rocket.rocketInertia + ...
+            inertialFillCylinder(propelantMass, zPropel, rocket.tankR);% + ...
+            %huygensSteinerMatrix(propelantMass, 0, 0, deltaZ);
     else
-        I = rocket.rocket_inertia;
+        I = rocket.rocketInertia;
     end
 end
 
@@ -31,14 +31,14 @@ end
 %   I = |Iyx Iyy Iyz|
 %       |Izx Izy Izz|
 
-function [I] = inertial_fill_cylinder(m, h, r)
+function [I] = inertialFillCylinder(m, h, r)
     I = [m*h^2 / 12 + m*r^2 / 4, 0, 0;
         0, m*h^2 / 12 + m*r^2 / 4, 0;
         0, 0, m*r^2 / 4];
 end
 
 % Compute Huygens-Steiner matrix for inertial matrix displacement
-function I = huygens_steiner_matrix(m, x, y, z)
+function I = huygensSteinerMatrix(m, x, y, z)
     I = [m*(y^2 + z^2), -m*x*y, -m*x*z;
         -m*x*y, m*(x^2 + z^2), -m*y*z;
         -m*x*z, -m*y*z, m*(x^2 + y^2)];

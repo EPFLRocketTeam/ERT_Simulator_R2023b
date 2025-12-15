@@ -7,12 +7,12 @@ function T = Thrust(t,Rocket)
 %   - T         Motor Thrust
 
 %   Linear Interpolation
-if t > Rocket.Burn_Time 
+if t > Rocket.burnTime 
     T = 0;
 elseif t < 0
     T = 0;
 else
-    T = interp1(Rocket.Thrust_Time,Rocket.Thrust_Force,t);
+    T = interp1(Rocket.thrustTime,Rocket.thrustForce,t);
 end
 end
 

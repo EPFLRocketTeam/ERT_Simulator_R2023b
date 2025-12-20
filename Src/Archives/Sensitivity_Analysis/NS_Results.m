@@ -1,4 +1,4 @@
-%% EE_Results.m - Frédéric Berdoz - November 2020 
+%% EE_Results.m - FrÃ©dÃ©ric Berdoz - November 2020 
 %
 % Secondary runabale script for the numerical stability analysis. Plots and analyse the results obtained by Main_NS.m
 % 
@@ -34,22 +34,22 @@ if ifPlot %on/off
     xlabel("Suimulation Id");
         
     
-    plot(1:N, sum(t_45,1), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'LineWidth', ls);
-    plot(1:N, sum(t_23,1), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'LineWidth', ls);
-    plot(1:N, sum(t_113,1), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'LineWidth', ls);
-    plot(1:N, sum(t_15s,1), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'LineWidth', ls);
-    plot(1:N, sum(t_23s,1), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'LineWidth', ls);
-    plot(1:N, sum(t_23t,1), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'LineWidth', ls);
-    plot(1:N, sum(t_23tb,1), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'LineWidth', ls);
+    plot(1:N, sum(t_45,1), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'lineWidth', ls);
+    plot(1:N, sum(t_23,1), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'lineWidth', ls);
+    plot(1:N, sum(t_113,1), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'lineWidth', ls);
+    plot(1:N, sum(t_15s,1), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'lineWidth', ls);
+    plot(1:N, sum(t_23s,1), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'lineWidth', ls);
+    plot(1:N, sum(t_23t,1), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'lineWidth', ls);
+    plot(1:N, sum(t_23tb,1), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'lineWidth', ls);
    
     
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_45,1), 2), '-', 'Color', colors(1), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_23,1), 2), '-', 'Color', colors(2), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_113,1), 2), '-', 'Color', colors(3), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_15s,1), 2), '-', 'Color', colors(4), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_23s,1), 2), '-', 'Color', colors(5), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_23t,1), 2), '-', 'Color', colors(6), 'LineWidth', ls);
-    plot(0:N+1, ones(1, N+2) * mean(sum(t_23tb,1), 2), '-', 'Color', colors(7), 'LineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_45,1), 2), '-', 'Color', colors(1), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_23,1), 2), '-', 'Color', colors(2), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_113,1), 2), '-', 'Color', colors(3), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_15s,1), 2), '-', 'Color', colors(4), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_23s,1), 2), '-', 'Color', colors(5), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_23t,1), 2), '-', 'Color', colors(6), 'lineWidth', ls);
+    plot(0:N+1, ones(1, N+2) * mean(sum(t_23tb,1), 2), '-', 'Color', colors(7), 'lineWidth', ls);
     
     
     legend('ode45', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb');
@@ -221,21 +221,21 @@ if ifPlot %on/off
     xlabel("Suimulation Id");
 
     
-    plot(1:N, d45_av(1,:), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'LineWidth', ls, 'DisplayName', 'ode45');
-    plot(1:N, d23_av(1,:), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'LineWidth', ls, 'DisplayName', 'ode23');
-    plot(1:N, d113_av(1,:), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'LineWidth', ls, 'DisplayName', 'ode113');
-    plot(1:N, d15s_av(1,:), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'LineWidth', ls, 'DisplayName', 'ode15s');
-    plot(1:N, d23s_av(1,:), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'LineWidth', ls, 'DisplayName', 'ode23s');
-    plot(1:N, d23t_av(1,:), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'LineWidth', ls, 'DisplayName', 'ode23t');
-    plot(1:N, d23tb_av(1,:), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'LineWidth', ls, 'DisplayName', 'ode23tb');
+    plot(1:N, d45_av(1,:), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'lineWidth', ls, 'DisplayName', 'ode45');
+    plot(1:N, d23_av(1,:), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'lineWidth', ls, 'DisplayName', 'ode23');
+    plot(1:N, d113_av(1,:), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'lineWidth', ls, 'DisplayName', 'ode113');
+    plot(1:N, d15s_av(1,:), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'lineWidth', ls, 'DisplayName', 'ode15s');
+    plot(1:N, d23s_av(1,:), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'lineWidth', ls, 'DisplayName', 'ode23s');
+    plot(1:N, d23t_av(1,:), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'lineWidth', ls, 'DisplayName', 'ode23t');
+    plot(1:N, d23tb_av(1,:), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'lineWidth', ls, 'DisplayName', 'ode23tb');
     
-    plot(0:N+1, ones(1, N+2) * mean(d45_av(1,:)), '-', 'Color', colors(1), 'LineWidth', ls, 'DisplayName', 'ode45');
-    plot(0:N+1, ones(1, N+2) * mean(d23_av(1,:)), '-',  'Color', colors(2), 'LineWidth', ls, 'DisplayName', 'ode23');
-    plot(0:N+1, ones(1, N+2) * mean(d113_av(1,:)), '-', 'Color', colors(3), 'LineWidth', ls, 'DisplayName', 'ode113');
-    plot(0:N+1, ones(1, N+2) * mean(d15s_av(1,:)), '-', 'Color', colors(4), 'LineWidth', ls, 'DisplayName', 'ode15s');
-    plot(0:N+1, ones(1, N+2) * mean(d23s_av(1,:)), '-', 'Color', colors(5), 'LineWidth', ls, 'DisplayName', 'ode23s');
-    plot(0:N+1, ones(1, N+2) * mean(d23t_av(1,:)), '-', 'Color', colors(6), 'LineWidth', ls, 'DisplayName', 'ode23t');
-    plot(0:N+1, ones(1, N+2) * mean(d23tb_av(1,:)), '-', 'Color', colors(7), 'LineWidth', ls, 'DisplayName', 'ode23tb');
+    plot(0:N+1, ones(1, N+2) * mean(d45_av(1,:)), '-', 'Color', colors(1), 'lineWidth', ls, 'DisplayName', 'ode45');
+    plot(0:N+1, ones(1, N+2) * mean(d23_av(1,:)), '-',  'Color', colors(2), 'lineWidth', ls, 'DisplayName', 'ode23');
+    plot(0:N+1, ones(1, N+2) * mean(d113_av(1,:)), '-', 'Color', colors(3), 'lineWidth', ls, 'DisplayName', 'ode113');
+    plot(0:N+1, ones(1, N+2) * mean(d15s_av(1,:)), '-', 'Color', colors(4), 'lineWidth', ls, 'DisplayName', 'ode15s');
+    plot(0:N+1, ones(1, N+2) * mean(d23s_av(1,:)), '-', 'Color', colors(5), 'lineWidth', ls, 'DisplayName', 'ode23s');
+    plot(0:N+1, ones(1, N+2) * mean(d23t_av(1,:)), '-', 'Color', colors(6), 'lineWidth', ls, 'DisplayName', 'ode23t');
+    plot(0:N+1, ones(1, N+2) * mean(d23tb_av(1,:)), '-', 'Color', colors(7), 'lineWidth', ls, 'DisplayName', 'ode23tb');
     
     legend('ode45', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb');
     
@@ -249,21 +249,21 @@ if ifPlot %on/off
     ylabel("Distance [m]");
     xlabel("Suimulation Id");
  
-    plot(1:N, d45_av(2,:), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'LineWidth', ls, 'DisplayName', 'ode45');
-    plot(1:N, d23_av(2,:), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'LineWidth', ls, 'DisplayName', 'ode23');
-    plot(1:N, d113_av(2,:), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'LineWidth', ls, 'DisplayName', 'ode113');
-    plot(1:N, d15s_av(2,:), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'LineWidth', ls, 'DisplayName', 'ode15s');
-    plot(1:N, d23s_av(2,:), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'LineWidth', ls, 'DisplayName', 'ode23s');
-    plot(1:N, d23t_av(2,:), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'LineWidth', ls, 'DisplayName', 'ode23t');
-    plot(1:N, d23tb_av(2,:), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'LineWidth', ls, 'DisplayName', 'ode23tb');
+    plot(1:N, d45_av(2,:), 'd', 'MarkerSize', ms, 'MarkerFaceColor', colors(1), 'lineWidth', ls, 'DisplayName', 'ode45');
+    plot(1:N, d23_av(2,:), 'x', 'MarkerSize', ms, 'MarkerFaceColor', colors(2), 'lineWidth', ls, 'DisplayName', 'ode23');
+    plot(1:N, d113_av(2,:), '+', 'MarkerSize', ms, 'MarkerFaceColor', colors(3), 'lineWidth', ls, 'DisplayName', 'ode113');
+    plot(1:N, d15s_av(2,:), '*', 'MarkerSize', ms, 'MarkerFaceColor', colors(4), 'lineWidth', ls, 'DisplayName', 'ode15s');
+    plot(1:N, d23s_av(2,:), '^', 'MarkerSize', ms, 'MarkerFaceColor', colors(5), 'lineWidth', ls, 'DisplayName', 'ode23s');
+    plot(1:N, d23t_av(2,:), 'v', 'MarkerSize', ms, 'MarkerFaceColor', colors(6), 'lineWidth', ls, 'DisplayName', 'ode23t');
+    plot(1:N, d23tb_av(2,:), 'p', 'MarkerSize', ms, 'MarkerFaceColor', colors(7), 'lineWidth', ls, 'DisplayName', 'ode23tb');
     
-    plot(0:N+1, ones(1, N+2) * mean(d45_av(2,:)), '-', 'Color', colors(1), 'LineWidth', ls, 'DisplayName', 'ode45');
-    plot(0:N+1, ones(1, N+2) * mean(d23_av(2,:)), '-',  'Color', colors(2), 'LineWidth', ls, 'DisplayName', 'ode23');
-    plot(0:N+1, ones(1, N+2) * mean(d113_av(2,:)), '-', 'Color', colors(3), 'LineWidth', ls, 'DisplayName', 'ode113');
-    plot(0:N+1, ones(1, N+2) * mean(d15s_av(2,:)), '-', 'Color', colors(4), 'LineWidth', ls, 'DisplayName', 'ode15s');
-    plot(0:N+1, ones(1, N+2) * mean(d23s_av(2,:)), '-', 'Color', colors(5), 'LineWidth', ls, 'DisplayName', 'ode23s');
-    plot(0:N+1, ones(1, N+2) * mean(d23t_av(2,:)), '-', 'Color', colors(6), 'LineWidth', ls, 'DisplayName', 'ode23t');
-    plot(0:N+1, ones(1, N+2) * mean(d23tb_av(2,:)), '-', 'Color', colors(7), 'LineWidth', ls, 'DisplayName', 'ode23tb');
+    plot(0:N+1, ones(1, N+2) * mean(d45_av(2,:)), '-', 'Color', colors(1), 'lineWidth', ls, 'DisplayName', 'ode45');
+    plot(0:N+1, ones(1, N+2) * mean(d23_av(2,:)), '-',  'Color', colors(2), 'lineWidth', ls, 'DisplayName', 'ode23');
+    plot(0:N+1, ones(1, N+2) * mean(d113_av(2,:)), '-', 'Color', colors(3), 'lineWidth', ls, 'DisplayName', 'ode113');
+    plot(0:N+1, ones(1, N+2) * mean(d15s_av(2,:)), '-', 'Color', colors(4), 'lineWidth', ls, 'DisplayName', 'ode15s');
+    plot(0:N+1, ones(1, N+2) * mean(d23s_av(2,:)), '-', 'Color', colors(5), 'lineWidth', ls, 'DisplayName', 'ode23s');
+    plot(0:N+1, ones(1, N+2) * mean(d23t_av(2,:)), '-', 'Color', colors(6), 'lineWidth', ls, 'DisplayName', 'ode23t');
+    plot(0:N+1, ones(1, N+2) * mean(d23tb_av(2,:)), '-', 'Color', colors(7), 'lineWidth', ls, 'DisplayName', 'ode23tb');
     
     legend('ode45', 'ode23', 'ode113', 'ode15s', 'ode23s', 'ode23t', 'ode23tb');
     if ifSave

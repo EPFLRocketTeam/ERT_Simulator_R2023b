@@ -28,16 +28,16 @@ for idx_sim = 1:N
     
     % Thrust phase
     t_A10 = tic;
-    [burnTime, burnState, ~, ~, ~] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+    [flightTime, flightState, ~, ~, ~] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
     t_A1 = toc(t_A10);
     
     % Ballistic phase
     t_A20 = tic;
-    [coastTime, coastState, ~, ~, ~] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+    [coastTime, coastState, ~, ~, ~] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
     t_A2 = toc(t_A20);
     
-    flightTime = [burnTime; coastTime(2:end)];
-    flightState = [burnState; coastState(2:end, :)];
+    flightTime = [flightTime; coastTime(2:end)];
+    flightState = [flightState; coastState(2:end, :)];
     combinedRailFlightTime = [railTime;flightTime];
     combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
 

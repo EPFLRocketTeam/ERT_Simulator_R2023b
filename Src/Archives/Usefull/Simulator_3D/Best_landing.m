@@ -49,17 +49,17 @@ else
     end
 
 
-[min_area,r_ellipse,r_ellipse1, X0, Y0, data] = landing_tool(n_sim,-1,azimuth_i/180*pi, Rocket_0, simulationOutputs,name_of_environnment);
+[min_area,r_ellipse,r_ellipse1, initialPosition, Y0, data] = landing_tool(n_sim,-1,azimuth_i/180*pi, Rocket_0, simulationOutputs,name_of_environnment);
 
 Environment = environnementReader(name_of_environnment,1);
 Environment = setfield(Environment, 'railAzimuth', azimuth_i/180*pi);
 
 simulatior3D = multilayerwindSimulator3D(Rocket_0, Environment, simulationOutputs);
 [railTime, railState] = simulatior3D.RailSim();
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState; coastState(2:end, :)];
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 combinedRailFlightTime = [railTime;flightTime];
 combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
 [T3, S3, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = simulatior3D.DrogueParaSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
@@ -67,7 +67,7 @@ combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
 
 %plot rocket orientation
 figure('Name','montecarlo'); hold on;
-%plot trajectory of CM
+%plot trajectory of centerOfMass
 zoom = 15;
 [XX, YY, M, Mcolor] = get_google_map(Environment.startLatitude, Environment.startLongitude, 'Height', 640, 'Width', 640, 'Zoom', zoom);
 metersPerPx = 156543.03392 * cos(Environment.startLatitude*pi/180)/ 2^zoom;
@@ -79,11 +79,11 @@ yImage = [ylim;ylim];
 zImage = zeros(2);
 colormap(Mcolor);
 surf(xImage, yImage, zImage, 'CData', M,'FaceColor', 'texturemap', 'EdgeColor', 'none', 'DisplayName', 'Base Map');
-plot3(flightState(:,1), flightState(:,2), flightState(:,3), 'DisplayName', 'Ascent','LineWidth',1);
-plot3(S3(:,1), S3(:,2), S3(:,3), 'DisplayName', 'Drogue Descent','LineWidth',1);
-plot3(mainChuteState(:,1), mainChuteState(:,2), mainChuteState(:,3), 'DisplayName', 'Main Descent','LineWidth',1);
-plot3(r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,0*r_ellipse(:,2),'DisplayName', '95% confidence Interval','LineWidth',1);
-plot3(r_ellipse1(:,1) + X0,r_ellipse1(:,2) + Y0,0*r_ellipse1(:,2),'DisplayName', '99,99% confidence Interval','LineWidth',1);
+plot3(flightState(:,1), flightState(:,2), flightState(:,3), 'DisplayName', 'Ascent','lineWidth',1);
+plot3(S3(:,1), S3(:,2), S3(:,3), 'DisplayName', 'Drogue Descent','lineWidth',1);
+plot3(mainChuteState(:,1), mainChuteState(:,2), mainChuteState(:,3), 'DisplayName', 'Main Descent','lineWidth',1);
+plot3(r_ellipse(:,1) + initialPosition,r_ellipse(:,2) + Y0,0*r_ellipse(:,2),'DisplayName', '95% confidence Interval','lineWidth',1);
+plot3(r_ellipse1(:,1) + initialPosition,r_ellipse1(:,2) + Y0,0*r_ellipse1(:,2),'DisplayName', '99,99% confidence Interval','lineWidth',1);
 plot3(data(:,1), data(:,2),0*data(:,2),'*k' , 'DisplayName', 'noised landing');
 daspect([1 1 1]); pbaspect([1, 1, 2]); view(45, 45);
 title '3D trajectory representation'

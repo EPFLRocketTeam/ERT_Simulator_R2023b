@@ -102,8 +102,8 @@ eulerAngles = zeros(3, length(tout)); % Euler angles (psi, theta, phi)
 
 %% Trajectory Animation
 figure('Name', 'Rocket Trajectory', 'Position', [100, 100, 800, 600]);
-centerOfMassLine = animatedline('LineWidth', 1.5, 'Color', 'blue', 'DisplayName', 'Center of Mass');
-rocketBodyLine = animatedline('LineWidth', 2.5, 'Color', 'red', 'DisplayName', 'Rocket Body');
+centerOfMassLine = animatedline('lineWidth', 1.5, 'Color', 'blue', 'DisplayName', 'Center of mass');
+rocketBodyLine = animatedline('lineWidth', 2.5, 'Color', 'red', 'DisplayName', 'Rocket Body');
 legend('Location', 'best');
 axis equal;
 view(45, 30); % 3D view
@@ -328,7 +328,7 @@ end
 %% Visualization Functions
 function createVerticalVelocityPlot(time, state)
     figure('Name', 'Vertical Velocity', 'Position', [100, 100, 600, 400]);
-    plot(time, state(:, 6), 'b-', 'LineWidth', 2);
+    plot(time, state(:, 6), 'b-', 'lineWidth', 2);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('Vertical Velocity v_z [m/s]', 'FontSize', 12);
     title('Vertical Velocity vs Time', 'FontSize', 14);
@@ -340,7 +340,7 @@ function createEulerAnglesPlot(time, eulerAngles)
     figure('Name', 'Euler Angles', 'Position', [100, 100, 900, 600]);
     
     subplot(2, 1, 1);
-    plot(time, rad2deg(eulerAngles(1, :)), 'b-', 'LineWidth', 2);
+    plot(time, rad2deg(eulerAngles(1, :)), 'b-', 'lineWidth', 2);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('Yaw (\psi) [deg]', 'FontSize', 12);
     title('Yaw Angle', 'FontSize', 14);
@@ -348,9 +348,9 @@ function createEulerAnglesPlot(time, eulerAngles)
     box on;
     
     subplot(2, 1, 2);
-    plot(time, rad2deg(eulerAngles(2, :)), 'r-', 'LineWidth', 2);
+    plot(time, rad2deg(eulerAngles(2, :)), 'r-', 'lineWidth', 2);
     hold on;
-    plot(time, rad2deg(eulerAngles(3, :)), 'g-', 'LineWidth', 2);
+    plot(time, rad2deg(eulerAngles(3, :)), 'g-', 'lineWidth', 2);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('Angle [deg]', 'FontSize', 12);
     title('Pitch (\theta) and Roll (\phi)', 'FontSize', 14);
@@ -363,7 +363,7 @@ function createConservationPlots(time, angularMomentumSquared, totalEnergy)
     figure('Name', 'Conservation Quantities', 'Position', [100, 100, 900, 600]);
     
     subplot(2, 1, 1);
-    plot(time, angularMomentumSquared, 'b-', 'LineWidth', 2);
+    plot(time, angularMomentumSquared, 'b-', 'lineWidth', 2);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('L^2 [kg^2 m^4 / s^2]', 'FontSize', 12);
     title('Squared Angular Momentum', 'FontSize', 14);
@@ -371,7 +371,7 @@ function createConservationPlots(time, angularMomentumSquared, totalEnergy)
     box on;
     
     subplot(2, 1, 2);
-    plot(time, totalEnergy, 'r-', 'LineWidth', 2);
+    plot(time, totalEnergy, 'r-', 'lineWidth', 2);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('Total Energy [J]', 'FontSize', 12);
     title('Total Mechanical Energy', 'FontSize', 14);
@@ -381,9 +381,9 @@ end
 
 function createQuaternionNormPlot(time, quaternionNorm)
     figure('Name', 'Quaternion Norm', 'Position', [100, 100, 600, 400]);
-    plot(time, quaternionNorm, 'b-', 'LineWidth', 2);
+    plot(time, quaternionNorm, 'b-', 'lineWidth', 2);
     hold on;
-    plot([time(1), time(end)], [1, 1], 'r--', 'LineWidth', 1.5);
+    plot([time(1), time(end)], [1, 1], 'r--', 'lineWidth', 1.5);
     xlabel('Time [s]', 'FontSize', 12);
     ylabel('Quaternion Norm', 'FontSize', 12);
     title('Quaternion Norm Constraint', 'FontSize', 14);

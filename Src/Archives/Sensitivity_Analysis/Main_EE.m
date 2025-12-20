@@ -45,7 +45,7 @@ simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs)
 
 %% EE analysis
 XX = baseValues(simulatior3D, Xid, sigma);
-Delta = p/(2*(p-1));
+flightPathAngle = p/(2*(p-1));
 k = length(Xid);
 o = length(Yid);
 d = NaN(r, k, o);

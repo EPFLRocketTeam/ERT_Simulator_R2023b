@@ -35,13 +35,13 @@ parfor idx_sim = 1:N
     
     if any(ismember(Yid, Yimp_apogee)) || any(ismember(Yid, Yimp_landing))
         % Thrust phase
-        [burnTime, burnState, ~, ~, ~] = simulationObj_i.FlightSim([railTime(end) simulationObj_i.Rocket.Burn_Time(end)], railState(end, 2));
+        [flightTime, flightState, ~, ~, ~] = simulationObj_i.FlightSim([railTime(end) simulationObj_i.Rocket.Burn_Time(end)], railState(end, 2));
         
         % Ballistic phase
-        [coastTime, coastState, ~, ~, ~] = simulationObj_i.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+        [coastTime, coastState, ~, ~, ~] = simulationObj_i.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
         
-        flightTime = [burnTime; coastTime(2:end)];
-        flightState = [burnState; coastState(2:end, :)];
+        flightTime = [flightTime; coastTime(2:end)];
+        flightState = [flightState; coastState(2:end, :)];
         combinedRailFlightTime = [railTime;flightTime];
         combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
     end
@@ -69,17 +69,17 @@ parfor idx_sim = 1:N
                 [~, tvmax] = max(flightState(:,6));
                 Y(i,idx_sim) = tvmax;
             case "Cdmax" 
-                Y(i,idx_sim) = max(simulationObj_i.simAuxResults.Cd);
+                Y(i,idx_sim) = max(simulationObj_i.simAuxResults.dragCoefficient);
             case "a_max" 
                 Y(i,idx_sim) = max(diff(combinedRailFlightState(:,2))./diff(combinedRailFlightTime));
             case "margin_min" 
-                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Margin);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.stabilityMargin);
             case "CNa_min"
-                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Cn_alpha);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.normalForceCoefficientSlope);
             case "MarCNa_min"
-                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.Margin.*simulationObj_i.simAuxResults.Cn_alpha);
+                Y(i,idx_sim) = min(simulationObj_i.simAuxResults.stabilityMargin.*simulationObj_i.simAuxResults.normalForceCoefficientSlope);
             case "MarCNa_av"
-                Y(i,idx_sim) = mean(simulationObj_i.simAuxResults.Margin.*simulationObj_i.simAuxResults.Cn_alpha);
+                Y(i,idx_sim) = mean(simulationObj_i.simAuxResults.stabilityMargin.*simulationObj_i.simAuxResults.normalForceCoefficientSlope);
             case "landing_drift"
                 Y(i,idx_sim) = sqrt(mainChuteState(end,1).^2 + mainChuteState(end,2).^2);
             case "landing_azi"

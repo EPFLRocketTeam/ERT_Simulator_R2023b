@@ -50,7 +50,7 @@ alphaNom = 0;
 thetaNom = 0;
 [cAlphaNom, cpNom] = barrowmanLift(rocket, alphaNom, mNom, thetaNom);
 cNa2ANom = 0;
-wNom = simObj.simAuxResults.CM(1);
+wNom = simObj.simAuxResults.centerOfMass(1);
 for i = 1:length(cAlphaNom)
     cNa2ANom = cNa2ANom + cAlphaNom(i) * (cpNom(i) - wNom)^2;
 end
@@ -65,9 +65,9 @@ c2RNom = dMdtNom * (lneNom - wNom)^2;
 % c2 Damping Moment Coefficient
 c2Nom = c2ANom + c2RNom;
 cNaNom = sum(cAlphaNom);
-pNom = simObj.simAuxResults.Xcp(1);
+pNom = simObj.simAuxResults.centerOfPressure(1);
 c1Nom = rhoNom / 2 * vNom^2 * arNom * cNaNom * (pNom - wNom);
-ilNom = simObj.simAuxResults.Il(1);
+ilNom = simObj.simAuxResults.inertiaLong(1);
 % Damping ratio
 epsilonNom = c2Nom / (2 * sqrt(c1Nom * ilNom));
 % Display Nominal Case results
@@ -131,7 +131,7 @@ angleMax = rot2anglemat(cMax);
 thetaMax = angleMax(3);
 [cAlphaMax, cpMax] = barrowmanLift(rocket, alphaMax, mMax, thetaMax);
 cNa2AMax = 0;
-wMax = simObj.simAuxResults.CM(indexMax);
+wMax = simObj.simAuxResults.centerOfMass(indexMax);
 for i = 1:length(cAlphaMax)
     cNa2AMax = cNa2AMax + cAlphaMax(i) * (cpMax(i) - wMax)^2;
 end
@@ -146,9 +146,9 @@ c2RMax = dMdtMax * (lneMax - wMax)^2;
 % c2 Damping Moment Coefficient
 c2Max = c2AMax + c2RMax;
 cNaMax = sum(cAlphaMax);
-pMax = simObj.simAuxResults.Xcp(indexMax);
+pMax = simObj.simAuxResults.centerOfPressure(indexMax);
 c1Max = rhoMax / 2 * norm(vMax)^2 * arMax * cNaMax * (pMax - wMax);
-ilMax = simObj.simAuxResults.Il(indexMax);
+ilMax = simObj.simAuxResults.inertiaLong(indexMax);
 % Damping ratio
 epsilonMax = c2Max / (2 * sqrt(c1Max * ilMax));
 % Display Max Speed results
@@ -229,7 +229,7 @@ thetaWcRail = 0;
 % CHANGE CN_alpha FOR THE FINS
 cAlphaWcRail(end) = cAlphaWcRail(end)*0.95;
 cNa2AWcRail = 0;
-wWcRail = simObjWcRail.simAuxResults.CM(1);
+wWcRail = simObjWcRail.simAuxResults.centerOfMass(1);
 for i = 1:length(cAlphaWcRail)
     cNa2AWcRail = cNa2AWcRail + cAlphaWcRail(i) * (cpWcRail(i) - wWcRail)^2;
 end
@@ -244,9 +244,9 @@ c2RWcRail = dMdtWcRail * (lneWcRail - wWcRail)^2;
 % c2 Damping Moment Coefficient
 c2WcRail = c2AWcRail + c2RWcRail;
 cNaWcRail = sum(cAlphaWcRail);
-pWcRail = simObjWcRail.simAuxResults.Xcp(1);
+pWcRail = simObjWcRail.simAuxResults.centerOfPressure(1);
 c1WcRail = rhoWcRail / 2 * vWcRail^2 * arWcRail * cNaWcRail * (pWcRail - wWcRail);
-ilWcRail = simObjWcRail.simAuxResults.Il(1);
+ilWcRail = simObjWcRail.simAuxResults.inertiaLong(1);
 % Damping ratio
 epsilonWcRail = c2WcRail / (2 * sqrt(c1WcRail * ilWcRail));
 % Display Worst Case (Rail Exit) results
@@ -314,7 +314,7 @@ thetaWcMax = angleWcMax(3);
 % CHANGE CN_alpha FOR THE FINS
 cAlphaWcMax(end) = cAlphaWcMax(end)*0.95;
 cNa2AWcMax = 0;
-wWcMax = simObjWcRail.simAuxResults.CM(indexWcMax);
+wWcMax = simObjWcRail.simAuxResults.centerOfMass(indexWcMax);
 for i = 1:length(cAlphaWcMax)
     cNa2AWcMax = cNa2AWcMax + cAlphaWcMax(i) * (cpWcMax(i) - wWcMax)^2;
 end
@@ -329,9 +329,9 @@ c2RWcMax = dMdtWcMax * (lneWcMax - wWcMax)^2;
 % c2 Damping Moment Coefficient
 c2WcMax = c2AWcMax + c2RWcMax;
 cNaWcMax = sum(cAlphaWcMax);
-pWcMax = simObjWcRail.simAuxResults.Xcp(indexWcMax);
+pWcMax = simObjWcRail.simAuxResults.centerOfPressure(indexWcMax);
 c1WcMax = rhoWcMax / 2 * norm(vWcMax)^2 * arWcMax * cNaWcMax * (pWcMax - wWcMax);
-ilWcMax = simObjWcRail.simAuxResults.Il(indexWcMax);
+ilWcMax = simObjWcRail.simAuxResults.inertiaLong(indexWcMax);
 % Damping ratio
 epsilonWcMax = c2WcMax / (2 * sqrt(c1WcMax * ilWcMax));
 % Display Worst Case Max Speed results
@@ -380,24 +380,24 @@ results.apogeeWc = s2WcRail(end, 3);
 % =========================================================================
 % Nominal
 dCommon = max(rocket.stageDiameters);
-stabilityNomFull = (simObj.simAuxResults.Xcp - simObj.simAuxResults.CM)./dCommon;
+stabilityNomFull = (simObj.simAuxResults.centerOfPressure - simObj.simAuxResults.centerOfMass)./dCommon;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
 stabilityNomCut = stabilityNomFull(1:length(s2_1Nom) + find(s2_2Nom(:,6) < 50,1));
 results.minStabilityNom = min(stabilityNomCut);
 results.maxStabilityNom = max(stabilityNomFull);
 % Worst Case
-stabilityWcFull = (simObjWcRail.simAuxResults.Xcp - simObjWcRail.simAuxResults.CM)./dCommon;
+stabilityWcFull = (simObjWcRail.simAuxResults.centerOfPressure - simObjWcRail.simAuxResults.centerOfMass)./dCommon;
 stabilityWcCut = stabilityWcFull(1:length(s2_1WcRail) + find(s2_2WcRail(:,6) < 50,1));
 results.minStabilityWc = min(stabilityWcCut);
 results.maxStabilityWc = max(stabilityWcFull);
-% Display Apogee and Min/Max Static Margin
+% Display Apogee and Min/Max Static stabilityMargin
 display(['Apogee (Nominal) : ' num2str(results.apogeeNom)]);
-display(['Min Static Margin (Nominal, cut) : ' num2str(results.minStabilityNom)]);
-display(['Max Static Margin (Nominal) : ' num2str(results.maxStabilityNom)]);
+display(['Min Static stabilityMargin (Nominal, cut) : ' num2str(results.minStabilityNom)]);
+display(['Max Static stabilityMargin (Nominal) : ' num2str(results.maxStabilityNom)]);
 display(['Apogee (Worst Case) : ' num2str(results.apogeeWc)]);
-display(['Min Static Margin (Worst Case, cut) : ' num2str(results.minStabilityWc)]);
-display(['Max Static Margin (Worst Case) : ' num2str(results.maxStabilityWc)]);
+display(['Min Static stabilityMargin (Worst Case, cut) : ' num2str(results.minStabilityWc)]);
+display(['Max Static stabilityMargin (Worst Case) : ' num2str(results.maxStabilityWc)]);
 if errorCount == 0
     display('All good !');
 else

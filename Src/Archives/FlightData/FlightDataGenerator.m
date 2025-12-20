@@ -43,26 +43,26 @@ simulatior3D = Simulator3D(Rocket_USA, Environment_USA, simulationOutputs);
 [mainChuteTime, mainChuteState] = simulatior3D.MainParaSim(drogueTime(end), drogueState(end,1:3)', drogueState(end, 4:6)');
 
 %% Generate data
-T0 = [0 3 5]';
+initialTime = [0 3 5]';
 H0 = [0 0 0]';
-V0 = [0 0 0]';
+initialVelocity = [0 0 0]';
 
-% time = [T0; T0(end)+railTime(2:end); T0(end)+flightTime(2:end); T0(end)+drogueTime(2:end); T0(end)+mainChuteTime(2:end)];
+% time = [initialTime; initialTime(end)+railTime(2:end); initialTime(end)+flightTime(2:end); initialTime(end)+drogueTime(2:end); initialTime(end)+mainChuteTime(2:end)];
 % altitude = [H0; railState(2:end,1);flightState(2:end,3);drogueState(2:end,3);mainChuteState(2:end,3)]+Environment_USA.startAltitude;
 % pressure = zeros(size(altitude));
 % for i = 1:length(altitude)
 %    [~, ~, pressure(i), ~, ~] = stdAtmos(altitude(i),Environment_USA);
 % end
-% velocity = [V0; railState(2:end,2);flightState(2:end,6);drogueState(2:end,6);mainChuteState(2:end,6)];
+% velocity = [initialVelocity; railState(2:end,2);flightState(2:end,6);drogueState(2:end,6);mainChuteState(2:end,6)];
 % acceleration = diff(velocity)./diff(time);
 
-time = [T0; T0(end)+railTime(2:end); T0(end)+flightTime(2:end)];
+time = [initialTime; initialTime(end)+railTime(2:end); initialTime(end)+flightTime(2:end)];
 altitude = [H0; railState(2:end,1);flightState(2:end,3)]+Environment_USA.startAltitude;
 pressure = zeros(size(altitude));
 for i = 1:length(altitude)
    [~, ~, pressure(i), ~, ~] = stdAtmos(altitude(i),Environment_USA);
 end
-velocity = [V0; railState(2:end,2);flightState(2:end,6)];
+velocity = [initialVelocity; railState(2:end,2);flightState(2:end,6)];
 acceleration = diff(velocity)./diff(time);
 
 %% Sample simulation

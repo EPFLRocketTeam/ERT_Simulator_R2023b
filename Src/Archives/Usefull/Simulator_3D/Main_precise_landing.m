@@ -27,14 +27,14 @@ display(['Launch rail departure time : ' num2str(railTime(end))]);
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
 %simulatior3D.Rocket.coneMode = 'off';
 
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState; coastState(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 
 combinedRailFlightTime = [railTime;flightTime];
 combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
@@ -45,10 +45,10 @@ display(['Apogee AGL @t = ' num2str(flightTime(end))]);
 display(['Max speed : ' num2str(maxi)]);
 display(['Max speed @t = ' num2str(flightTime(index))]);
 [~,a,~,density,nu] = stdAtmos(flightState(index,3),Environment);
-Fd = 0.5*simulatior3D.simAuxResults.Cd(index)*density*pi*Rocket.maxDiameter^2/4*maxi^2;
+Fd = 0.5*simulatior3D.simAuxResults.dragCoefficient(index)*density*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['Max drag force = ' num2str(Fd)]);
-display(['Max drag force along rocket axis = ' num2str(Fd*cos(simulatior3D.simAuxResults.Delta(index)))]);
-C_Dab = drag_shuriken(Rocket, 0, simulatior3D.simAuxResults.Delta(index), maxi, nu);
+display(['Max drag force along rocket axis = ' num2str(Fd*cos(simulatior3D.simAuxResults.flightPathAngle(index)))]);
+C_Dab = drag_shuriken(Rocket, 0, simulatior3D.simAuxResults.flightPathAngle(index), maxi, nu);
 F_Dab = 0.5*C_Dab*density*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['AB drag force at max speed = ' num2str(F_Dab)]);
 display(['Max Mach number : ' num2str(maxi/a)]);
@@ -104,11 +104,11 @@ for i  = 1:length(C)
 end
 %quiver3(flightState(:,1), flightState(:,2), flightState(:,3), directionVectors(:,1), directionVectors(:,2), directionVectors(:,3));
 
-% plot trajectory of CM
-plot3(flightState(:,1), flightState(:,2), flightState(:,3), 'DisplayName', 'Ascent','LineWidth',2);
-plot3(S3(:,1), S3(:,2), S3(:,3), 'DisplayName', 'Drogue Descent','LineWidth',2);
-plot3(mainChuteState(:,1), mainChuteState(:,2), mainChuteState(:,3), 'DisplayName', 'Main Descent','LineWidth',2);
-plot3(crashState(:,1), crashState(:,2), crashState(:,3), 'DisplayName', 'Ballistic Descent','LineWidth',2)
+% plot trajectory of centerOfMass
+plot3(flightState(:,1), flightState(:,2), flightState(:,3), 'DisplayName', 'Ascent','lineWidth',2);
+plot3(S3(:,1), S3(:,2), S3(:,3), 'DisplayName', 'Drogue Descent','lineWidth',2);
+plot3(mainChuteState(:,1), mainChuteState(:,2), mainChuteState(:,3), 'DisplayName', 'Main Descent','lineWidth',2);
+plot3(crashState(:,1), crashState(:,2), crashState(:,3), 'DisplayName', 'Ballistic Descent','lineWidth',2)
 daspect([1 1 1]); pbaspect([1, 1, 1]); view(45, 45);
 [XX, YY, M, Mcolor] = get_google_map(Environment.startLatitude, Environment.startLongitude, 'Height', ceil(diff(xlim)/3.4), 'Width', ceil(diff(ylim)/3.4));
 xImage = [xlim',xlim'];

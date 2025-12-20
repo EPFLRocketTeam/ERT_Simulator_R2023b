@@ -25,7 +25,7 @@ Rocket.Thrust_Force = Thrust;
 % Burn time
 Rocket.Burn_Time = time(end);
 
-% Mass variation coefficient
+% mass variation coefficient
 A_T = trapz(time,Thrust);
 Rocket.Thrust2dMass_Ratio = Rocket.propel_mass/A_T;
 else
@@ -74,7 +74,7 @@ Rocket.Thrust_Force = ThrustP;
 % Burn time
 Rocket.Burn_Time = time(end);
 
-% Mass variation coefficient
+% mass variation coefficient
 A_T = trapz(time,ThrustP);
 Rocket.Thrust2dMass_Ratio = Rocket.propel_mass/(A_T);    
 end

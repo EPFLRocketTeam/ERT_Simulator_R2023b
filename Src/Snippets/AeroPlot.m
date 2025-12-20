@@ -64,7 +64,7 @@ if readRocketFile
        % Display basic rocket information
        fprintf('  Rocket Name: %s\n', Rocket.Name);
        fprintf('  Reference Diameter: %.3f m\n', Rocket.dm);
-       fprintf('  Center of Mass: %.3f m\n', Rocket.rocket_cm);
+       fprintf('  Center of mass: %.3f m\n', Rocket.rocket_cm);
        fprintf('  Reference Area: %.4f m²\n', Rocket.Sm);
    catch ME
        error('aeroPlot:RocketLoadError', ...
@@ -83,7 +83,7 @@ fprintf('\nComputing aerodynamic coefficients...\n');
 
 % Initialize coefficient matrices
 dragCoefficientMatrix = zeros(length(velocityRange), length(angleOfAttackRange));  % Drag coefficient matrix
-CNa = zeros(1, length(angleOfAttackRange));                      % Normal force slope
+normalForceCoefficientSlope = zeros(1, length(angleOfAttackRange));                      % Normal force slope
 centerOfPressure = zeros(1, length(angleOfAttackRange));                      % Center of pressure
 
 % 4.1 Drag Coefficient Calculation (dragCoefficientMatrix vs Mach, for different alpha)
@@ -108,7 +108,7 @@ for j = 1:length(angleOfAttackRange)
     % Calculate normal force coefficient slope and center of pressure
     % Parameters: Rocket, alpha, airbrake deployment, Mach, roll rate, 
     %             useNonlinear flag
-    [CNa(j), centerOfPressure(j)] = normalLift(Rocket, angleOfAttackRange(j), 1.1, 0, 0, 1);
+    [normalForceCoefficientSlope(j), centerOfPressure(j)] = normalLift(Rocket, angleOfAttackRange(j), 1.1, 0, 0, 1);
 end
 
 fprintf('Aerodynamic calculations complete.\n\n');
@@ -132,7 +132,7 @@ hold on; grid on; box on;
 for i = 1:length(angleOfAttackRange)
     plot(velocityRange/speedOfSound, dragCoefficientMatrix(:,i), ...
          'DisplayName', sprintf('\\alpha = %.1f°', rad2deg(angleOfAttackRange(i))), ...
-         'LineWidth', 2);
+         'lineWidth', 2);
 end
 
 % Format the drag coefficient plot
@@ -156,10 +156,10 @@ figure('Name', 'Normal Force Analysis', ...
        'NumberTitle', 'off');
 hold on; grid on; box on;
 
-% Calculate and plot normal force coefficient (normalForceCoefficient = CNa * alpha)
-normalForceCoefficient = CNa .* angleOfAttackRange; % Normal force coefficient at each alpha
+% Calculate and plot normal force coefficient (normalForceCoefficient = normalForceCoefficientSlope * alpha)
+normalForceCoefficient = normalForceCoefficientSlope .* angleOfAttackRange; % Normal force coefficient at each alpha
 plot(rad2deg(angleOfAttackRange), normalForceCoefficient, ...
-     'LineWidth', 2, 'Color', 'b', 'Marker', 'o', 'MarkerSize', 6);
+     'lineWidth', 2, 'Color', 'b', 'Marker', 'o', 'MarkerSize', 6);
 
 % Format the normal force plot
 title('Normal Force Coefficient vs Angle of Attack', ...
@@ -176,7 +176,7 @@ text(0.05, 0.95, sprintf('Maximum C_N = %.3f', max(normalForceCoefficient)), ...
 
 fprintf('  Plot 2: Normal force coefficient generated.\n');
 
-% 5.3 Stability Margin vs Angle of Attack
+% 5.3 Stability stabilityMargin vs Angle of Attack
 figure('Name', 'Stability Analysis', ...
        'Position', [1800, 100, 800, 600], ...
        'NumberTitle', 'off');
@@ -186,21 +186,21 @@ hold on; grid on; box on;
 stabilityMargin = (centerOfPressure - Rocket.emptyCenterOfMass) / Rocket.maxDiameter;
 
 plot(rad2deg(angleOfAttackRange), stabilityMargin, ...
-     'LineWidth', 2, 'Color', 'r', 'Marker', 's', 'MarkerSize', 6);
+     'lineWidth', 2, 'Color', 'r', 'Marker', 's', 'MarkerSize', 6);
 
 % Format the stability margin plot
-title('Stability Margin vs Angle of Attack', ...
+title('Stability stabilityMargin vs Angle of Attack', ...
       'FontSize', 14, 'FontWeight', 'bold');
 xlabel('Angle of Attack \alpha [°]', 'FontSize', 12);
-ylabel('Stability Margin (X_{cp} - X_{cm})/d_m [calibers]', 'FontSize', 12);
+ylabel('Stability stabilityMargin (X_{cp} - X_{cm})/d_m [calibers]', 'FontSize', 12);
 set(gca, 'FontSize', 12, 'GridLineStyle', '--', 'GridAlpha', 0.3);
 xlim([0, rad2deg(max(angleOfAttackRange))]);
 
 % Add stability guidelines
 % 1 caliber = minimum stability (marginal stability)
 % 2 calibers = typical minimum for stable flight
-yline(1, '--k', '1 caliber (marginal)', 'LineWidth', 1, 'FontSize', 9);
-yline(2, '--k', '2 calibers (minimum)', 'LineWidth', 1, 'FontSize', 9);
+yline(1, '--k', '1 caliber (marginal)', 'lineWidth', 1, 'FontSize', 9);
+yline(2, '--k', '2 calibers (minimum)', 'lineWidth', 1, 'FontSize', 9);
 
 % Indicate stable region
 yl = ylim;
@@ -221,11 +221,11 @@ fprintf('  Plot 3: Stability margin generated.\n');
 % if exportData
 %     % Save workspace variables
 %     save('AeroPlot_Results.mat', 'Rocket', 'velocityRange', 'angleOfAttackRange', ...
-%          'dragCoefficientMatrix', 'CNa', 'centerOfPressure', 'stabilityMargin');
+%          'dragCoefficientMatrix', 'normalForceCoefficientSlope', 'centerOfPressure', 'stabilityMargin');
 %     
 %     % Export to CSV for external analysis
-%     resultsTable = table(angleOfAttackRange', CNa', centerOfPressure', stabilityMargin', ...
-%                          'VariableNames', {'Alpha_rad', 'CNa', 'centerOfPressure', 'Stability_Calibers'});
+%     resultsTable = table(angleOfAttackRange', normalForceCoefficientSlope', centerOfPressure', stabilityMargin', ...
+%                          'VariableNames', {'Alpha_rad', 'normalForceCoefficientSlope', 'centerOfPressure', 'Stability_Calibers'});
 %     writetable(resultsTable, 'AeroPlot_Results.csv');
 %     fprintf('\nResults exported to AeroPlot_Results.mat and AeroPlot_Results.csv\n');
 % end
@@ -243,8 +243,8 @@ fprintf('  Angle of Attack: 0 to %.1f° (%d points)\n', ...
 fprintf('\nKey Results:\n');
 fprintf('  Minimum Drag Coefficient: %.4f\n', min(dragCoefficientMatrix(:)));
 fprintf('  Maximum Drag Coefficient: %.4f\n', max(dragCoefficientMatrix(:)));
-fprintf('  Normal Force Slope at α=0: %.3f /rad\n', CNa(1));
-fprintf('  Stability Margin Range: %.2f to %.2f calibers\n', ...
+fprintf('  Normal Force Slope at α=0: %.3f /rad\n', normalForceCoefficientSlope(1));
+fprintf('  Stability stabilityMargin Range: %.2f to %.2f calibers\n', ...
         min(stabilityMargin), max(stabilityMargin));
 
 % Check stability criteria

@@ -143,5 +143,5 @@ DCDi = (3.12*(Kfb +Kbf-1)*A_fe*4/(pi*d_f^2))*alpha^2;
 Cd_f_alpha =  CDi + DCDi;
 
 %% -------Totol Drag Coefficient-------
-Cd = Cd0 + Cd_b_alpha + Cd_f_alpha;
-Cd = Cd/sqrt(1-M^2);
+dragCoefficient = Cd0 + Cd_b_alpha + Cd_f_alpha;
+dragCoefficient = dragCoefficient/sqrt(1-M^2);

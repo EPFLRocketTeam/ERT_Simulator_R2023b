@@ -144,9 +144,9 @@ x1 = Rocket.stagePositions(find(diff(Rocket.stageDiameters)==0, 1, 'first'));
 % 5.1.2.2 x0 as in (eq 140, p404)
 x0 = 0.55*x1+0.36*Rocket.stagePositions(end);
 % 5.1.2.3 Section Area at station x0
-S0 = pi*interp1(Rocket.stagePositions, Rocket.stageDiameters, x0, 'linear')^2/4;
+initialState = pi*interp1(Rocket.stagePositions, Rocket.stageDiameters, x0, 'linear')^2/4;
 % 5.1.2.4 Body drag at low AoA (eq 139, p. 404)
-CDB_alpha = 2*deltak*S0/Sm*alpha*sin(alpha);
+CDB_alpha = 2*deltak*initialState/Sm*alpha*sin(alpha);
 tmp_stages = [x0, Rocket.stagePositions(Rocket.stagePositions>x0)];
 tmp_diameters = [interp1(Rocket.stagePositions, Rocket.stageDiameters, x0, 'linear'), Rocket.stageDiameters(Rocket.stagePositions>x0)];
 % 5.1.2.4 Body drag at high AoA (eq 142, p. 406)

@@ -67,7 +67,7 @@ function Plot(T, a, p, density, nu, alt, fig_nbr)
     subplot(2,3,1)
     hold on
     title("Temperature")
-    plot(T, alt, LineWidth=1.5)
+    plot(T, alt, lineWidth=1.5)
     grid on
     box on
     xlabel("$T$ [K]")
@@ -76,7 +76,7 @@ function Plot(T, a, p, density, nu, alt, fig_nbr)
     subplot(2,3,2)
     hold on
     title("Speed of sound")
-    plot(a, alt, LineWidth=1.5)
+    plot(a, alt, lineWidth=1.5)
     grid on
     box on
     xlabel("$a$ [m/s]")
@@ -85,7 +85,7 @@ function Plot(T, a, p, density, nu, alt, fig_nbr)
     subplot(2,3,3)
     hold on
     title("Pressure")
-    plot(p, alt, LineWidth=1.5)
+    plot(p, alt, lineWidth=1.5)
     grid on
     box on
     xlabel("$p$ [N/m$^2$]")
@@ -94,7 +94,7 @@ function Plot(T, a, p, density, nu, alt, fig_nbr)
     subplot(2,3,4)
     hold on
     title("Density")
-    plot(density, alt, LineWidth=1.5)
+    plot(density, alt, lineWidth=1.5)
     grid on
     box on
     xlabel("$\density$ [kg/m$^3$]")
@@ -103,7 +103,7 @@ function Plot(T, a, p, density, nu, alt, fig_nbr)
     subplot(2,3,5)
     hold on
     title("Viscosity")
-    plot(nu, alt, LineWidth=1.5)
+    plot(nu, alt, lineWidth=1.5)
     grid on
     box on
     set(gca, 'XScale', 'log')

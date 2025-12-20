@@ -1,4 +1,4 @@
-function [M, dMdt, CM, I, dIdt] = RocketInertia(t, Rocket, massmodel)
+function [M, dMdt, centerOfMass, I, dIdt] = RocketInertia(t, Rocket, massmodel)
 % ROCKETINERTIA Compute mass, mass derivative, center of mass position from
 % cone tip, Inertia moment tensor and derivative of the inertia moment
 % tensor. 
@@ -7,9 +7,9 @@ function [M, dMdt, CM, I, dIdt] = RocketInertia(t, Rocket, massmodel)
 % - Rocket      :   Rocket structure
 % - massmodel   :   mass model selection [0 (linear), 1 (non-linear)]
 % OUTPUTS
-% - M           :   Mass [kg]
+% - M           :   mass [kg]
 % - dMdt        :   Time derivative of mass [kg/s]
-% - CM          :   Center of mass from cone tip [m]
+% - centerOfMass          :   Center of mass from cone tip [m]
 % - I           :   Moment of inertia tensor in rocket coordinate system (3x3)[kgm^2]
 % - dIdt        :   Time derivative of moment of inertia tensor in rocket coordinate system (3x3)[kgm^2/s]
 
@@ -21,7 +21,7 @@ else
 end
 
 % Compute center of mass
-CM = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 
+centerOfMass = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 
     (M-Rocket.emptyMass)*(Rocket.totalLength-Rocket.motor_length/2))/M;
 
 % Compute Inertia tensor
@@ -36,7 +36,7 @@ I_L_Grain = Grain_Mass*(Rocket.motor_length^2/12 + (R_e^2+R_i^2)/4);
 
 I_L = Rocket.emptyInertia + I_L_Casing + I_L_Grain + ...
     (Grain_Mass+Rocket.casing_mass)*...
-    (Rocket.totalLength-CM-Rocket.motor_length/2); % I + ... + Steiner
+    (Rocket.totalLength-centerOfMass-Rocket.motor_length/2); % I + ... + Steiner
 % rotational inertia
 
 I = [I_L, 1];

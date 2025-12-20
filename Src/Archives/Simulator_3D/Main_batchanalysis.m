@@ -37,7 +37,7 @@ for i=1:length(windSpace)
         % 6DOF Flight Simulation
         %--------------------------------------------------------------------------
 
-         [flightTime, flightState, T21, S21, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+         [flightTime, flightState, T21, S21, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
         apogee_rec(i,j) = flightState(end, 3);
 

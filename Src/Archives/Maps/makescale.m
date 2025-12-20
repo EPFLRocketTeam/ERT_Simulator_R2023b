@@ -187,7 +187,7 @@ washold = ishold;
 hold on
 hbox = patch(blon,blat,'w');
 set(hbox,'Tag','MapScale');
-hline = plot(slon,slat,'k','LineWidth',3);
+hline = plot(slon,slat,'k','lineWidth',3);
 set(hline,'Tag','MapScale');
 units_axis = get(gca,'Units');
 set(gca,'Units','Inches')

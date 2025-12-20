@@ -74,9 +74,9 @@ display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
 % ------------------------------------------------------------------------
 % 6DOF Boost Simulation
 %--------------------------------------------------------------------------
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
 
-SimX = (R*burnState(:,1:3)')';
+SimX = (R*flightState(:,1:3)')';
 
 %% Compute flight path from end of GPS data to apogee
 
@@ -86,25 +86,25 @@ simulatior3D.Rocket.emptyCenterOfMass = 1.44;
 simulatior3D.Rocket.emptyInertia = 5.68;
 simulatior3D.Environment.V_inf = 2;
 
-V0 = [gps_v(end-1,1),gps_v(end-1,2), gps_v(end-1,3)]';
-phi = atan2(norm(cross(V0, [0;0;1])), dot(V0, [0;0;1]));
-n = cross(V0, [0;0;1]); n = n/norm(n); 
-Q0 = [n*sin(phi/2); cos(phi/2)];
+initialVelocity = [gps_v(end-1,1),gps_v(end-1,2), gps_v(end-1,3)]';
+phi = atan2(norm(cross(initialVelocity, [0;0;1])), dot(initialVelocity, [0;0;1]));
+n = cross(initialVelocity, [0;0;1]); n = n/norm(n); 
+initialQuaternion = [n*sin(phi/2); cos(phi/2)];
 W = [0, 0, 0]';
 
 [coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([simulatior3D.Rocket.Thrust_Time 40],...
     [gps_x(end), gps_y(end), gps_h(end)]',...
-    V0,...
-    Q0,...
+    initialVelocity,...
+    initialQuaternion,...
     W);
 
 %% Compute payload flight path
 
-T0 = coastTime(end);
-X0 = coastState(end, 1:3)';
-V0 = coastState(end, 4:6)';
+initialTime = coastTime(end);
+initialPosition = coastState(end, 1:3)';
+initialVelocity = coastState(end, 4:6)';
 
-[T6, S6] = simulatior3D.PayloadCrashSim(T0, X0, V0);
+[T6, S6] = simulatior3D.PayloadCrashSim(initialTime, initialPosition, initialVelocity);
 
 %% Compute flight path from burnout to apogee
 

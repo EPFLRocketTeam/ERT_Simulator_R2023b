@@ -34,7 +34,7 @@ legend show;
 figure;
 hold on;grid on;
 title('Stability margin')
-plot(time1(1:i_apo1),margin1(1:i_apo1),'DisplayName','Stability Margin');
+plot(time1(1:i_apo1),margin1(1:i_apo1),'DisplayName','Stability stabilityMargin');
 xlabel('time [s]');
 ylabel('stability margin [cal]');
 

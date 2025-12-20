@@ -165,7 +165,7 @@ simulatior3D.Rocket.motor_length = simulatior3D.Rocket.motor_lengthP + simulatio
 simulatior3D.Rocket.propel_mass = simulatior3D.Rocket.propel_massP + simulatior3D.Rocket.propel_massF ;
 simulatior3D.Rocket.motor_mass = simulatior3D.Rocket.motor_massP + simulatior3D.Rocket.motor_massF; 
 simulatior3D.Rocket.casing_mass = simulatior3D.Rocket.casing_massP + simulatior3D.Rocket.casing_massF ;
-% Mass variation coefficient
+% mass variation coefficient
 A_T = trapz(simulatior3D.Rocket.Thrust_Time, simulatior3D.Rocket.Thrust_Force);
 simulatior3D.Rocket.Thrust2dMass_Ratio = simulatior3D.Rocket.propel_mass/(A_T);
 

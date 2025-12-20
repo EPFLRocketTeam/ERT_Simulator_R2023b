@@ -1,4 +1,4 @@
-%% EE_Results.m - Frédéric Berdoz - November 2020 
+%% EE_Results.m - FrÃ©dÃ©ric Berdoz - November 2020 
 %
 % Secondary runabale script for the elementary Effect method (Morris, 1993) applied to the ERT
 % simulator. Plots and analyse the results obtained by Main_EE.m
@@ -26,7 +26,7 @@ if false %on/off
         figure("Name", "Elementary Analysis: " + yid, 'Units', 'pixels', 'Position', geom);
         title("Elementary Analysis: " + yid, 'Interpreter', 'none');
         hold on; grid on;
-        plot(1:k, mu_sorted(:,j), 'bd', 'MarkerSize', 6, 'MarkerFaceColor', 'none', 'LineWidth', 0.7);
+        plot(1:k, mu_sorted(:,j), 'bd', 'MarkerSize', 6, 'MarkerFaceColor', 'none', 'lineWidth', 0.7);
         set(gca,'XTickLabelRotation', lab_rot, ...
                 'DefaultTextInterpreter', 'none', ...
                 'FontSize', fs, ...

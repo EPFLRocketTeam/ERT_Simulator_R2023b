@@ -23,7 +23,7 @@ function [T, a, p, density, nu] = atmosphere(alt, env)
 
     % Initial
     p0 = 101325;                    % [Pa] Pressure at sea level
-    T0 = env.groundTemperature;    % [K] Temperature at sea level
+    initialTime = env.groundTemperature;    % [K] Temperature at sea level
     g = 9.80665;                    % [m/sec^2] Gravity at sea level
     
     % Evaluate temperature using ISA and the Temperature Lapse Rate [K/m]
@@ -45,7 +45,7 @@ function [T, a, p, density, nu] = atmosphere(alt, env)
     density = p / (T * R_star) * (1 + x) / (1 + 1.609 * x);
     
     % Viscosity
-    mu = 1.715e-5 * (T/T0)^1.5 * (T0 + 110.4) / (T + 110.4);    % Dynamic viscosity
+    mu = 1.715e-5 * (T/initialTime)^1.5 * (initialTime + 110.4) / (T + 110.4);    % Dynamic viscosity
     nu = mu / density;                                              % Kinematic viscosity
 end
 

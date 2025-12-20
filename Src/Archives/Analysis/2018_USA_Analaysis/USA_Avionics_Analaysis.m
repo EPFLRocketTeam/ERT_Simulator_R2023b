@@ -71,7 +71,7 @@ display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
 % ------------------------------------------------------------------------
 % 6DOF Boost Simulation
 %--------------------------------------------------------------------------
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Thrust_Time(end)], railState(end,2));
 
 % ------------------------------------------------------------------------
 % 6DOF Boost Simulation
@@ -82,10 +82,10 @@ simulatior3D.Rocket.emptyMass = simulatior3D.Rocket.emptyMass-2.1;
 simulatior3D.Rocket.emptyCenterOfMass = 1.44;
 simulatior3D.Rocket.emptyInertia = 5.68;
 
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end,1:3)', burnState(end,4:6)', burnState(end,7:10)', burnState(end,11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end,1:3)', flightState(end,4:6)', flightState(end,7:10)', flightState(end,11:13)');
 
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState;coastState(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState;coastState(2:end, :)];
 
 display(['Apogee AGL : ' num2str(flightState(end,3))]);
 display(['Max speed : ' num2str(max(flightState(:,6)))]);

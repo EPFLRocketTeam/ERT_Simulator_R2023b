@@ -46,7 +46,7 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     V_inf = Environment.V_inf;
 
     % Necessary function calls
-    [M,dMdt] = Mass_Non_Lin(t,Rocket);  % Rocket Mass information
+    [M,dMdt] = Mass_Non_Lin(t,Rocket);  % Rocket mass information
     [Temp, a, p, density] = stdAtmos(x(1)); % Atmosphere information
     T = Thrust(t,Rocket);   % Motor thrust
     g = 9.81;               % Gravity []
@@ -120,12 +120,12 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     Ft = [0;-q*(CD+CD_AB)];                     % Force de train?e
 
     % Force Normale (E,F)
-    [CNa, Xp] = normalLift(Rocket,abs(alpha),1.1,V/a,0,0); % Normal lift Coefficient
-    Fn = [q*CNa*alpha;0];        % Force Normale
+    [normalForceCoefficientSlope, Xp] = normalLift(Rocket,abs(alpha),1.1,V/a,0,0); % Normal lift Coefficient
+    Fn = [q*normalForceCoefficientSlope*alpha;0];        % Force Normale
 
     % Moment autour de X=D=U
     [Calpha, CP] = barrowmanLift(Rocket,abs(alpha),V/a,0); % Coef. Normaux des sections
-    C1 = CorrectionMoment(t,Rocket,CNa,Xp,V); % Coef. Moment de correction
+    C1 = CorrectionMoment(t,Rocket,normalForceCoefficientSlope,Xp,V); % Coef. Moment de correction
     C2 = DampingMoment(t,Rocket,Calpha,CP,V); % Coef. Moment amortis
 
     %--------------------------------------------------------------------------

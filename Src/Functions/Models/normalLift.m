@@ -1,4 +1,4 @@
-function [CNa, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, alpha, K, M, theta, Galejs)
+function [normalForceCoefficientSlope, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, alpha, K, M, theta, Galejs)
 % NORMALLIFT computes the normal force intensity applied to the center of
 % pressure according to Barrowman's theory and corrections for extreme
 % aspect ratio bodies proposed by robert Galejs.
@@ -10,7 +10,7 @@ function [CNa, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, alpha, K, M
 % - theta       : Roll angle [rad]
 % - Galejs      : Flag indicating use of Galejs' correction or not [1 or 0]
 % OUTPUTS:
-% - CNa        : Normal lift derivative versus delta coefficient derivative [1/rad]
+% - normalForceCoefficientSlope        : Normal lift derivative versus delta coefficient derivative [1/rad]
 % - Xp          : Center of pressure
 % - CNa_barrowman: Normal lift coefficient derivatives of rocket components
 % according to barrowman theory [1/rad]
@@ -23,11 +23,11 @@ Xp_barrowman = Xp_barrowman*Rocket.centerOfPressureFactor;
 CNa_barrowman = CNa_barrowman*Rocket.normalForceCoefficientFactor;
 if Galejs
     [CNa_galejs, Xp_galejs] = robertGalejsLift(Rocket, alpha, K);
-    CNa = sum([CNa_barrowman, CNa_galejs]);
-    Xp = sum([CNa_barrowman.*Xp_barrowman, CNa_galejs.*Xp_galejs])/CNa;
+    normalForceCoefficientSlope = sum([CNa_barrowman, CNa_galejs]);
+    Xp = sum([CNa_barrowman.*Xp_barrowman, CNa_galejs.*Xp_galejs])/normalForceCoefficientSlope;
 else
-    CNa = sum(CNa_barrowman);
-    Xp = sum(CNa_barrowman.*Xp_barrowman)/CNa;
+    normalForceCoefficientSlope = sum(CNa_barrowman);
+    Xp = sum(CNa_barrowman.*Xp_barrowman)/normalForceCoefficientSlope;
 end
 
 end

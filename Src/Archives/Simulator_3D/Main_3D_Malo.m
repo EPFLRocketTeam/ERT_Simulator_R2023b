@@ -26,14 +26,14 @@ display(['Launch rail departure velocity : ' num2str(railState(end,2))]);
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
 %simulatior3D.Rocket.coneMode = 'off';
 
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState; coastState(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 display(['Apogee AGL : ' num2str(flightState(end,3))]);
 display(['Max speed : ' num2str(max(flightState(:,6)))]);
 display(['Max acceleration : ' num2str(max(diff(flightState(:,6))./diff(flightTime)))]);
@@ -72,7 +72,7 @@ for i  = 1:length(C)
 end
 %quiver3(flightState(:,1), flightState(:,2), flightState(:,3), direcv(:,1), direcv(:,2), direcv(:,3));
 
-% plot trajectory of CM
+% plot trajectory of centerOfMass
 plot3(flightState(:,1), flightState(:,2), flightState(:,3), 'DisplayName', 'Ascent');
 plot3(drogueState(:,1), drogueState(:,2), drogueState(:,3), 'DisplayName', 'Drogue Descent');
 plot3(mainChuteState(:,1), mainChuteState(:,2), mainChuteState(:,3), 'DisplayName', 'Main Descent');
@@ -110,91 +110,91 @@ daspect([1 1 1]);
 
 % PLOT 4 : Aerodynamic properties
 figure; hold on;
-% Plot Margin
+% Plot stabilityMargin
 subplot(3,2,1);
-plot(flightTime, simulatior3D.simAuxResults.Margin)
+plot(flightTime, simulatior3D.simAuxResults.stabilityMargin)
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-title 'Margin';
-% Plot Xcp
+title 'stabilityMargin';
+% Plot centerOfPressure
 subplot(3,2,2);
-plot(flightTime, simulatior3D.simAuxResults.Xcp)
+plot(flightTime, simulatior3D.simAuxResults.centerOfPressure)
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'X_{cp}';
 % Plot AoA vs. time
 subplot(3,2,3);
-plot(flightTime, simulatior3D.simAuxResults.Alpha)
+plot(flightTime, simulatior3D.simAuxResults.angleOfAttack)
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title '\alpha';
-% Plot CNa vs. time
+% Plot normalForceCoefficientSlope vs. time
 subplot(3,2,4);
-plot(flightTime, simulatior3D.simAuxResults.Cn_alpha)
+plot(flightTime, simulatior3D.simAuxResults.normalForceCoefficientSlope)
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 title 'Cn_{\alpha}';
-% Plot Cd vs. time
+% Plot dragCoefficient vs. time
 subplot(3,2,5);
-plot(flightTime, simulatior3D.simAuxResults.Cd)
+plot(flightTime, simulatior3D.simAuxResults.dragCoefficient)
 ylim([0, 1.5]);
 tmpYlim = ylim;
 set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-title 'Cd'
+title 'dragCoefficient'
 screensize = get( groot, 'Screensize' );
 set(gcf,'Position',[screensize(1:2), screensize(3)*0.5,screensize(4)]);
 
-% PLOT 5 : Mass properties
+% PLOT 5 : mass properties
 figure; hold on;
 % Plot mass vs. time
 subplot(2,2,1);
-plot(flightTime, simulatior3D.simAuxResults.Mass)
+plot(flightTime, simulatior3D.simAuxResults.mass)
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 tmpYlim = ylim;
-title 'Mass';
+title 'mass';
 set(gca, 'YTick', tmpYlim(1):0.5:tmpYlim(2));
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-% Plot CM vs. time
+% Plot centerOfMass vs. time
 subplot(2,2,2);
-plot(flightTime, simulatior3D.simAuxResults.CM)
+plot(flightTime, simulatior3D.simAuxResults.centerOfMass)
 tmpYlim = ylim;
-title 'CM';
+title 'centerOfMass';
 set(gca, 'YTick', tmpYlim(1):0.01:tmpYlim(2));
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-% Plot Il vs. time
+% Plot inertiaLong vs. time
 subplot(2,2,3);
-plot(flightTime, simulatior3D.simAuxResults.Il)
+plot(flightTime, simulatior3D.simAuxResults.inertiaLong)
 tmpYlim = ylim;
-title 'Il';
+title 'inertiaLong';
 set(gca, 'YTick', tmpYlim(1):0.1:tmpYlim(2));
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
-%Plot Ir vs. time
+%Plot inertiaRot vs. time
 subplot(2,2,4);
-plot(flightTime, simulatior3D.simAuxResults.Ir)
-title 'Ir';
+plot(flightTime, simulatior3D.simAuxResults.inertiaRot)
+title 'inertiaRot';
 hold on;
 plot(ones(1,2)*Rocket.Burn_Time, ylim, 'g');
 screensize = get( groot, 'Screensize' );
 set(gcf,'Position',[screensize(3)*0.5, screensize(2),...
     screensize(3)*0.5,screensize(3)*0.5]);            
 
-% PLOT 6 : Margin plot
+% PLOT 6 : stabilityMargin plot
 figure; hold on;
 title 'Stability margin'
 yyaxis left;
-plot(flightTime, simulatior3D.simAuxResults.CM, 'DisplayName', 'X_{CM}');
-plot(flightTime, simulatior3D.simAuxResults.Xcp, 'DisplayName', 'X_{CP}');
-ylabel 'X_{CM}, X_{CP} [cm]'
+plot(flightTime, simulatior3D.simAuxResults.centerOfMass, 'DisplayName', 'X_{centerOfMass}');
+plot(flightTime, simulatior3D.simAuxResults.centerOfPressure, 'DisplayName', 'X_{CP}');
+ylabel 'X_{centerOfMass}, X_{CP} [cm]'
 yyaxis right;
-plot(flightTime, simulatior3D.simAuxResults.Margin, 'DisplayName', 'Margin');
-ylabel 'Margin [calibers]';
-title 'Dynamic Stability Margin'
+plot(flightTime, simulatior3D.simAuxResults.stabilityMargin, 'DisplayName', 'stabilityMargin');
+ylabel 'stabilityMargin [calibers]';
+title 'Dynamic Stability stabilityMargin'
 legend show;
 
 % plot 7 : norm of quaternion

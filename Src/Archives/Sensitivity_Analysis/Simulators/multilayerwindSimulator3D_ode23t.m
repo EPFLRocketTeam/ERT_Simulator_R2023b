@@ -26,8 +26,8 @@ classdef multilayerwindSimulator3D_ode23t < handle
       tmpInertiaRot
       tmp_Delta
       
-      tmpNoseAlpha
-      tmpNoseDelta
+      tmpNoseAngleOfAttack
+      tmpNoseFlightPathAngle
    end
    
 % -------------------------------------------------------------------------  
@@ -49,18 +49,18 @@ classdef multilayerwindSimulator3D_ode23t < handle
  
            % Initialise Auxiliary results structure
            obj.simAuxResults.Margin = [];
-           obj.simAuxResults.Alpha = [];
-           obj.simAuxResults.Cn_alpha = [];
-           obj.simAuxResults.Xcp = [];
-           obj.simAuxResults.Cd = [];
-           obj.simAuxResults.Mass = [];
-           obj.simAuxResults.CM = [];
-           obj.simAuxResults.Il = [];
-           obj.simAuxResults.Ir = [];
-           obj.simAuxResults.Delta = [];
+           obj.simAuxResults.angleOfAttack = [];
+           obj.simAuxResults.normalForceCoefficientSlope = [];
+           obj.simAuxResults.centerOfPressure = [];
+           obj.simAuxResults.dragCoefficient = [];
+           obj.simAuxResults.mass = [];
+           obj.simAuxResults.centerOfMass = [];
+           obj.simAuxResults.inertiaLong = [];
+           obj.simAuxResults.inertiaRot = [];
+           obj.simAuxResults.flightPathAngle = [];
            
-           obj.simAuxResults.Nose_Alpha = [];
-           obj.simAuxResults.Nose_Delta = [];
+           obj.simAuxResults.noseAngleOfAttack = [];
+           obj.simAuxResults.noseFlightPathAngle = [];
        end
        
    end
@@ -80,7 +80,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             v = s(2); % speed
 
             % Rocket Inertia
-            [Mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
+            [mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -89,7 +89,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             % Force estimation
 
             % gravity
-            G = -g*cos(obj.Environment.railAngle)*Mass;
+            G = -g*cos(obj.Environment.railAngle)*mass;
 
             % Thrust 
             T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
@@ -103,7 +103,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             % State derivatives
 
             x_dot = v;
-            v_dot = 1/Mass*(F_tot - v*dMdt);
+            v_dot = 1/mass*(F_tot - v*dMdt);
 
             S_dot = [x_dot; v_dot];
         end
@@ -170,10 +170,10 @@ classdef multilayerwindSimulator3D_ode23t < handle
             % Mach number
             Mach = Vcm_mag/a;
             % Normal lift coefficient and center of pressure
-            [CNa, Xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
+            [normalForceCoefficientSlope, centerOfPressure,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
                 Mach, angle(3), 1);
             % Stability margin
-            margin = (Xcp-Cm);
+            margin = (centerOfPressure-Cm);
 
             % Compute Rocket angle of attack
             Wnorm = W/norm(W);
@@ -205,7 +205,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*density*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*density*obj.Rocket.maxCrossSectionArea*normalForceCoefficientSlope*alpha*Vmag^2*NA/norm(NA);
             end
 
             % Drag
@@ -255,8 +255,8 @@ classdef multilayerwindSimulator3D_ode23t < handle
             % cache auxiliary result data
             obj.tmp_Margin = margin/obj.Rocket.maxDiameter;
             obj.tmp_Alpha = alpha;
-            obj.tmp_Cn_alpha = CNa;
-            obj.tmpCenterOfPressure = Xcp;
+            obj.tmp_Cn_alpha = normalForceCoefficientSlope;
+            obj.tmpCenterOfPressure = centerOfPressure;
             obj.tmpDragCoefficient = CD;
             obj.tmpMass = M;
             obj.tmpCenterOfMass = Cm;
@@ -407,10 +407,10 @@ classdef multilayerwindSimulator3D_ode23t < handle
             % Mach number
             Mach = Vcm_mag/a;
             % Normal lift coefficient and center of pressure
-            [CNa, Xcp,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
+            [normalForceCoefficientSlope, centerOfPressure,CNa_bar,CP_bar] = normalLift(obj.Rocket, alpha_cm, 1.1,...
                 Mach, angle(3), 1);
             % Stability margin
-            margin = (Xcp-Cm);
+            margin = (centerOfPressure-Cm);
 
             % Compute Rocket angle of attack
             Wnorm = W/norm(W);
@@ -442,7 +442,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             if norm(NA) == 0
                 N = [0, 0, 0]'; 
             else
-                N = 0.5*density*obj.Rocket.maxCrossSectionArea*CNa*alpha*Vmag^2*NA/norm(NA);
+                N = 0.5*density*obj.Rocket.maxCrossSectionArea*normalForceCoefficientSlope*alpha*Vmag^2*NA/norm(NA);
             end
 
             % Drag
@@ -490,8 +490,8 @@ classdef multilayerwindSimulator3D_ode23t < handle
             S_dot = [X_dot;V_dot;Q_dot;W_dot];
             
             % cache auxiliary result data
-            obj.tmpNoseAlpha = alpha;
-            obj.tmpNoseDelta = delta;
+            obj.tmpNoseAngleOfAttack = alpha;
+            obj.tmpNoseFlightPathAngle = delta;
         end
       
         
@@ -508,7 +508,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
         function [railTime, railState] = RailSim(obj)
             
            % Initial Conditions
-            X0 = [0,0]'; % positioned at 0 height and 0 velocity
+            initialPosition = [0,0]'; % positioned at 0 height and 0 velocity
 
             % time span 
             tspan = [0, 5];
@@ -517,7 +517,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
             Option = odeset('Events', @(t,x) RailEvent(t,x,obj.Environment));
 
             % integration
-            [railTime,railState] = ode23t(@(t,x) obj.Dynamics_Rail_1DOF(t,x),tspan,X0, Option); 
+            [railTime,railState] = ode23t(@(t,x) obj.Dynamics_Rail_1DOF(t,x),tspan,initialPosition, Option); 
             
         end
         
@@ -531,25 +531,25 @@ classdef multilayerwindSimulator3D_ode23t < handle
                 V = arg2;
                 
                 % Rail vector
-                C_rail = rotmat(obj.Environment.railAzimuth, 3)*...
+                railRotation = rotmat(obj.Environment.railAzimuth, 3)*...
                     rotmat(obj.Environment.railAngle, 2)*...
                     rotmat(obj.Environment.railAzimuth, 3)';
-                RV = C_rail*[0;0;1];
+                railVector = railRotation*[0;0;1];
 
                 % Initial Conditions
-                X0 = RV*obj.Environment.railLength; % spatial position of cm
-                V0 = RV*V; % Initial velocity of cm
-                Q0 = rot2quat(C_rail'); % Initial attitude
+                initialPosition = railVector*obj.Environment.railLength; % spatial position of cm
+                initialVelocity = railVector*V; % Initial velocity of cm
+                initialQuaternion = rot2quat(railRotation'); % Initial attitude
                 W0 = [0;0;0]; % Initial angular rotation in rocket principle coordinates
-                S0 = [X0; V0; Q0; W0];
+                initialState = [initialPosition; initialVelocity; initialQuaternion; W0];
             elseif (nargin == 6)
                 % Set initial conditions based on the exact initial value
                 % of the state vector.
-                X0 = arg2;
-                V0 = arg3;
-                Q0 = arg4;
+                initialPosition = arg2;
+                initialVelocity = arg3;
+                initialQuaternion = arg4;
                 W0 = arg5;
-                S0 = [X0; V0; Q0; W0];
+                initialState = [initialPosition; initialVelocity; initialQuaternion; W0];
             else
                error('ERROR: In Flight Simulator, function accepts either 3 or 6 arguments.') 
             end
@@ -560,7 +560,7 @@ classdef multilayerwindSimulator3D_ode23t < handle
                             'Refine', 1);
 
             % integration
-            [flightTime,flightState, T2E, S2E, I2E] = ode23t(@(t,s) obj.Dynamics_6DOF(t,s),tspan,S0, Option);
+            [flightTime,flightState, T2E, S2E, I2E] = ode23t(@(t,s) obj.Dynamics_6DOF(t,s),tspan,initialState, Option);
             
         end
         
@@ -568,62 +568,62 @@ classdef multilayerwindSimulator3D_ode23t < handle
         % --------------------------- 
         % Drogue Parachute Simulation
         % ---------------------------
-        function [T3, S3, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = DrogueParaSim(obj, T0, X0, V0)
+        function [T3, S3, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = DrogueParaSim(obj, initialTime, initialPosition, initialVelocity)
             
             % initial conditions
-            S0 = [X0; V0];
+            initialState = [initialPosition; initialVelocity];
 
             % empty mass
             M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
-            tspan = [T0, 500];
+            tspan = [initialTime, 500];
 
             % options 
             Option = odeset('Events', @(T,X) MainEvent(T,X,obj.Rocket));
 
             % integration
-            [T3,S3, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = ode23t(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 0),tspan,S0, Option);
+            [T3,S3, drogueTimeEvents, drogueStateEvents, drogueEventIndices] = ode23t(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 0),tspan,initialState, Option);
         
         end
         
         % --------------------------- 
         % Main Parachute Simulation
         % ---------------------------
-        function [mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = MainParaSim(obj, T0, X0, V0)
+        function [mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = MainParaSim(obj, initialTime, initialPosition, initialVelocity)
             
             % initial conditions
-            S0 = [X0; V0];
+            initialState = [initialPosition; initialVelocity];
 
             % empty mass
             M = obj.Rocket.emptyMass - obj.Rocket.payloadMass;
 
             % time span
-            tspan = [T0, 500];
+            tspan = [initialTime, 500];
 
             % options 
             Option = odeset('Events', @CrashEvent);
 
             % integration
-            [mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = ode23t(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 1),tspan,S0, Option);
+            [mainChuteTime, mainChuteState, mainChuteTimeEvents, S4E, mainChuteEventsIndices] = ode23t(@(t,s) obj.Dynamics_Parachute_3DOF(t,s,obj.Rocket,obj.Environment, M, 1),tspan,initialState, Option);
             
         end
             % --------------------------- 
         % Crash Simulation
         % ---------------------------
-        function [crashTime, crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = CrashSim(obj, T0, X0, V0)
+        function [crashTime, crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = CrashSim(obj, initialTime, initialPosition, initialVelocity)
             
             % Initial Conditions
-            S0 = [X0; V0];
+            initialState = [initialPosition; initialVelocity];
 
             % time span
-            tspan = [T0, 100];
+            tspan = [initialTime, 100];
 
             % options
             Option = odeset('Events', @CrashEvent);
 
             % integration
-            [crashTime,crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = ode23t(@(t,s) obj.Dynamics_3DOF(t,s,obj.Rocket,obj.Environment),tspan,S0, Option);
+            [crashTime,crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = ode23t(@(t,s) obj.Dynamics_3DOF(t,s,obj.Rocket,obj.Environment),tspan,initialState, Option);
 
         end
    
@@ -646,39 +646,39 @@ methods(Access = private)
             if obj.SimOutput.Margin
                 obj.simAuxResults.Margin = [obj.simAuxResults.Margin, obj.tmp_Margin];
             end 
-            if obj.SimOutput.Alpha
-                obj.simAuxResults.Alpha = [obj.simAuxResults.Alpha, obj.tmp_Alpha];
+            if obj.SimOutput.angleOfAttack
+                obj.simAuxResults.angleOfAttack = [obj.simAuxResults.angleOfAttack, obj.tmp_Alpha];
             end 
-            if obj.SimOutput.Cn_alpha
-                obj.simAuxResults.Cn_alpha = [obj.simAuxResults.Cn_alpha, obj.tmp_Cn_alpha];
+            if obj.SimOutput.normalForceCoefficientSlope
+                obj.simAuxResults.normalForceCoefficientSlope = [obj.simAuxResults.normalForceCoefficientSlope, obj.tmp_Cn_alpha];
             end 
-            if obj.SimOutput.Xcp
-                obj.simAuxResults.Xcp = [obj.simAuxResults.Xcp, obj.tmpCenterOfPressure];
+            if obj.SimOutput.centerOfPressure
+                obj.simAuxResults.centerOfPressure = [obj.simAuxResults.centerOfPressure, obj.tmpCenterOfPressure];
             end 
-            if obj.SimOutput.Cd
-                obj.simAuxResults.Cd = [obj.simAuxResults.Cd, obj.tmpDragCoefficient];
+            if obj.SimOutput.dragCoefficient
+                obj.simAuxResults.dragCoefficient = [obj.simAuxResults.dragCoefficient, obj.tmpDragCoefficient];
             end 
-            if obj.SimOutput.Mass
-                obj.simAuxResults.Mass = [obj.simAuxResults.Mass, obj.tmpMass];
+            if obj.SimOutput.mass
+                obj.simAuxResults.mass = [obj.simAuxResults.mass, obj.tmpMass];
             end 
-            if obj.SimOutput.CM
-                obj.simAuxResults.CM = [obj.simAuxResults.CM, obj.tmpCenterOfMass];
+            if obj.SimOutput.centerOfMass
+                obj.simAuxResults.centerOfMass = [obj.simAuxResults.centerOfMass, obj.tmpCenterOfMass];
             end 
-            if obj.SimOutput.Il
-                obj.simAuxResults.Il = [obj.simAuxResults.Il, obj.tmpInertiaLong];
+            if obj.SimOutput.inertiaLong
+                obj.simAuxResults.inertiaLong = [obj.simAuxResults.inertiaLong, obj.tmpInertiaLong];
             end 
-            if obj.SimOutput.Ir
-                obj.simAuxResults.Ir = [obj.simAuxResults.Ir, obj.tmpInertiaRot];
+            if obj.SimOutput.inertiaRot
+                obj.simAuxResults.inertiaRot = [obj.simAuxResults.inertiaRot, obj.tmpInertiaRot];
             end
-            if obj.SimOutput.Delta
-                obj.simAuxResults.Delta = [obj.simAuxResults.Delta, obj.tmp_Delta];
+            if obj.SimOutput.flightPathAngle
+                obj.simAuxResults.flightPathAngle = [obj.simAuxResults.flightPathAngle, obj.tmp_Delta];
             end
             
-            if obj.SimOutput.Nose_Alpha
-                obj.simAuxResults.Nose_Alpha = [obj.simAuxResults.Nose_Alpha, obj.tmpNoseAlpha];
+            if obj.SimOutput.noseAngleOfAttack
+                obj.simAuxResults.noseAngleOfAttack = [obj.simAuxResults.noseAngleOfAttack, obj.tmpNoseAngleOfAttack];
             end
-            if obj.SimOutput.Nose_Delta
-                obj.simAuxResults.Nose_Delta = [obj.simAuxResults.Nose_Delta, obj.tmpNoseDelta];
+            if obj.SimOutput.noseFlightPathAngle
+                obj.simAuxResults.noseFlightPathAngle = [obj.simAuxResults.noseFlightPathAngle, obj.tmpNoseFlightPathAngle];
             end
             
         end
@@ -693,11 +693,11 @@ methods(Access = private)
         if isempty(flag) || (strcmp(flag, 'init') && obj.firstSimFlag)
 
             obj.firstSimFlag = 0;
-            if obj.SimOutput.Nose_Alpha
-                obj.simAuxResults.Nose_Alpha = [obj.simAuxResults.Nose_Alpha, obj.tmpNoseAlpha];
+            if obj.SimOutput.noseAngleOfAttack
+                obj.simAuxResults.noseAngleOfAttack = [obj.simAuxResults.noseAngleOfAttack, obj.tmpNoseAngleOfAttack];
             end
-            if obj.SimOutput.Nose_Delta
-                obj.simAuxResults.Nose_Delta = [obj.simAuxResults.Nose_Delta, obj.tmpNoseDelta];
+            if obj.SimOutput.noseFlightPathAngle
+                obj.simAuxResults.noseFlightPathAngle = [obj.simAuxResults.noseFlightPathAngle, obj.tmpNoseFlightPathAngle];
             end
             
         end

@@ -34,7 +34,7 @@ Rad=6.371e6;
 
 % MEAN SEA LEVEL CONDITIONS
 p0 = 101325; %[Pa]
-T0 = 288.15; %[K]
+initialTime = 288.15; %[K]
 a0 = 340.294; %[m/sec] sound speed at sea level
 g0 = 9.80665; %[m/sec^2] gravity at sea level
 
@@ -108,9 +108,9 @@ T=ncread(url,'tmpprs',[lon_index lat_index level_index time_index],[1 1 1 1]);%[
 
 % PRESSURE MODEL
 % if Env.startLatitude==32.942380 && Env.startLongitude== -106.91428
-%     p = p0*(1+Env.dTdh/1000*(alt-Env.startAltitude)/T0).^(-g0/R/Env.dTdh*1000);
+%     p = p0*(1+Env.dTdh/1000*(alt-Env.startAltitude)/initialTime).^(-g0/R/Env.dTdh*1000);
 % else
-%     p = p0*(1+Env.dTdh/1000*(alt)/T0).^(-g0/R/Env.dTdh*1000);
+%     p = p0*(1+Env.dTdh/1000*(alt)/initialTime).^(-g0/R/Env.dTdh*1000);
 % 
 % end
 

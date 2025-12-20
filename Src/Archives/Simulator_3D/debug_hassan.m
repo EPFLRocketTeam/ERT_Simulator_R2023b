@@ -25,7 +25,7 @@ title('Variance in apogee due to parameter uncertainty')
 %%
 load('nominalTrag')
 hold on 
-plot(nominalTrag(:,1), nominalTrag(:,4),'r','LineWidth',2 )
+plot(nominalTrag(:,1), nominalTrag(:,4),'r','lineWidth',2 )
 title 'Effect of variance in center of pressure on Altitude'
 %%
 title 'Variance in apogee due to parameter uncertainty, Std = 160[m]'

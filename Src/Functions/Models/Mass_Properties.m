@@ -5,17 +5,17 @@ function [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,Opt)
 %   - t         Time [s]
 %   - Rocket    Matlab structure containing all data [.]
 %   OUTPUT:
-%   - M         Mass [kg]
-%   - dMdt      Derivative of Mass [kg/s]
-%   - Cm        Center of Mass [m]
-%   - dCmdt     Derivative of Center of Mass [m/s]
+%   - M         mass [kg]
+%   - dMdt      Derivative of mass [kg/s]
+%   - Cm        Center of mass [m]
+%   - dCmdt     Derivative of Center of mass [m/s]
 %   - I_L       Longitudinal Moment of Inertia [kgm^2]
 %   - dI_Ldt    Derivative of L. Moment of Inertia [kgm^2/s]
 %   - I_R       Rotational Moment of Inertia [kgm^2]
 %   - dI_Rdt    Derivative of R. Moment of Inertia [kgm^2/s]
 
 %--------------------------------------------------------------------------
-% Mass
+% mass
 %--------------------------------------------------------------------------
 if (Rocket.isHybrid == 0)
     
@@ -48,7 +48,7 @@ else
     error('Opt parameter should be Linear or Nonlinear')
 end
 %--------------------------------------------------------------------------
-% Center of Mass
+% Center of mass
 %--------------------------------------------------------------------------
 % Centre de masse
 Cm = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 
@@ -118,7 +118,7 @@ else
     error('Opt parameter should be Linear or Nonlinear')
     end
 %--------------------------------------------------------------------------
-% Center of Mass
+% Center of mass
 %--------------------------------------------------------------------------
 % Centre de masse
 

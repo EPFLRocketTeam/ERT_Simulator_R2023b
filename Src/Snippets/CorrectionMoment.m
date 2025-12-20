@@ -1,4 +1,4 @@
-function C1 = CorrectionMoment(t,Rocket,CNa,Xp,Velocity,Environnement,Altitude)
+function C1 = CorrectionMoment(t,Rocket,normalForceCoefficientSlope,Xp,Velocity,Environnement,Altitude)
 % Give the corrective moment based on rocket geometry
 %
 
@@ -11,7 +11,7 @@ function C1 = CorrectionMoment(t,Rocket,CNa,Xp,Velocity,Environnement,Altitude)
 %--------------------------------------------------------------------------
 % 2 Total Damping Coefficient
 %--------------------------------------------------------------------------
-C1 = 1/2*density*Rocket.maxCrossSectionArea*Velocity^2*CNa*(Xp-Cm);
+C1 = 1/2*density*Rocket.maxCrossSectionArea*Velocity^2*normalForceCoefficientSlope*(Xp-Cm);
 
 end
 

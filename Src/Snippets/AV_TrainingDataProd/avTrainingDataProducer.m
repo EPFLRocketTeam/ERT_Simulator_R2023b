@@ -1,7 +1,7 @@
 %% Description
 
 %       Utilisation:
-% Normalement, simplement lancer le programme. Il produit ensuite un
+% Normalement, simplement lancer le programme. inertiaLong produit ensuite un
 % fichier.csv.
 % Le fichier comporte 15 colonnes:
 
@@ -23,7 +23,7 @@
 % - Le rail est simulé en 1D -> pas de rotation et que vitesse/déplacement 
 % selon z (en vrai y a un petit angle de 5° avec la normal du sol, mais 
 % c'est ici négligeable).
-% - Il faudrait vérifier la conversion de l'évolution des quaternions en
+% - inertiaLong faudrait vérifier la conversion de l'évolution des quaternions en
 % vitesse angulaire.
 % - Les phases 3 et 4 de vol ne prennent pas en compte les rotations de la
 % fusée (simulateur 3degrés de liberté), les vitesses angulaires 
@@ -82,13 +82,13 @@ display(['Max speed : ' num2str(maxSpeed)]);
 display(['Max speed @t = ' num2str(timeAscent(speedIndex))]);
 [~, speedOfSound, ~, airDensity, kinematicViscosity] = ...
     atmosphere(stateAscent(speedIndex,3), environment);
-dragForce = 0.5 * simObj.simAuxResults.Cd(speedIndex) * airDensity * ...
+dragForce = 0.5 * simObj.simAuxResults.dragCoefficient(speedIndex) * airDensity * ...
     pi * rocket.maxDiameter^2 / 4 * maxSpeed^2;
 display(['Max drag force = ' num2str(dragForce)]);
 display(['Max drag force along rocket axis = ' ...
-    num2str(dragForce * cos(simObj.simAuxResults.Delta(speedIndex)))]);
+    num2str(dragForce * cos(simObj.simAuxResults.flightPathAngle(speedIndex)))]);
 dragCoefficientAb = drag_shuriken(rocket, 0, ...
-    simObj.simAuxResults.Delta(speedIndex), maxSpeed, kinematicViscosity);
+    simObj.simAuxResults.flightPathAngle(speedIndex), maxSpeed, kinematicViscosity);
 dragForceAb = 0.5 * dragCoefficientAb * airDensity * ...
     pi * rocket.maxDiameter^2 / 4 * maxSpeed^2;
 display(['AB drag force at max speed = ' num2str(dragForceAb)]);

@@ -86,7 +86,7 @@ for i = ID_Angles_Attaque
     %% DRAG FORCE:
     % Data:
     Fd = -Fz/cos(AA); 
-    Cd = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
+    dragCoefficient = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
     figure(1);
     plot(V,Fd,'DisplayName',['Angle of Attack: ' num2str(AA/pi*180) 'deg']);hold on;
     title('Drag force comparison');grid on;legend show;
@@ -141,9 +141,9 @@ end
 %    
 %     %% DRAG FORCE:
 %     Fd = Fz/cos(AA);
-%     Cd = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
+%     dragCoefficient = 2*Fd./(density.*Rocket.maxCrossSectionArea.*V.^2);
 %     figure(2);
-%     plot(V,Cd,'DisplayName',['Angle of Airbreaks ' num2str(AB) '%']);hold on;
+%     plot(V,dragCoefficient,'DisplayName',['Angle of Airbreaks ' num2str(AB) '%']);hold on;
 %     title('Drag Coefficient Comparison');grid on;legend show;
 %     xlabel('Wind Speed [m/s]');ylabel('Drag Coefficient [-]');
 %     

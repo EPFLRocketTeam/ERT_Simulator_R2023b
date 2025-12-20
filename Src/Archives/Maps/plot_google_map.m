@@ -26,7 +26,7 @@ function varargout = plot_google_map(varargin)
 %    MapType        - ('roadmap') Type of map to return. Any of [roadmap, 
 %                     satellite, terrain, hybrid]. See the Google Maps API for
 %                     more information. 
-%    Alpha (1)      - (0-1) Transparency level of the map (0 is fully
+%    angleOfAttack (1)      - (0-1) Transparency level of the map (0 is fully
 %                     transparent). While the map is always moved to the
 %                     bottom of the plot (i.e. will not hide previously
 %                     drawn items), this can be useful in order to increase

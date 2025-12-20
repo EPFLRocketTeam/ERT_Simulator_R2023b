@@ -92,26 +92,26 @@ test_motors = test_motors(ind_sort);
 %--------------------------------------------------------------------------
 
 figure;
-plot(test_masses, app', 'LineWidth', 2);
+plot(test_masses, app', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
 title('Appogee vs. dry mass');
-xlabel 'Mass [kg]'; ylabel 'Appogee [m]';
+xlabel 'mass [kg]'; ylabel 'Appogee [m]';
 set(gca, 'FontSize', 14);
 
 figure;
-plot(test_masses, M_max', 'LineWidth', 2);
+plot(test_masses, M_max', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
 title('Max Mach vs. dry mass');
-xlabel 'Mass [kg]'; ylabel 'max(Mach) [-]';
+xlabel 'mass [kg]'; ylabel 'max(Mach) [-]';
 set(gca, 'FontSize', 14);
 
 figure;
-plot(test_masses, v_rail', 'LineWidth', 2);
+plot(test_masses, v_rail', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
 title(['Departure velocity vs. dry mass ( Rail Length = ' num2str(Environnement.railLength) 'm )']);
-xlabel 'Mass [kg]'; ylabel 'v_{rail} [m/s]';
+xlabel 'mass [kg]'; ylabel 'v_{rail} [m/s]';
 set(gca, 'FontSize', 14);
 

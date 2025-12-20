@@ -26,12 +26,12 @@ simulatior3D = multilayerwindSimulator3D(Rocket, Environment, simulationOutputs)
 
 [railTime, railState] = simulatior3D.RailSim();
 
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState; coastState(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 
 combinedRailFlightTime = [railTime;flightTime];
 combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
@@ -42,32 +42,32 @@ combinedRailFlightState = [railState;flightState(:,3) flightState(:,6)];
 
 [crashTime, crashState, crashTimeEvents, crashStateEvents, crashEventIndices] = simulatior3D.CrashSim(flightTime(end), flightState(end,1:3)', flightState(end, 4:6)');
 
-%% Margin plot
-figure('Name','Static Margin'); hold on;
-title 'Static Margin';
+%% stabilityMargin plot
+figure('Name','Static stabilityMargin'); hold on;
+title 'Static stabilityMargin';
 yyaxis left;
-plot(flightTime, simulatior3D.simAuxResults.CM, 'DisplayName', 'X_{CM}');
-plot(flightTime, simulatior3D.simAuxResults.Xcp, 'DisplayName', 'X_{CP}');
-ylabel 'X_{CM}, X_{CP} [cm]'
+plot(flightTime, simulatior3D.simAuxResults.centerOfMass, 'DisplayName', 'X_{centerOfMass}');
+plot(flightTime, simulatior3D.simAuxResults.centerOfPressure, 'DisplayName', 'X_{CP}');
+ylabel 'X_{centerOfMass}, X_{CP} [cm]'
 yyaxis right;
-plot(flightTime, simulatior3D.simAuxResults.Margin, 'DisplayName', 'Margin');
+plot(flightTime, simulatior3D.simAuxResults.stabilityMargin, 'DisplayName', 'stabilityMargin');
 xlabel 'Time [s]';
-ylabel 'Margin [-]';
+ylabel 'stabilityMargin [-]';
 legend show;
 
-%% Margin * CNa plot and apogee
+%% stabilityMargin * normalForceCoefficientSlope plot and apogee
 figure('Name','Simulator Outputs'); 
 
 subplot(1,2,1)
 hold on;
-title 'Stability Margin'
-xline(flightTime(1), '-', {'End of Rail'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'green', 'LineWidth', 1.2, 'DisplayName', 'End of Rail');
-xline(simulatior3D.Rocket.Burn_Time,  '-', {'End of Propulsion'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'red', 'LineWidth', 1.2, 'DisplayName', 'End of Propulsion');
-xline(flightTime(end),  '-', {'Apogee'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'magenta', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
+title 'Stability stabilityMargin'
+xline(flightTime(1), '-', {'End of Rail'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'green', 'lineWidth', 1.2, 'DisplayName', 'End of Rail');
+xline(simulatior3D.Rocket.Burn_Time,  '-', {'End of Propulsion'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'red', 'lineWidth', 1.2, 'DisplayName', 'End of Propulsion');
+xline(flightTime(end),  '-', {'Apogee'}, 'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'Color', 'magenta', 'lineWidth', 1.2, 'DisplayName', 'Apogee');
 legend show;
 
 yyaxis left
-plot(flightTime,simulatior3D.simAuxResults.Cn_alpha.*simulatior3D.simAuxResults.Margin, 'LineWidth', 1.2, 'DisplayName', 'Stability')
+plot(flightTime,simulatior3D.simAuxResults.normalForceCoefficientSlope.*simulatior3D.simAuxResults.stabilityMargin, 'lineWidth', 1.2, 'DisplayName', 'Stability')
 xlabel 'Time [s]';
 ylabel 'MS{\times}C_{N{\alpha}} [-]';
 grid on
@@ -75,16 +75,16 @@ ylim([0 50]);
 
 yyaxis right
 ylabel 'V [m/s]';
-plot(flightTime,sqrt(flightState(:,4).^2 + flightState(:,5).^2 + flightState(:,6).^2) , 'LineWidth', 1.2, 'DisplayName', 'Velocity')
+plot(flightTime,sqrt(flightState(:,4).^2 + flightState(:,5).^2 + flightState(:,6).^2) , 'lineWidth', 1.2, 'DisplayName', 'Velocity')
 
 % Altitude vs. drift
 subplot(1,2,2)
 title 'Altitude vs Drift'; 
 hold on; grid on
-plot(sqrt(flightState(:,1).^2 + flightState(:,2).^2), flightState(:,3), 'DisplayName', 'Ascent', 'LineWidth', 1.2);
-plot(sqrt(drogueState(:,1).^2 + drogueState(:,2).^2), drogueState(:,3), 'DisplayName', 'Drogue', 'LineWidth', 1.2);
-plot(sqrt(mainChuteState(:,1).^2 + mainChuteState(:,2).^2), mainChuteState(:,3), 'DisplayName', 'Main', 'LineWidth', 1.2);
-plot(sqrt(crashState(:,1).^2 + crashState(:,2).^2), crashState(:,3), 'd', 'DisplayName', 'CrashSim', 'LineWidth', 1.2);
+plot(sqrt(flightState(:,1).^2 + flightState(:,2).^2), flightState(:,3), 'DisplayName', 'Ascent', 'lineWidth', 1.2);
+plot(sqrt(drogueState(:,1).^2 + drogueState(:,2).^2), drogueState(:,3), 'DisplayName', 'Drogue', 'lineWidth', 1.2);
+plot(sqrt(mainChuteState(:,1).^2 + mainChuteState(:,2).^2), mainChuteState(:,3), 'DisplayName', 'Main', 'lineWidth', 1.2);
+plot(sqrt(crashState(:,1).^2 + crashState(:,2).^2), crashState(:,3), 'd', 'DisplayName', 'CrashSim', 'lineWidth', 1.2);
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 
 ymax = ceil(flightState(end,3)/1000)*1000;
@@ -115,9 +115,9 @@ xl = [-10 15];
 xlim(xl);
 yl = [0 4000];
 ylim(yl);
-plt1 = plot(simulatior3D.Environment.Vspeed, axis, 'DisplayName', 'Wind Model', 'LineWidth', 1.2);
-plt2 = plot(Vspeed, alt, 'd', 'DisplayName', 'Data Points', 'LineWidth', 1.5);
-yline(flightState(end,3), '--', 'LineWidth', 1.2, 'DisplayName', 'Apogee');
+plt1 = plot(simulatior3D.Environment.Vspeed, axis, 'DisplayName', 'Wind Model', 'lineWidth', 1.2);
+plt2 = plot(Vspeed, alt, 'd', 'DisplayName', 'Data Points', 'lineWidth', 1.5);
+yline(flightState(end,3), '--', 'lineWidth', 1.2, 'DisplayName', 'Apogee');
 
 for i = 1:10
     
@@ -125,8 +125,8 @@ for i = 1:10
     Vspeed_i = interp1(alt, Vspeed_i_dp, axis, 'pchip', 'extrap');
     Vazy_i = interp1(alt, Vazy, axis, 'pchip', 'extrap');
     
-    plot(Vspeed_i, axis, 'LineWidth', 0.8, 'Color', [0.8 0.8 0.8]);
-    plot(Vspeed_i_dp, alt, 'x', 'DisplayName', 'Data Points', 'LineWidth', 1.2, 'MarkerSize', 4, 'Color', [0.8 0.8 0.8]);
+    plot(Vspeed_i, axis, 'lineWidth', 0.8, 'Color', [0.8 0.8 0.8]);
+    plot(Vspeed_i_dp, alt, 'x', 'DisplayName', 'Data Points', 'lineWidth', 1.2, 'MarkerSize', 4, 'Color', [0.8 0.8 0.8]);
 end
 
 xBox = [xl(1), xl(1), 0, 0, xl(1)]

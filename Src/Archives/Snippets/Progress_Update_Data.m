@@ -66,14 +66,14 @@ warning('off','all')
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[burnTime, burnState, burnTimeEvents, burnStateEvents, burnEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
 %simulatior3D.Rocket.coneMode = 'off';
 
-[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([burnTime(end) 40], burnState(end, 1:3)', burnState(end, 4:6)', burnState(end, 7:10)', burnState(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-flightTime = [burnTime; coastTime(2:end)];
-flightState = [burnState; coastState(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 
 % Constants
 g0 = 9.80665; %[m/sec^2] gravity at sea level
@@ -85,10 +85,10 @@ m_to_feet = 3.2808399;
 Liftoff_thrust_to_weight_ratio = max(Rocket.Thrust_Force) / ((Rocket.emptyMass + Rocket.motor_mass) * g0);
 Launch_rail_departure_velocity_ft = railState(end,2) * m_to_feet;
 
-Stability = (simulatior3D.simAuxResults.Xcp - simulatior3D.simAuxResults.CM)./Rocket.maxDiameter;
+Stability = (simulatior3D.simAuxResults.centerOfPressure - simulatior3D.simAuxResults.centerOfMass)./Rocket.maxDiameter;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
-Stability = Stability(1:length(burnState));
+Stability = Stability(1:length(flightState));
 
 Min_static_margin_during_boost = min(Stability);
 

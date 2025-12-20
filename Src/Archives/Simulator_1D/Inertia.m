@@ -9,7 +9,7 @@ function [I_L,dI_Ldt,I_R] = Inertia(t,Rocket)
 
 % Appel de fonctions necessaires
 [M,dMdt] = Mass_Lin(t,Rocket);
-[cm dcmdt] = CM(t,Rocket);
+[cm dcmdt] = centerOfMass(t,Rocket);
 
 % I_L:
 R_i = 0.005; % Diametre interieur grains (Tjr identique)

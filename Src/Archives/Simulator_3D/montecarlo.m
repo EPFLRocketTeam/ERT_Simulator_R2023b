@@ -62,7 +62,7 @@ drawnow;
 
 fh = figure; hold on;
 load('nominalTrag')
-plot(nominalTrag(:,1), nominalTrag(:,4),'r','LineWidth',2 )
+plot(nominalTrag(:,1), nominalTrag(:,4),'r','lineWidth',2 )
 title 'Effect of variance in center of pressure on Altitude'
 param_rec = zeros(n_sim, n_param);
 for i = 1:n_sim
@@ -100,7 +100,7 @@ for i = 1:n_sim
     drawnow;
     
 end
-%title 'Effect of variance in Cd on Altitude'
+%title 'Effect of variance in dragCoefficient on Altitude'
 xlabel 't [s]'; ylabel 'Altitude [m]';
 %%
 %Saving Results 

@@ -44,7 +44,6 @@ classdef barrowmanLiftTest < matlab.unittest.TestCase
     end
     
     methods (Test)
-        
         function testZeroAngleOfAttack(testCase)
             % Test at zero angle of attack
             alpha = 0;

@@ -1,4 +1,4 @@
-function CD = drag_shuriken(Rocket, theta, alpha, Uinf, nu)
+function CD = dragShuriken(Rocket, theta, alpha, Uinf, nu)
 % DRAG_SHURIKEN estimates the drag coefficient normalized to the Rocket's
 % reference area for the shuriken airbrake design.
 % INPUTS : 

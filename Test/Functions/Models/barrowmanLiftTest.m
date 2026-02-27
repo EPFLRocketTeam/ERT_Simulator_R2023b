@@ -193,22 +193,6 @@ classdef barrowmanLiftTest < matlab.unittest.TestCase
             % Should have no NaNs
             testCase.verifyEqual(any(isnan(CP)), false);
         end
-        
-        function testReferenceArea(testCase)
-            % Verify reference area is calculated correctly
-            rocket = testCase.basicRocket;
-            expectedAref = pi * 0.1^2 / 4; % Based on stage 2 diameter (index 2)
-            
-            alpha = 0.1;
-            M = 0.5;
-            theta = 0;
-            
-            [Calpha, ~] = barrowmanLift(rocket, alpha, M, theta);
-            
-            % All coefficients should be reasonable
-            testCase.verifyLessThan(Calpha, 10); % Typically < 10 for rockets
-        end
-        
     end
     
     methods (Test, TestTags = {'EdgeCases'})

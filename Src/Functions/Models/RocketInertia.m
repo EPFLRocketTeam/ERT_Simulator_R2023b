@@ -1,11 +1,12 @@
-function [M, dMdt, CM, I, dIdt] = RocketInertia(t, Rocket, massmodel)
+function [mass, massRate, centerOfMass, inertiaMoment, inertiaRate] = RocketInertia(t, Rocket, massModel)
+%         M     dMdt      CM            I              dIdt
 % ROCKETINERTIA Compute mass, mass derivative, center of mass position from
 % cone tip, Inertia moment tensor and derivative of the inertia moment
 % tensor. 
 % INPUTS : 
 % - t           :   time [s]
 % - Rocket      :   Rocket structure
-% - massmodel   :   mass model selection [0 (linear), 1 (non-linear)]
+% - massModel   :   mass model selection [0 (linear), 1 (non-linear)]
 % OUTPUTS
 % - M           :   Mass [kg]
 % - dMdt        :   Time derivative of mass [kg/s]
@@ -14,32 +15,32 @@ function [M, dMdt, CM, I, dIdt] = RocketInertia(t, Rocket, massmodel)
 % - dIdt        :   Time derivative of moment of inertia tensor in rocket coordinate system (3x3)[kgm^2/s]
 
 % Compute mass values
-if(massmodel)
-    [M, dMdt] = Mass_Lin(t, Rocket);
+if(massModel)
+    [mass, massRate] = Mass_Lin(t, Rocket);
 else
-    [M, dMdt] = Mass_Non_Lin(t, Rocket);
+    [mass, massRate] = Mass_Non_Lin(t, Rocket);
 end
 
 % Compute center of mass
-CM = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 
-    (M-Rocket.emptyMass)*(Rocket.totalLength-Rocket.motor_length/2))/M;
+centerOfMass = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 
+    (mass-Rocket.emptyMass)*(Rocket.totalLength-Rocket.motorLength/2))/mass;
 
 % Compute Inertia tensor
 % longitudinal inertia
-R_i = 0.005; % Diametre interieur grains (Tjr identique)
-R_e = Rocket.motor_dia/2; % Diametre exterieur grains
+innerDiameterGrain = 0.005; % Diametre interieur grains (Tjr identique)
+outerDiameterGrain = Rocket.motor_dia/2; % Diametre exterieur grains
 
-I_L_Casing = Rocket.casing_mass*(Rocket.motor_length^2/12 + R_e^2/2); 
+inertiaCasing = Rocket.casingMass*(Rocket.motorLength^2/12 + outerDiameterGrain^2/2); 
 
-Grain_Mass = M-Rocket.emptyMass-Rocket.casing_mass; % Masse des grains
-I_L_Grain = Grain_Mass*(Rocket.motor_length^2/12 + (R_e^2+R_i^2)/4);
+grainMass = mass-Rocket.emptyMass-Rocket.casingMass; % Masse des grains
+inertiaGrain = grainMass*(Rocket.motorLength^2/12 + (outerDiameterGrain^2+innerDiameterGrain^2)/4);
 
-I_L = Rocket.emptyInertia + I_L_Casing + I_L_Grain + ...
-    (Grain_Mass+Rocket.casing_mass)*...
-    (Rocket.totalLength-CM-Rocket.motor_length/2); % I + ... + Steiner
+inertia = Rocket.emptyInertia + inertiaCasing + inertiaGrain + ...
+    (grainMass+Rocket.casingMass)*...
+    (Rocket.totalLength-centerOfMass-Rocket.motorLength/2); % I + ... + Steiner
 % rotational inertia
 
-I = [I_L, 1];
+inertiaMoment = [inertia, 1];
 % TODO : rotational inertia and inertia moment derivative.
-dIdt = 0;
+inertiaRate = 0;
 end

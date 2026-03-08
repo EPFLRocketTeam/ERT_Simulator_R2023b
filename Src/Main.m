@@ -58,7 +58,7 @@ display(['Max speed @t = ' num2str(T2(index))]);
 Fd = 0.5*SimObj.SimAuxResults.Cd(index)*rho*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['Max drag force = ' num2str(Fd)]);
 display(['Max drag force along rocket axis = ' num2str(Fd*cos(SimObj.SimAuxResults.Delta(index)))]);
-C_Dab = drag_shuriken(Rocket, 0, SimObj.SimAuxResults.Delta(index), maxi, nu);
+C_Dab = dragShuriken(Rocket, 0, SimObj.SimAuxResults.Delta(index), maxi, nu);
 F_Dab = 0.5*C_Dab*rho*pi*Rocket.maxDiameter^2/4*maxi^2;
 display(['AB drag force at max speed = ' num2str(F_Dab)]);
 display(['Max Mach number : ' num2str(maxi/a)]);

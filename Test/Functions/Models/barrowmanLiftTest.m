@@ -25,7 +25,16 @@ classdef barrowmanLiftTest < matlab.unittest.TestCase
             % 5. Store the path so we can remove it later
             testCase.AddedPath = functionPath;
         end
+    end
+    
+    methods (TestClassTeardown)
+        function removeFunctionPath(testCase)
+            % This removes the path added in TestClassSetup
+            rmpath(testCase.AddedPath);
+        end
+    end
 
+    methods (TestMethodSetup)
         function createRocket(testCase)
             % Create a basic rocket structure for testing
             testCase.basicRocket = struct(...

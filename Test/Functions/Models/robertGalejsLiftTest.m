@@ -26,8 +26,17 @@ classdef robertGalejsLiftTest < matlab.unittest.TestCase
             % 5. Store the path so we can remove it later
             testCase.AddedPath = functionPath;
         end
+    end
+    
+    methods (TestClassTeardown)
+        function removeFunctionPath(testCase)
+            % This removes the path added in TestClassSetup
+            rmpath(testCase.AddedPath);
+        end
+    end
 
-        function createTestRocket(testCase)
+    methods (TestMethodSetup)
+        function createRocket(testCase)
             % Create a standard test rocket structure
             testCase.testRocket = struct();
             testCase.testRocket.coneMode = 'off';

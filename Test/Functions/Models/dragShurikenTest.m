@@ -29,7 +29,16 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             % 5. Store the path so we can remove it later
             testCase.AddedPath = functionPath;
         end
+    end
+    
+    methods (TestClassTeardown)
+        function removeFunctionPath(testCase)
+            % This removes the path added in TestClassSetup
+            rmpath(testCase.AddedPath);
+        end
+    end
 
+    methods (TestMethodSetup)
         function createRocket(testCase)
             % Create a standard test rocket
             testCase.testRocket = struct(...
@@ -47,7 +56,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
     methods (Test)
         function testBasicFunctionality(testCase)
             % Test basic functionality with nominal inputs
-            CD = drag_shuriken(testCase.testRocket, testCase.testTheta, ...
+            CD = dragShuriken(testCase.testRocket, testCase.testTheta, ...
                                testCase.testAlpha, testCase.testUinf, testCase.testNu);
             
             % Verify output is positive and finite
@@ -62,7 +71,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             % Test with airbrakes fully closed
             theta_closed = -232; % closed position
             
-            CD = drag_shuriken(testCase.testRocket, theta_closed, ...
+            CD = dragShuriken(testCase.testRocket, theta_closed, ...
                                testCase.testAlpha, testCase.testUinf, testCase.testNu);
             
             % When closed, drag should be very small (near zero)
@@ -73,7 +82,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             % Test with airbrakes fully open
             theta_open = 0.9; % open position
             
-            CD = drag_shuriken(testCase.testRocket, theta_open, ...
+            CD = dragShuriken(testCase.testRocket, theta_open, ...
                                testCase.testAlpha, testCase.testUinf, testCase.testNu);
             
             % Open position should produce maximum drag
@@ -85,9 +94,9 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             theta = -116; % half open
             
             % Test with different angles of attack
-            CD_0deg = drag_shuriken(testCase.testRocket, theta, 0, ...
+            CD_0deg = dragShuriken(testCase.testRocket, theta, 0, ...
                                      testCase.testUinf, testCase.testNu);
-            CD_10deg = drag_shuriken(testCase.testRocket, theta, 10*pi/180, ...
+            CD_10deg = dragShuriken(testCase.testRocket, theta, 10*pi/180, ...
                                       testCase.testUinf, testCase.testNu);
             
             % Drag should decrease with angle of attack (cos(alpha) factor)
@@ -105,8 +114,8 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             alpha = 0;
             
             % Test at different velocities
-            CD_low = drag_shuriken(testCase.testRocket, theta, alpha, 20, testCase.testNu);
-            CD_high = drag_shuriken(testCase.testRocket, theta, alpha, 100, testCase.testNu);
+            CD_low = dragShuriken(testCase.testRocket, theta, alpha, 20, testCase.testNu);
+            CD_high = dragShuriken(testCase.testRocket, theta, alpha, 100, testCase.testNu);
             
             % Both should be finite
             testCase.verifyThat(CD_low, matlab.unittest.constraints.IsFinite);
@@ -127,8 +136,8 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             rocket_4brakes = testCase.testRocket;
             rocket_4brakes.numAirbrakes = 4;
             
-            CD_2 = drag_shuriken(rocket_2brakes, theta, alpha, testCase.testUinf, testCase.testNu);
-            CD_4 = drag_shuriken(rocket_4brakes, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_2 = dragShuriken(rocket_2brakes, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_4 = dragShuriken(rocket_4brakes, theta, alpha, testCase.testUinf, testCase.testNu);
             
             % Should scale linearly with number of airbrakes
             testCase.verifyEqual(CD_4 / CD_2, 2, 'AbsTol', 1e-6);
@@ -145,8 +154,8 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             rocket_small = testCase.testRocket;
             rocket_small.maxCrossSectionArea = pi*0.025^2; % Half diameter
             
-            CD_large = drag_shuriken(rocket_large, theta, alpha, testCase.testUinf, testCase.testNu);
-            CD_small = drag_shuriken(rocket_small, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_large = dragShuriken(rocket_large, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_small = dragShuriken(rocket_small, theta, alpha, testCase.testUinf, testCase.testNu);
             
             % Should be inversely proportional to reference area
             expected_ratio = rocket_large.maxCrossSectionArea / rocket_small.maxCrossSectionArea;
@@ -167,8 +176,8 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             U_low = 1; % m/s - gives larger delta
             U_high = 200; % m/s - gives smaller delta
             
-            CD_lowU = drag_shuriken(testCase.testRocket, theta, alpha, U_low, testCase.testNu);
-            CD_highU = drag_shuriken(testCase.testRocket, theta, alpha, U_high, testCase.testNu);
+            CD_lowU = dragShuriken(testCase.testRocket, theta, alpha, U_low, testCase.testNu);
+            CD_highU = dragShuriken(testCase.testRocket, theta, alpha, U_high, testCase.testNu);
             
             % Both should be finite
             testCase.verifyThat(CD_lowU, ...
@@ -183,9 +192,9 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             alpha = 0;
             
             % Test at different viscosities
-            CD_lowNu = drag_shuriken(testCase.testRocket, theta, alpha, ...
+            CD_lowNu = dragShuriken(testCase.testRocket, theta, alpha, ...
                                       testCase.testUinf, 1e-6); % Low viscosity
-            CD_highNu = drag_shuriken(testCase.testRocket, theta, alpha, ...
+            CD_highNu = dragShuriken(testCase.testRocket, theta, alpha, ...
                                        testCase.testUinf, 2e-5); % High viscosity
             
             testCase.verifyThat(CD_lowNu, ...
@@ -206,9 +215,9 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             theta_closed = -232; % maps to angle = 0
             theta_open = 0.9;    % maps to angle = 73
             
-            CD_closed = drag_shuriken(testCase.testRocket, theta_closed, ...
+            CD_closed = dragShuriken(testCase.testRocket, theta_closed, ...
                                        testCase.testAlpha, testCase.testUinf, testCase.testNu);
-            CD_open = drag_shuriken(testCase.testRocket, theta_open, ...
+            CD_open = dragShuriken(testCase.testRocket, theta_open, ...
                                      testCase.testAlpha, testCase.testUinf, testCase.testNu);
             
             % Open should have much higher drag than closed
@@ -221,7 +230,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             CD_previous = 0;
             
             for i = 1:length(theta_values)
-                CD = drag_shuriken(testCase.testRocket, theta_values(i), ...
+                CD = dragShuriken(testCase.testRocket, theta_values(i), ...
                                    testCase.testAlpha, testCase.testUinf, testCase.testNu);
                 
                 if i > 1
@@ -240,7 +249,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             theta = -116;
             alpha = 0;
             
-            CD = drag_shuriken(testCase.testRocket, theta, alpha, 0, testCase.testNu);
+            CD = dragShuriken(testCase.testRocket, theta, alpha, 0, testCase.testNu);
             
             % Should handle zero velocity (Rex = 0)
             testCase.verifyThat(CD, matlab.unittest.constraints.IsFinite);
@@ -252,13 +261,13 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             alpha = 0;
             
             % Very high viscosity
-            CD_highNu = drag_shuriken(testCase.testRocket, theta, alpha, ...
+            CD_highNu = dragShuriken(testCase.testRocket, theta, alpha, ...
                                        testCase.testUinf, 1);
             testCase.verifyThat(CD_highNu, ...
                 matlab.unittest.constraints.IsFinite);
             
             % Very low viscosity
-            CD_lowNu = drag_shuriken(testCase.testRocket, theta, alpha, ...
+            CD_lowNu = dragShuriken(testCase.testRocket, theta, alpha, ...
                                       testCase.testUinf, 1e-10);
             testCase.verifyThat(CD_lowNu, ...
                 matlab.unittest.constraints.IsFinite);
@@ -275,8 +284,8 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             theta = -116;
             alpha = 0;
             
-            CD_near = drag_shuriken(rocket_near, theta, alpha, testCase.testUinf, testCase.testNu);
-            CD_far = drag_shuriken(rocket_far, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_near = dragShuriken(rocket_near, theta, alpha, testCase.testUinf, testCase.testNu);
+            CD_far = dragShuriken(rocket_far, theta, alpha, testCase.testUinf, testCase.testNu);
             
             % Both should be finite
             testCase.verifyThat(CD_near, matlab.unittest.constraints.IsFinite);
@@ -291,9 +300,9 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             % Test symmetry around zero angle of attack
             theta = -116;
             
-            CD_positive = drag_shuriken(testCase.testRocket, theta, 5*pi/180, ...
+            CD_positive = dragShuriken(testCase.testRocket, theta, 5*pi/180, ...
                                          testCase.testUinf, testCase.testNu);
-            CD_negative = drag_shuriken(testCase.testRocket, theta, -5*pi/180, ...
+            CD_negative = dragShuriken(testCase.testRocket, theta, -5*pi/180, ...
                                          testCase.testUinf, testCase.testNu);
             
             % Should be symmetric (cos is even)
@@ -306,7 +315,7 @@ classdef dragShurikenTest < matlab.unittest.TestCase
             CD_values = zeros(size(theta));
             
             for i = 1:length(theta)
-                CD_values(i) = drag_shuriken(testCase.testRocket, theta(i), ...
+                CD_values(i) = dragShuriken(testCase.testRocket, theta(i), ...
                                              testCase.testAlpha, testCase.testUinf, testCase.testNu);
             end
             

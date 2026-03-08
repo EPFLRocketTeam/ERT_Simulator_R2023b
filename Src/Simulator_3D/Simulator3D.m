@@ -92,7 +92,7 @@ classdef Simulator3D < handle
             G = -g*cos(obj.Environment.Rail_Angle)*Mass;
 
             % Thrust 
-            T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
+            T = thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
             CD = drag(obj.Rocket, 0, v,Nu, a); % (TODO: make air-viscosity adaptable to temperature)
@@ -177,7 +177,7 @@ classdef Simulator3D < handle
 
             % Thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
+            T = thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             G = -g*M*ZE;
@@ -469,7 +469,7 @@ classdef Simulator3D < handle
 
             % Thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
+            T = thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             G = -g*M*ZE;

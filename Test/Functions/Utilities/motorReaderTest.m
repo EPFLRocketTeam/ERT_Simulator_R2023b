@@ -31,6 +31,13 @@ classdef motorReaderTest < matlab.unittest.TestCase
         end
     end
     
+    methods (TestClassTeardown)
+        function removeFunctionPath(testCase)
+            % This removes the path added in TestClassSetup
+            rmpath(testCase.AddedPath);
+        end
+    end
+    
     methods (Test)
         function testBasicFunctionality(testCase)
             % Test that the function returns expected output structure
@@ -120,9 +127,9 @@ classdef motorReaderTest < matlab.unittest.TestCase
                 'First thrust value mismatch');
             
             % Test a middle data point (e.g., at t=5.0)
-            idx_5s = find(abs(t - 5.0) < 1e-6);
-            if ~isempty(idx_5s)
-                testCase.verifyEqual(T(idx_5s), 1529.6289, 'RelTol', 1e-4, ...
+            indexAt5s = find(abs(t - 5.0) < 1e-6);
+            if ~isempty(indexAt5s)
+                testCase.verifyEqual(T(indexAt5s), 1529.6289, 'RelTol', 1e-4, ...
                     'Thrust at t=5.0 mismatch');
             end
             

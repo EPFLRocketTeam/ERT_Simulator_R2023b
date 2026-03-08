@@ -32,17 +32,17 @@ if strcmp(Opt, 'Linear')
     end
 elseif strcmp(Opt, 'NonLinear')
     if t == 0
-        dMdt = Rocket.Thrust2dMass_Ratio*Thrust(t,Rocket);
+        dMdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
         M = Rocket.emptyMass;
     elseif t>Rocket.Burn_Time
         M = Rocket.emptyMass+Rocket.motor_mass-Rocket.propel_mass;
         dMdt = 0;
     else
         tt = linspace(0,t,500);
-        Current_Impulse = trapz(tt,Thrust(tt,Rocket));
+        Current_Impulse = trapz(tt,thrust(tt,Rocket));
         M = Rocket.emptyMass + Rocket.motor_mass - ... 
         Rocket.Thrust2dMass_Ratio*Current_Impulse;
-        dMdt = Rocket.Thrust2dMass_Ratio*Thrust(t,Rocket);
+        dMdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
     end
 else
     error('Opt parameter should be Linear or Nonlinear')
@@ -102,17 +102,17 @@ else
     end
 elseif strcmp(Opt, 'NonLinear')
     if t == 0
-        dMdt = Rocket.Thrust2dMass_Ratio*Thrust(t,Rocket);
+        dMdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
         M = Rocket.emptyMass ; 
     elseif t>Rocket.Burn_Time
         M = Rocket.emptyMass+Rocket.casing_mass;
         dMdt = 0;
     else
         tt = linspace(0,t,500);
-        Current_Impulse = trapz(tt,Thrust(tt,Rocket));
+        Current_Impulse = trapz(tt,thrust(tt,Rocket));
         M = Rocket.emptyMass + Rocket.motor_mass - ... 
         Rocket.Thrust2dMass_Ratio*Current_Impulse;
-        dMdt = Rocket.Thrust2dMass_Ratio*Thrust(t,Rocket);
+        dMdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
     end
 else
     error('Opt parameter should be Linear or Nonlinear')

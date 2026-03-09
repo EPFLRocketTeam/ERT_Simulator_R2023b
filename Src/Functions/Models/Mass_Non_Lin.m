@@ -8,13 +8,13 @@ function [mass,dmassdt] = Mass_Non_Lin(t,Rocket)
 %   - dMassdt   Rocket mass derivative over time
 
 % OUTPUT:
-if t>Rocket.Burn_Time
-    mass = Rocket.emptyMass+Rocket.motor_mass-Rocket.propel_mass;
+if t>Rocket.burnTime
+    mass = Rocket.emptyMass+Rocket.motorMass-Rocket.propelMass;
     dmassdt = 0;
 else
     tt = linspace(0,t,500);
     Current_Impulse = trapz(tt,thrust(tt,Rocket));
-    mass = Rocket.emptyMass + Rocket.motor_mass - Rocket.Thrust2dMass_Ratio*Current_Impulse;
+    mass = Rocket.emptyMass + Rocket.motorMass - Rocket.Thrust2dMass_Ratio*Current_Impulse;
     dmassdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
 end
 end

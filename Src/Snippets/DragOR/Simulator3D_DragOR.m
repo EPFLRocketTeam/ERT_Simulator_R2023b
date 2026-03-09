@@ -170,19 +170,19 @@ classdef Simulator3D_DragOR < handle
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
-            motor_inertia = inertia_fill_cylinder(M, ...
-                obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
+            motorInertia = inertia_fill_cylinder(M, ...
+                obj.Rocket.motorLength, obj.Rocket.motorDiameter / 2);
             % Total inertia
             %I = inertial_matrix(obj.Rocket, Cm, t);
             %disp(I)
-            I = obj.Rocket.emptyInertia + motor_inertia;
+            I = obj.Rocket.emptyInertia + motorInertia;
             %disp(I)
             %disp("==============================")
             I = C' * I * C; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
-                obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
+            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motorLength, ...
+                obj.Rocket.motorDiameter / 2); % Inertial matrix time derivative
             dIdt = C' * dIdt * C; % Transfert to earth coordinates
 
             % Environment
@@ -466,15 +466,15 @@ classdef Simulator3D_DragOR < handle
 
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
-            motor_inertia = inertia_fill_cylinder(M, ...
-                obj.Rocket.motor_length, obj.Rocket.motor_dia / 2);
+            motorInertia = inertia_fill_cylinder(M, ...
+                obj.Rocket.motorLength, obj.Rocket.motorDiameter / 2);
             % Total inertia
-            I = obj.Rocket.emptyInertia + motor_inertia;
+            I = obj.Rocket.emptyInertia + motorInertia;
             I = C' * I * C; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motor_length, ...
-                obj.Rocket.motor_dia / 2); % Inertial matrix time derivative
+            dIdt = inertia_fill_cylinder(dMdt, obj.Rocket.motorLength, ...
+                obj.Rocket.motorDiameter / 2); % Inertial matrix time derivative
             dIdt = C' * dIdt * C; % Transfert to earth coordinates
 
             % Environment

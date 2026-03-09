@@ -80,7 +80,7 @@ classdef Simulator3D < handle
             v = s(2); % speed
 
             % Rocket Inertia
-            [Mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
+            [Mass,dMdt] = massNonLin(t,obj.Rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -148,8 +148,8 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
@@ -444,8 +444,8 @@ classdef Simulator3D < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
 
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)

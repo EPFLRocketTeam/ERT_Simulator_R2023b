@@ -16,9 +16,9 @@ function [mass, massRate, centerOfMass, inertiaMoment, inertiaRate] = rocketIner
 
 % Compute mass values
 if(massModel)
-    [mass, massRate] = Mass_Lin(t, Rocket);
+    [mass, massRate] = massLin(t, Rocket);
 else
-    [mass, massRate] = Mass_Non_Lin(t, Rocket);
+    [mass, massRate] = massNonLin(t, Rocket);
 end
 
 % Compute center of mass

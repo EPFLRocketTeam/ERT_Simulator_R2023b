@@ -97,7 +97,7 @@ classdef Simulator3D_DragOR < handle
             v = s(2); % speed
 
             % Rocket Inertia
-            [Mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
+            [mass,massRate] = massNonLin(t,obj.Rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -106,7 +106,7 @@ classdef Simulator3D_DragOR < handle
             % Force estimation
 
             % gravity
-            G = -g*cos(obj.Environment.Rail_Angle)*Mass;
+            G = -g*cos(obj.Environment.Rail_Angle)*mass;
 
             % Thrust 
             T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
@@ -120,7 +120,7 @@ classdef Simulator3D_DragOR < handle
             % State derivatives
             
             x_dot = v;
-            v_dot = 1/Mass*(F_tot);
+            v_dot = 1/mass*(F_tot);
             if v_dot < 0
                 x_dot = 0;
                 v_dot = 0;
@@ -165,8 +165,8 @@ classdef Simulator3D_DragOR < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
@@ -254,7 +254,7 @@ classdef Simulator3D_DragOR < handle
             % Drag
             % Drag coefficient
             CD = drag(obj.Drag, obj.interp_type, t, X(3), V(3))*obj.Rocket.dragCoefficientFactor; 
-            if(t>obj.Rocket.Burn_Time)
+            if(t>obj.Rocket.burnTime)
               CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force
@@ -461,8 +461,8 @@ classdef Simulator3D_DragOR < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            %I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
 
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
@@ -545,7 +545,7 @@ classdef Simulator3D_DragOR < handle
             % Drag
             % Drag coefficient
             CD = noseDrag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
-            if(t>obj.Rocket.Burn_Time)
+            if(t>obj.Rocket.burnTime)
               CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end
             % Drag force

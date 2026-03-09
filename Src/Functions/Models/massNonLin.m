@@ -1,4 +1,4 @@
-function [mass,dmassdt] = Mass_Non_Lin(t,Rocket)
+function [mass,massRate] = massNonLin(t,Rocket)
 %	Return the tocket mass during burn time
 %   INPUT:
 %   - t         Time
@@ -10,12 +10,12 @@ function [mass,dmassdt] = Mass_Non_Lin(t,Rocket)
 % OUTPUT:
 if t>Rocket.burnTime
     mass = Rocket.emptyMass+Rocket.motorMass-Rocket.propelMass;
-    dmassdt = 0;
+    massRate = 0;
 else
     tt = linspace(0,t,500);
     Current_Impulse = trapz(tt,thrust(tt,Rocket));
     mass = Rocket.emptyMass + Rocket.motorMass - Rocket.Thrust2dMass_Ratio*Current_Impulse;
-    dmassdt = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
+    massRate = Rocket.Thrust2dMass_Ratio*thrust(t,Rocket);
 end
 end
 

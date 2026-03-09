@@ -16,37 +16,37 @@
 % out   rho : density
 % out   nu : viscosity
 
-function [T, a, p, rho, nu] = atmosphere(alt, env)
+function [temperature, speedOfSound, pressure, density, kinematicViscosity] = atmosphere(alt, env)
     % Constant
-    R_star = 287.04;                % [J / (kg K)] Real gas constant of air (R0 / M_air)
-    gamma = 1.4;                    % [-] Specific heat coefficient of air
+    specificGasConstant = 287.04;   % [J / (kg K)] Real gas constant of air (R0 / M_air)
+    specificHeatCoeff = 1.4;        % [-] Specific heat coefficient of air
 
     % Initial
-    p0 = 101325;                    % [Pa] Pressure at sea level
-    T0 = env.Temperature_Ground;    % [K] Temperature at sea level
-    g = 9.80665;                    % [m/sec^2] Gravity at sea level
+    seaPressure = 101325;                       % [Pa] Pressure at sea level
+    seaTemperature = env.Temperature_Ground;    % [K] Temperature at sea level
+    gravity = 9.80665;                          % [m/sec^2] Gravity at sea level
     
     % Evaluate temperature using ISA and the Temperature Lapse Rate [K/m]
     % Also evaluate the integral dh/T(h) for the pressure.
-    [T, I] = atmosphereTemperatureIntegral(alt, env);
+    [temperature, I] = atmosphereTemperatureIntegral(alt, env);
 
     % Evaluate speed of sound
-    a = sqrt(gamma * R_star * T);
+    speedOfSound = sqrt(specificHeatCoeff * specificGasConstant * temperature);
 
     % Pressure
-    p = p0 * exp(-g / R_star * I);
+    pressure = seaPressure * exp(-gravity / specificGasConstant * I);
     % Pressure 0 over the max value of the ISA
     if alt > 86000
-        p = 0;
+        pressure = 0;
     end
 
     % Density (ideal gas law)
     x = env.Saturation_Vapor_Ratio*env.Humidity_Ground;
-    rho = p / (T * R_star) * (1 + x) / (1 + 1.609 * x);
+    density = pressure / (temperature * specificGasConstant) * (1 + x) / (1 + 1.609 * x);
     
     % Viscosity
-    mu = 1.715e-5 * (T/T0)^1.5 * (T0 + 110.4) / (T + 110.4);    % Dynamic viscosity
-    nu = mu / rho;                                              % Kinematic viscosity
+    mu = 1.715e-5 * (temperature/seaTemperature)^1.5 * (seaTemperature + 110.4) / (temperature + 110.4);    % Dynamic viscosity
+    kinematicViscosity = mu / density;                                              % Kinematic viscosity
 end
 
 
@@ -64,7 +64,7 @@ end
 % adding altitude and temperature of the new layer in tableIsaAltitude and
 % tableIsaTemperature respectively. Note that the altitude table should remain in
 % ascending order.
-function [T, I] = atmosphereTemperatureIntegral(alt, env)
+function [temperature, I] = atmosphereTemperatureIntegral(alt, env)
     % Table of the International Atmospheric Model
     % Source : https://en.wikipedia.org/wiki/International_Standard_Atmosphere
     tableIsaAltitude = [0,      11000,  20000,  32000,  47000,  51000,  71000,  86000];
@@ -76,7 +76,7 @@ function [T, I] = atmosphereTemperatureIntegral(alt, env)
 
     % Check if the altitude is in range
     if alt < tableIsaAltitude(1) || alt >= tableIsaAltitude(end)
-        T = tableIsaTemperature(end);
+        temperature = tableIsaTemperature(end);
     else
         % Find the interval index and compute the integral at each layer
         for i = 1:length(tableIsaAltitude)-1
@@ -97,10 +97,10 @@ function [T, I] = atmosphereTemperatureIntegral(alt, env)
         T1 =    tableIsaTemperature(index);
         T2 =    tableIsaTemperature(index+1);
         
-        T = T1 + (alt - alt1) * (T2 - T1)/(alt2 - alt1);
+        temperature = T1 + (alt - alt1) * (T2 - T1)/(alt2 - alt1);
 
         % Integrate until the altitude of the rocket (add the last layer)
-        I = I + integral_dh_T(alt1, alt, T1, T);
+        I = I + integral_dh_T(alt1, alt, T1, temperature);
     end
 end
 

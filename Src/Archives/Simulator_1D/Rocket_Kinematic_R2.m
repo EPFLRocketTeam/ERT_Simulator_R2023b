@@ -9,7 +9,7 @@ function xdot = Rocket_Kinematic(t,x,Rocket,Environnement,AB_drag, theta)
 xdot = zeros(2,1);
 
 % Call Function:
-[M,dMdt] = Mass_Properties(t,Rocket,'NonLinear');
+[M,dMdt] = massProperties(t,Rocket,'NonLinear');
 [~, a, ~, density, nu] = stdAtmos(x(1) + Environnement.startAltitude, Environnement);
 T = Thrust(t,Rocket);
 g = 9.80665; %[m/s2] Gravity

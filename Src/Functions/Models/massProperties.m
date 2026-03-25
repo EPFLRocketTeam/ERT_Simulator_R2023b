@@ -1,6 +1,6 @@
 function [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,Opt)
 %Return the global mass properties of the rocket
-%   [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties_Lin(t,Rocket)
+%   [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties_Lin(t,Rocket)
 %   INPUT:
 %   - t         Time [s]
 %   - Rocket    Matlab structure containing all data [.]

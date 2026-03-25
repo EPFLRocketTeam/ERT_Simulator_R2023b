@@ -1,7 +1,9 @@
 %% rocket Simulator 3D
 
 % Initialize
-close all; clear all; clc;
+close all; 
+%clear all; 
+clc;
 addpath(genpath('./Declarations'),...
         genpath('./Functions'),...
         genpath('./Snippets'),...
@@ -117,8 +119,15 @@ disp(['Touchdown @t = ' num2str(touchdownSeconds) ' = ' num2str(touchdownMinutes
 % Analyse results ?
 %--------------------------------------------------------------------------
 
-plotShowAnswer = input('Show plots ? [Y/N]\n','s');
-if ~strcmp(plotShowAnswer,{'Y','y','Yes','yes'})
+if ~exist('plotShowAnswer', 'var')
+    if usejava('desktop') && ~ismcc
+        plotShowAnswer = input('Show plots ? [Y/N]\n','s');
+    else
+        plotShowAnswer = 'N';  % default in non-interactive/CI
+    end
+end
+
+if ~any(strcmpi(plotShowAnswer, {'Y','Yes'}))
     return
 end
 

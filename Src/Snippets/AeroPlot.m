@@ -42,7 +42,7 @@ end
 
 % Rocket configuration
 readRocketFile = 1;           % Flag to read rocket from file (1=yes, 0=no)
-rocketFile = 'BL_H3.txt';    % Rocket configuration file name
+rocketFile = 'BL_H5.txt';    % Rocket configuration file name
 
 % Analysis ranges
 velocityRange = linspace(0, 346, 20);    % Velocity range [m/s] (0 to speed of sound)
@@ -50,7 +50,7 @@ angleOfAttackRange = linspace(0, pi/4, 5);      % Angle of attack range [rad] (0
 reynoldsNumberRange = linspace(0, 1, 10);            % Reynolds number parameter range (unused)
 
 % Atmospheric properties (constant for this analysis)
-kineamaticVelocity = 1.5e-5;           % Kinematic viscosity [m²/s]
+kinematicViscosity = 1.5e-5;           % Kinematic viscosity [m²/s]
 speedOfSound = 346;                   % Speed of sound at sea level [m/s]
 
 % -------------------------------------------------------------------------
@@ -92,7 +92,7 @@ for i = 1:length(velocityRange)
     for j = 1:length(angleOfAttackRange)
         % Calculate drag coefficient for each velocity and angle of attack
         dragCoefficientMatrix(i,j) = drag(Rocket, angleOfAttackRange(j), velocityRange(i), ...
-                       kineamaticVelocity, speedOfSound);
+                       kinematicViscosity, speedOfSound);
     end
     
     % Progress indicator for large calculations

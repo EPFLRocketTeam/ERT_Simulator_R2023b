@@ -146,15 +146,15 @@ close all;
 Y_to_plt = ["apogee" "MarCNa_av" "landing_drift"];
 
 % Inputs categories
-Xid_env = ["Temperature_Ground" "Pressure_Ground" "Humidity_Ground" "Start_Altitude" "dTdh" "Vi1" "Vi2" "Vi3" "Vi4" "Vi5" "Vi6" "ai1" "ai2" "ai3" "ai4" "ai5" "ai6"];
+Xid_env = ["groundTemperature" "groundPressure" "groundHumidity" "startAltitude" "dTdh" "Vi1" "Vi2" "Vi3" "Vi4" "Vi5" "Vi6" "ai1" "ai2" "ai3" "ai4" "ai5" "ai6"];
 
-Xid_rail = ["Rail_Length" "Rail_Angle" "Rail_Azimuth"];
+Xid_rail = ["railLength" "railAngle" "railAzimuth"];
     
 Xid_roc = [ "dmin" "dd" "z1" "z12" "z23" "finRootPosition" "finSpan" "finRootChord" "finTipChord" "finSweepDistance" ...
         "finThickness" "lugSurfaceArea" "emptyMass" "emptyInertia" "emptyCenterOfMass" "airbrakePosition" "airbrakeAngle" ... 
         "payloadMass" "mainParachuteDragArea" "drogueParachuteDragArea" "mainParachuteDeploymentAltitude" "interMotorDistance" "motor_diaP" ...
         "motor_lengthP" "propel_massP" "motor_massP" "motor_diaF" "motor_lengthF" "propel_massF" ...
-        "motor_massF" "Burn_Time" "T1" "T2"];
+        "motor_massF" "Burn_Time" "railTime" "flightTime"];
 
 for i = 1:o
     yid = Yid(i);

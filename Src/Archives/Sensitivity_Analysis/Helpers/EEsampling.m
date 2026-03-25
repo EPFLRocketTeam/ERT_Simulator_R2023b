@@ -10,10 +10,10 @@ function [B_l, EEidx_l] = EEsampling(Xid, p);
 %       EEid_l  Matrix storing which 2 samples are corresponding to which EE increment.
 
 k = length(Xid);
-Delta = p/(2*(p-1));
+flightPathAngle = p/(2*(p-1));
 
 % Sampling Xbar_l
-XXbar = 0:1/(p-1):1-Delta;
+XXbar = 0:1/(p-1):1-flightPathAngle;
 idx = randi(length(XXbar), k, 1);
 Xbar_l = XXbar(idx)';
 
@@ -30,7 +30,7 @@ P_l = eye(k);
 P_l = P_l(randperm(k),:);
 
 % Computing B_l
-B_l = ones(k+1, 1) * Xbar_l' + (Delta/2) * ((2*B - ones(k+1, k)) * D_l + ones(k+1, k)) * P_l;
+B_l = ones(k+1, 1) * Xbar_l' + (flightPathAngle/2) * ((2*B - ones(k+1, k)) * D_l + ones(k+1, k)) * P_l;
 
 % Clever trick to keep track of the EE idices
 EEidx_l = (EEidx_l * D_l - min(0, sum(EEidx_l * D_l, 1))) * P_l;

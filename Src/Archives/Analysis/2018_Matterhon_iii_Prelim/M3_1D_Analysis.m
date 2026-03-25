@@ -62,10 +62,10 @@ for i = 1:n_motors
         [T,X] = ode45(@(t,x) Rocket_Kinematic_R2(t,x,Rocket,Environnement,@drag_shuriken, -190.5),tspan,x_0,Option);
         app(i,j) = X(end, 1);
         [v_max(i,j), ind_v_max] = max(X(:,2));
-        [~, a, ~, ~, ~] = stdAtmos(Environnement.Start_Altitude+X(ind_v_max, 1), Environnement);
+        [~, a, ~, ~, ~] = stdAtmos(Environnement.startAltitude+X(ind_v_max, 1), Environnement);
         M_max(i,j) = v_max(i,j)/a;
         
-        v_rail(i,j) = interp1(X(find(X(:,1)>0),1), X(find(X(:,1)>0),2), Environnement.Rail_Length);
+        v_rail(i,j) = interp1(X(find(X(:,1)>0),1), X(find(X(:,1)>0),2), Environnement.railLength);
          
     end
     
@@ -92,26 +92,26 @@ test_motors = test_motors(ind_sort);
 %--------------------------------------------------------------------------
 
 figure;
-plot(test_masses, app', 'LineWidth', 2);
+plot(test_masses, app', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
 title('Appogee vs. dry mass');
-xlabel 'Mass [kg]'; ylabel 'Appogee [m]';
+xlabel 'mass [kg]'; ylabel 'Appogee [m]';
 set(gca, 'FontSize', 14);
 
 figure;
-plot(test_masses, M_max', 'LineWidth', 2);
+plot(test_masses, M_max', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
 title('Max Mach vs. dry mass');
-xlabel 'Mass [kg]'; ylabel 'max(Mach) [-]';
+xlabel 'mass [kg]'; ylabel 'max(Mach) [-]';
 set(gca, 'FontSize', 14);
 
 figure;
-plot(test_masses, v_rail', 'LineWidth', 2);
+plot(test_masses, v_rail', 'lineWidth', 2);
 l = legend(char(test_motors));
 set(l, 'Interpreter', 'none');
-title(['Departure velocity vs. dry mass ( Rail Length = ' num2str(Environnement.Rail_Length) 'm )']);
-xlabel 'Mass [kg]'; ylabel 'v_{rail} [m/s]';
+title(['Departure velocity vs. dry mass ( Rail Length = ' num2str(Environnement.railLength) 'm )']);
+xlabel 'mass [kg]'; ylabel 'v_{rail} [m/s]';
 set(gca, 'FontSize', 14);
 

@@ -25,7 +25,7 @@ Rocket = rocketReader('Rocket_Definition.txt');
 Uinf = 200;
 
 % 1.2 Environment
-Env.rho = 1.2;
+Env.density = 1.2;
 Env.nu = 1.5e-5;
 Env.a = 345;
 Env.g = 9.81;
@@ -56,7 +56,7 @@ apogee = 3048;
 x0_ext = kron(x0, ones(1, length(CDab)));
 CDab_ext = kron(ones(1, length(x0)), CDab);
 theta_ext = kron(ones(1, length(x0)), theta_tab);
-Vinf_ext = sqrt(2*Rocket.emptyMass*Env.g./Env.rho./Rocket.maxCrossSectionArea./(CD0_body + CDab_ext));
+Vinf_ext = sqrt(2*Rocket.emptyMass*Env.g./Env.density./Rocket.maxCrossSectionArea./(CD0_body + CDab_ext));
 v0_ext = Vinf_ext.*tan(acos(exp(Env.g./Vinf_ext.^2.*(x0_ext-apogee))));
 
 % -------------------------------------------------------------------------

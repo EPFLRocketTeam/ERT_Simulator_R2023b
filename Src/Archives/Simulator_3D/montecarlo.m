@@ -10,7 +10,7 @@ addpath(genpath('../Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('BL_H4.txt');
 Environment = environnementReader('Environnement_Definition_Meringen.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
 %% variable parameter definition
 
@@ -62,7 +62,7 @@ drawnow;
 
 fh = figure; hold on;
 load('nominalTrag')
-plot(nominalTrag(:,1), nominalTrag(:,4),'r','LineWidth',2 )
+plot(nominalTrag(:,1), nominalTrag(:,4),'r','lineWidth',2 )
 title 'Effect of variance in center of pressure on Altitude'
 param_rec = zeros(n_sim, n_param);
 for i = 1:n_sim
@@ -79,28 +79,28 @@ for i = 1:n_sim
         end
     end
     
-    SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+    simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
     
     %% ------------------------------------------------------------------------
     % 6DOF Rail Simulation
     %--------------------------------------------------------------------------
 
-    [T1, S1] = SimObj.RailSim();
+    [railTime, railState] = simulatior3D.RailSim();
 
     %% ------------------------------------------------------------------------
     % 6DOF Flight Simulation
     %--------------------------------------------------------------------------
     
-    [T2, S2] = SimObj.FlightSim(T1(end), S1(end,2));
+    [flightTime, flightState] = simulatior3D.FlightSim(railTime(end), railState(end,2));
     
-    apogee_rec(i) = S2(end, 3);
+    apogee_rec(i) = flightState(end, 3);
     
-    plot(T2, S2(:,3),'--g');
+    plot(flightTime, flightState(:,3),'--g');
 
     drawnow;
     
 end
-%title 'Effect of variance in Cd on Altitude'
+%title 'Effect of variance in dragCoefficient on Altitude'
 xlabel 't [s]'; ylabel 'Altitude [m]';
 %%
 %Saving Results 

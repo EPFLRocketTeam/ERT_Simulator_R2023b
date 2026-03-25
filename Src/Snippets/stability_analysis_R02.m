@@ -16,7 +16,7 @@ addpath(genpath('..\Declarations'),...
 % Rocket Definition
 Rocket = rocketReader('WH_test.txt');
 Environment = environnementReader('Environment\Environnement_Definition_Euroc.txt');
-SimOutputs = SimOutputReader('Simulation\Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation\Simulation_outputs.txt');
 
 warning('off','all')
 Error = 0;
@@ -25,33 +25,33 @@ Error = 0;
 % Nominal case
 % =========================================================================
 
-SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
 
 % -------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
 % -------------------------------------------------------------------------
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], S1(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1; S2_2(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 
 % -------------------------------------------------------------------------
 % Results
 % -------------------------------------------------------------------------
 
 % Speed off rail
-V = S1(end, 2);
+V = railState(end, 2);
 % Local speed of sound and density of air
-[~,a,~,rho] = stdAtmos(Environment.Start_Altitude + S2(1, 3), Environment);
+[~,a,~,density] = stdAtmos(Environment.startAltitude + flightState(1, 3), Environment);
 % Mach number
 M = V / a;
 alpha = 0;
@@ -59,16 +59,16 @@ theta = 0;
 [Calpha, CP] = barrowmanLift(Rocket, alpha, M, theta);
 
 CNa2A = 0;
-W = SimObj.SimAuxResults.CM(1);
+W = simulatior3D.simAuxResults.centerOfMass(1);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A = rho * V * Ar / 2 * CNa2A;
+C2A = density * V * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(T1(end), Rocket);
+[~,dMdt] = Mass_Non_Lin(railTime(end), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -78,20 +78,20 @@ C2R = dMdt * (Lne - W)^2;
 % C2 Damping Moment Coefficient
 C2 = C2A + C2R;
 
-CNa = sum(Calpha);
-P = SimObj.SimAuxResults.Xcp(1);
+normalForceCoefficientSlope = sum(Calpha);
+P = simulatior3D.simAuxResults.centerOfPressure(1);
 
-C1 = rho / 2 * V^2 * Ar * CNa * (P - W);
+C1 = density / 2 * V^2 * Ar * normalForceCoefficientSlope * (P - W);
 
-Il = SimObj.SimAuxResults.Il(1);
+inertiaLong = simulatior3D.simAuxResults.inertiaLong(1);
 
 % Damping ratio
-epsilon = C2 / (2 * sqrt(C1 * Il));
+epsilon = C2 / (2 * sqrt(C1 * inertiaLong));
 
 display('=============== Nominal case');
 % display(['CG - Nominal case : ' num2str(Rocket.emptyCenterOfMass)]);
-% display(['Il initial - Nominal case : ' num2str(Rocket.emptyInertia)]);
-% display(['Rho - Nominal case : ' num2str(rho)]);
+% display(['inertiaLong initial - Nominal case : ' num2str(Rocket.emptyInertia)]);
+% display(['Rho - Nominal case : ' num2str(density)]);
 
 if norm(V)>=20
     Status = 'OK';
@@ -133,22 +133,22 @@ display(['Damping ratio - Nominal case : ' num2str(epsilon) ' ' Status]);
 % Max speed
 % =========================================================================
 
-[maxi,index] = max(S2(:,6));
+[maxi,index] = max(flightState(:,6));
 
 % Max speed
-X = S2(index, 1:3);
-V = S2(index, 4:6);
+X = flightState(index, 1:3);
+V = flightState(index, 4:6);
 % Local speed of sound and density of air
-[~,a,~,rho] = stdAtmos(Environment.Start_Altitude + S2(index, 3), Environment);
+[~,a,~,density] = stdAtmos(Environment.startAltitude + flightState(index, 3), Environment);
 % Mach number
 M = norm(V) / a;
 
-C = quat2rotmat(normalizeVect(S2(index, 7:10)'));
+C = quat2rotmat(normalizeVect(flightState(index, 7:10)'));
 
 RA = C*[0,0,1]'; % Roll Axis
 Vcm = V -...
           ... % Wind as computed by windmodel
-windModel(T2(index), Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
+windModel(flightTime(index), Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
 Environment.Turb_model,X(3))';
 alpha = atan2(norm(cross(RA, Vcm)), dot(RA, Vcm));
 angle = rot2anglemat(C);
@@ -157,16 +157,16 @@ theta = angle(3);
 [Calpha, CP] = barrowmanLift(Rocket, alpha, M, theta);
 
 CNa2A = 0;
-W = SimObj.SimAuxResults.CM(index);
+W = simulatior3D.simAuxResults.centerOfMass(index);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A = rho * norm(V) * Ar / 2 * CNa2A;
+C2A = density * norm(V) * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(T2(index), Rocket);
+[~,dMdt] = Mass_Non_Lin(flightTime(index), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -176,20 +176,20 @@ C2R = dMdt * (Lne - W)^2;
 % C2 Damping Moment Coefficient
 C2 = C2A + C2R;
 
-CNa = sum(Calpha);
-P = SimObj.SimAuxResults.Xcp(index);
+normalForceCoefficientSlope = sum(Calpha);
+P = simulatior3D.simAuxResults.centerOfPressure(index);
 
-C1 = rho / 2 * norm(V)^2 * Ar * CNa * (P - W);
+C1 = density / 2 * norm(V)^2 * Ar * normalForceCoefficientSlope * (P - W);
 
-Il = SimObj.SimAuxResults.Il(index);
+inertiaLong = simulatior3D.simAuxResults.inertiaLong(index);
 
 % Damping ratio
-epsilon = C2 / (2 * sqrt(C1 * Il));
+epsilon = C2 / (2 * sqrt(C1 * inertiaLong));
 
 display('=============== Max speed case');
 % display(['CG - Max speed : ' num2str(Rocket.emptyCenterOfMass)]);
-% display(['Il initial - Max speed : ' num2str(Rocket.emptyInertia)]);
-% display(['Rho - Max speed : ' num2str(rho)]);
+% display(['inertiaLong initial - Max speed : ' num2str(Rocket.emptyInertia)]);
+% display(['Rho - Max speed : ' num2str(density)]);
 
 if norm(V)>=20
     Status = 'OK';
@@ -230,15 +230,15 @@ display(['Damping ratio - Max speed case : ' num2str(epsilon) ' ' Status]);
 % Extra values
 % =========================================================================
 
-display(['Apogee : ' num2str(S2(end, 3))]);
+display(['Apogee : ' num2str(flightState(end, 3))]);
 
-Stability = (SimObj.SimAuxResults.Xcp - SimObj.SimAuxResults.CM)./d;
+Stability = (simulatior3D.simAuxResults.centerOfPressure - simulatior3D.simAuxResults.centerOfMass)./d;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
-Stability = Stability(1:length(S2_1) + find(S2_2(:,6) < 50,1));
+Stability = Stability(1:length(flightState) + find(coastState(:,6) < 50,1));
 
-display(['Min Static Margin : ' num2str(min(Stability))]);
-display(['Max Static Margin : ' num2str(max(Stability))]);
+display(['Min Static stabilityMargin : ' num2str(min(Stability))]);
+display(['Max Static stabilityMargin : ' num2str(max(Stability))]);
 
 %% ========================================================================
 % Worst case
@@ -250,33 +250,33 @@ Rocket.emptyInertia = Rocket.emptyInertia * 1.15;
 % Speed off rail
 V = 20;
 
-SimObj = Simulator3D(Rocket, Environment, SimOutputs);
+simulatior3D = Simulator3D(Rocket, Environment, simulationOutputs);
 
 % -------------------------------------------------------------------------
 % 6DOF Rail Simulation
 %--------------------------------------------------------------------------
 
-[T1, S1] = SimObj.RailSim();
+[railTime, railState] = simulatior3D.RailSim();
 
 % -------------------------------------------------------------------------
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[T2_1, S2_1, T2_1E, S2_1E, I2_1E] = SimObj.FlightSim([T1(end) SimObj.Rocket.Burn_Time(end)], V);
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], V);
 
-[T2_2, S2_2, T2_2E, S2_2E, I2_2E] = SimObj.FlightSim([T2_1(end) 40], S2_1(end, 1:3)', S2_1(end, 4:6)', S2_1(end, 7:10)', S2_1(end, 11:13)');
+[coastTime, coastState, coastTimeEvents, coastStateEvents, coastEventIndices] = simulatior3D.FlightSim([flightTime(end) 40], flightState(end, 1:3)', flightState(end, 4:6)', flightState(end, 7:10)', flightState(end, 11:13)');
 
-T2 = [T2_1; T2_2(2:end)];
-S2 = [S2_1; S2_2(2:end, :)];
+flightTime = [flightTime; coastTime(2:end)];
+flightState = [flightState; coastState(2:end, :)];
 
 % -------------------------------------------------------------------------
 % Results
 % -------------------------------------------------------------------------
 
 % Local speed of sound and density of air
-[~,a,~,rho] = stdAtmos(Environment.Start_Altitude + S2(1, 3), Environment);
+[~,a,~,density] = stdAtmos(Environment.startAltitude + flightState(1, 3), Environment);
 % CHANGE DENSITY
-rho = rho * 0.99;
+density = density * 0.99;
 % Mach number
 M = V / a;
 alpha = 0;
@@ -286,16 +286,16 @@ theta = 0;
 Calpha(end) = Calpha(end)*0.95;
 
 CNa2A = 0;
-W = SimObj.SimAuxResults.CM(1);
+W = simulatior3D.simAuxResults.centerOfMass(1);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A = rho * V * Ar / 2 * CNa2A;
+C2A = density * V * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(T1(end), Rocket);
+[~,dMdt] = Mass_Non_Lin(railTime(end), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -305,20 +305,20 @@ C2R = dMdt * (Lne - W)^2;
 % C2 Damping Moment Coefficient
 C2 = C2A + C2R;
 
-CNa = sum(Calpha);
-P = SimObj.SimAuxResults.Xcp(1);
+normalForceCoefficientSlope = sum(Calpha);
+P = simulatior3D.simAuxResults.centerOfPressure(1);
 
-C1 = rho / 2 * V^2 * Ar * CNa * (P - W);
+C1 = density / 2 * V^2 * Ar * normalForceCoefficientSlope * (P - W);
 
-Il = SimObj.SimAuxResults.Il(1);
+inertiaLong = simulatior3D.simAuxResults.inertiaLong(1);
 
 % Damping ratio
-epsilon = C2 / (2 * sqrt(C1 * Il));
+epsilon = C2 / (2 * sqrt(C1 * inertiaLong));
 
 display('=============== Worst case');
 % display(['CG - Worst case : ' num2str(Rocket.emptyCenterOfMass)]);
-% display(['Il initial - Worst case : ' num2str(Rocket.emptyInertia)]);
-% display(['Rho - Worst case : ' num2str(rho)]);
+% display(['inertiaLong initial - Worst case : ' num2str(Rocket.emptyInertia)]);
+% display(['Rho - Worst case : ' num2str(density)]);
 
 if norm(V)>=20
     Status = 'OK';
@@ -360,24 +360,24 @@ display(['Damping ratio - Worst case : ' num2str(epsilon) ' ' Status]);
 % Worst case Max speed
 % =========================================================================
 
-[maxi,index] = max(S2(:,6));
+[maxi,index] = max(flightState(:,6));
 
 % Max speed
-X = S2(index, 1:3);
-V = S2(index, 4:6);
+X = flightState(index, 1:3);
+V = flightState(index, 4:6);
 % Local speed of sound and density of air
-[~,a,~,rho] = stdAtmos(Environment.Start_Altitude + S2(index, 3), Environment);
+[~,a,~,density] = stdAtmos(Environment.startAltitude + flightState(index, 3), Environment);
 % CHANGE DENSITY
-rho = rho * 0.85;
+density = density * 0.85;
 % Mach number
 M = norm(V) / a;
 
-C = quat2rotmat(normalizeVect(S2(index, 7:10)'));
+C = quat2rotmat(normalizeVect(flightState(index, 7:10)'));
 
 RA = C*[0,0,1]'; % Roll Axis
 Vcm = V -...
           ... % Wind as computed by windmodel
-windModel(T2(index), Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
+windModel(flightTime(index), Environment.Turb_I,Environment.V_inf*Environment.V_dir,...
 Environment.Turb_model,X(3))';
 alpha = atan2(norm(cross(RA, Vcm)), dot(RA, Vcm));
 angle = rot2anglemat(C);
@@ -388,16 +388,16 @@ theta = angle(3);
 Calpha(end) = Calpha(end)*0.95;
 
 CNa2A = 0;
-W = SimObj.SimAuxResults.CM(index);
+W = simulatior3D.simAuxResults.centerOfMass(index);
 for i = 1:length(Calpha)
     CNa2A = CNa2A + Calpha(i) * (CP(i) - W)^2;
 end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A = rho * norm(V) * Ar / 2 * CNa2A;
+C2A = density * norm(V) * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(T2(index), Rocket);
+[~,dMdt] = Mass_Non_Lin(flightTime(index), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -407,20 +407,20 @@ C2R = dMdt * (Lne - W)^2;
 % C2 Damping Moment Coefficient
 C2 = C2A + C2R;
 
-CNa = sum(Calpha);
-P = SimObj.SimAuxResults.Xcp(index);
+normalForceCoefficientSlope = sum(Calpha);
+P = simulatior3D.simAuxResults.centerOfPressure(index);
 
-C1 = rho / 2 * norm(V)^2 * Ar * CNa * (P - W);
+C1 = density / 2 * norm(V)^2 * Ar * normalForceCoefficientSlope * (P - W);
 
-Il = SimObj.SimAuxResults.Il(index);
+inertiaLong = simulatior3D.simAuxResults.inertiaLong(index);
 
 % Damping ratio
-epsilon = C2 / (2 * sqrt(C1 * Il));
+epsilon = C2 / (2 * sqrt(C1 * inertiaLong));
 
 display('=============== Worst case max speed');
 % display(['CG - Worst case Max speed : ' num2str(Rocket.emptyCenterOfMass)]);
-% display(['Il initial - Worst case Max speed : ' num2str(Rocket.emptyInertia)]);
-% display(['Rho - Worst case Max speed : ' num2str(rho)]);
+% display(['inertiaLong initial - Worst case Max speed : ' num2str(Rocket.emptyInertia)]);
+% display(['Rho - Worst case Max speed : ' num2str(density)]);
 
 if norm(V)>=20
     Status = 'OK';
@@ -461,15 +461,15 @@ display(['Damping ratio - Worst case Max speed case : ' num2str(epsilon) ' ' Sta
 % Extra values
 % =========================================================================
 
-display(['Apogee : ' num2str(S2(end, 3))]);
+display(['Apogee : ' num2str(flightState(end, 3))]);
 
-Stability = (SimObj.SimAuxResults.Xcp - SimObj.SimAuxResults.CM)./d;
+Stability = (simulatior3D.simAuxResults.centerOfPressure - simulatior3D.simAuxResults.centerOfMass)./d;
 % Cut values near apogee, when the rocket's speed is below 50 m/s
 % (arbitrary, value chosen from analysis)
-Stability = Stability(1:length(S2_1) + find(S2_2(:,6) < 50,1));
+Stability = Stability(1:length(flightState) + find(coastState(:,6) < 50,1));
 
-display(['Min Static Margin : ' num2str(min(Stability))]);
-display(['Max Static Margin : ' num2str(max(Stability))]);
+display(['Min Static stabilityMargin : ' num2str(min(Stability))]);
+display(['Max Static stabilityMargin : ' num2str(max(Stability))]);
 
 %% End
 

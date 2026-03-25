@@ -20,7 +20,7 @@ function [tab, path] = Table_1D_Generator_R3(Rocket, Environment, H_target, drag
  theta_AB = linspace(phi_span(1), phi_span(2), N_AB); % [deg]
 
 % rail length
-x_rail = Environment.Rail_Length;
+x_rail = Environment.railLength;
 
 % -------------------------------------------------------------------------
 % Forward simulation; x1 and x2 for �10% of thrust error
@@ -46,9 +46,9 @@ end
 
 hold(plotAxes, 'on');
 set(plotAxes, 'Fontsize', 16); xlabel(plotAxes, 'altitude [m]'); ylabel(plotAxes, 'speed [m/s]');
-plot(plotAxes, x(:,1), x(:,2), 'k--', 'DisplayName', ['+' num2str(thrust_err*100) '% apogee trajectory'],'LineWidth', 1.5);
-plot(plotAxes, x1(:,1), x1(:,2), 'k-', 'DisplayName', 'Nominal trajectory','LineWidth', 1.5);
-%plot(plotAxes, x2(:,1), x2(:,2), 'k--', 'DisplayName', ['-' num2str(thrust_err*100) '% thrust trajectory'],'LineWidth', 1.5);
+plot(plotAxes, x(:,1), x(:,2), 'k--', 'DisplayName', ['+' num2str(thrust_err*100) '% apogee trajectory'],'lineWidth', 1.5);
+plot(plotAxes, x1(:,1), x1(:,2), 'k-', 'DisplayName', 'Nominal trajectory','lineWidth', 1.5);
+%plot(plotAxes, x2(:,1), x2(:,2), 'k--', 'DisplayName', ['-' num2str(thrust_err*100) '% thrust trajectory'],'lineWidth', 1.5);
 hold(plotAxes, 'on');
 display('Sim: Boost OK ');
 
@@ -60,7 +60,7 @@ x0 = [H_target, 0];
 Brake_Results = {};
 for i = 1:N_AB
     [t,x,t1,x1,t2,x2] = Sim_1D_R3(Rocket, Environment, tspan, x0, drag_func, theta_AB(i), thrust_err, ab_err, 'Altitude', H_initial, 0);
-    plot(plotAxes, x1(:,1), x1(:,2), 'DisplayName', ['\phi = ' num2str(convert_func(theta_AB(i))) '^\circ'],'LineWidth', 2);
+    plot(plotAxes, x1(:,1), x1(:,2), 'DisplayName', ['\phi = ' num2str(convert_func(theta_AB(i))) '^\circ'],'lineWidth', 2);
 %     if i==N_AB
 %         plot(plotAxes, x1(:,1), x1(:,2)-(max(x1(:,2))-max(x(:,2))), 'DisplayName', ['\phi +10% = ' num2str(convert_func(theta_AB(i))) '^\circ']);
 %     end

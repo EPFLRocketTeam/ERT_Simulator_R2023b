@@ -1,17 +1,17 @@
-Temperature_Ground 3 33512dsafsa // add some gibberish here, only the first word (1) should be processed, the rest ignored
-Pressure_Ground 1 324 j3j2lkj3k kr // same here
-Humidity_Ground 4
-Start_Altitude 1
-Start_Latitude 5
-Start_Longitude 9
+groundTemperature 3 33512dsafsa // add some gibberish here, only the first word (1) should be processed, the rest ignored
+groundPressure 1 324 j3j2lkj3k kr // same here
+groundHumidity 4
+startAltitude 1
+startLatitude 5
+startLongitude 9
 dTdh 2
 V_inf 6
 V_Azimuth 5
 Turb_I 3
 Turb_model Vroom
-Rail_Length 5
-Rail_Angle 8
-Rail_Azimuth 9
+railLength 5
+railAngle 8
+railAzimuth 9
 Gibberish 793238 dasfkljskdjflk // this line should be ignored, and prompt a warning
 multilayerwind 3 10 0.5 265 0 100 2 180 0 250 4 190 0 // number of datapoint; altitude [m]; total wind speed [m/s]; azimuth; standart deviation; ... time number of point
 map maptest.xyz

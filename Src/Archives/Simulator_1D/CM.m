@@ -1,4 +1,4 @@
-function [cm dcmdt] = CM(t,Rocket)
+function [cm dcmdt] = centerOfMass(t,Rocket)
 %	Return the rocekt center of mass
 %   INPUT:
 %   - t         Time

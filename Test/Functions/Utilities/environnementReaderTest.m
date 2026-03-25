@@ -52,22 +52,22 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             Environment = environnementReader(file);
             
             % Expected output of environnementReader
-            EnvironmentExpected.Temperature_Ground = 3;
-            EnvironmentExpected.Pressure_Ground = 1;
-            EnvironmentExpected.Humidity_Ground = 4;
-            EnvironmentExpected.Start_Altitude = 1;
-            EnvironmentExpected.Start_Latitude = 5;
-            EnvironmentExpected.Start_Longitude = 9;
+            EnvironmentExpected.groundTemperature = 3;
+            EnvironmentExpected.groundPressure = 1;
+            EnvironmentExpected.groundHumidity = 4;
+            EnvironmentExpected.startAltitude = 1;
+            EnvironmentExpected.startLatitude = 5;
+            EnvironmentExpected.startLongitude = 9;
             EnvironmentExpected.dTdh = 2;
             EnvironmentExpected.V_inf = 6;
             EnvironmentExpected.V_Azimuth = 5;
             EnvironmentExpected.Turb_I = 3;
             EnvironmentExpected.Turb_model = 'Vroom';
-            EnvironmentExpected.Rail_Length = 5;
-            EnvironmentExpected.Rail_Angle = 8/180*pi;
-            EnvironmentExpected.Rail_Azimuth = 9/180*pi;
-            p_ws = exp(77.345+0.0057*EnvironmentExpected.Temperature_Ground-7235/EnvironmentExpected.Temperature_Ground)/EnvironmentExpected.Temperature_Ground^8.2;
-            p_a = EnvironmentExpected.Pressure_Ground;
+            EnvironmentExpected.railLength = 5;
+            EnvironmentExpected.railAngle = 8/180*pi;
+            EnvironmentExpected.railAzimuth = 9/180*pi;
+            p_ws = exp(77.345+0.0057*EnvironmentExpected.groundTemperature-7235/EnvironmentExpected.groundTemperature)/EnvironmentExpected.groundTemperature^8.2;
+            p_a = EnvironmentExpected.groundPressure;
             EnvironmentExpected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
             EnvironmentExpected.V_dir = [cosd(EnvironmentExpected.V_Azimuth);sind(EnvironmentExpected.V_Azimuth); 0];
 
@@ -91,7 +91,7 @@ classdef environnementReaderTest < matlab.unittest.TestCase
                 xyz2grid('maptest.xyz');
             EnvironmentExpected.map_x = EnvironmentExpected.map_x-2648540;
             EnvironmentExpected.map_y = EnvironmentExpected.map_y-1195050;
-            EnvironmentExpected.map_z = EnvironmentExpected.map_z-EnvironmentExpected.Start_Altitude;
+            EnvironmentExpected.map_z = EnvironmentExpected.map_z-EnvironmentExpected.startAltitude;
 
             % constants; no need to test
             EnvironmentExpected.T_Nu = Environment.T_Nu;
@@ -120,22 +120,22 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             Environment = environnementReader(tempFile);
 
             % Declare expected Environment struct, with default values
-            EnvironmentExpected.Temperature_Ground = 289.15;
-            EnvironmentExpected.Pressure_Ground = 102400;
-            EnvironmentExpected.Humidity_Ground = 0.7;
-            EnvironmentExpected.Start_Altitude = 154;
-            EnvironmentExpected.Start_Latitude = 39.393564;
-            EnvironmentExpected.Start_Longitude = -8.287676;
+            EnvironmentExpected.groundTemperature = 289.15;
+            EnvironmentExpected.groundPressure = 102400;
+            EnvironmentExpected.groundHumidity = 0.7;
+            EnvironmentExpected.startAltitude = 154;
+            EnvironmentExpected.startLatitude = 39.393564;
+            EnvironmentExpected.startLongitude = -8.287676;
             EnvironmentExpected.dTdh = -9.5;
             EnvironmentExpected.V_inf = 2;
             EnvironmentExpected.V_Azimuth = 250;
             EnvironmentExpected.Turb_I = 0;
             EnvironmentExpected.Turb_model = 'None';
-            EnvironmentExpected.Rail_Length = 12;
-            EnvironmentExpected.Rail_Angle = 5/180*pi;
-            EnvironmentExpected.Rail_Azimuth = 156/180*pi;
-            p_ws = exp(77.345+0.0057*EnvironmentExpected.Temperature_Ground-7235/EnvironmentExpected.Temperature_Ground)/EnvironmentExpected.Temperature_Ground^8.2;
-            p_a = EnvironmentExpected.Pressure_Ground;
+            EnvironmentExpected.railLength = 12;
+            EnvironmentExpected.railAngle = 5/180*pi;
+            EnvironmentExpected.railAzimuth = 156/180*pi;
+            p_ws = exp(77.345+0.0057*EnvironmentExpected.groundTemperature-7235/EnvironmentExpected.groundTemperature)/EnvironmentExpected.groundTemperature^8.2;
+            p_a = EnvironmentExpected.groundPressure;
             EnvironmentExpected.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
             EnvironmentExpected.V_dir = [cosd(EnvironmentExpected.V_Azimuth);sind(EnvironmentExpected.V_Azimuth); 0];
 
@@ -156,7 +156,7 @@ classdef environnementReaderTest < matlab.unittest.TestCase
             % Test with malformed data lines
             tempFile = 'temp_malformed.txt';
             fid = fopen(tempFile, 'w');
-            fprintf(fid, 'Temperature_Ground gibberish\n');
+            fprintf(fid, 'groundTemperature gibberish\n');
             fclose(fid);
             
             % Should handle parsing errors

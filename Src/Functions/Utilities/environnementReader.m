@@ -19,29 +19,29 @@ while ~feof(rfid)
     [lineId, lineData] = strtok(lineContent);
     switch lineId
         
-        case 'Temperature_Ground'
+        case 'groundTemperature'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Temperature_Ground is not a number.');
+                error('environnementReader:NaN', 'Environment definition : groundTemperature is not a number.');
             end
-            Environnement.Temperature_Ground = lineDataNum;
+            Environnement.groundTemperature = lineDataNum;
             
-        case 'Pressure_Ground'
+        case 'groundPressure'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Pressure_Ground is not a number.');
+                error('environnementReader:NaN', 'Environment definition : groundPressure is not a number.');
             end
-            Environnement.Pressure_Ground = lineDataNum;
+            Environnement.groundPressure = lineDataNum;
             
-        case 'Humidity_Ground'
+        case 'groundHumidity'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Humidity_Ground is not a number.');
+                error('environnementReader:NaN', 'Environment definition : groundHumidity is not a number.');
             end
-            Environnement.Humidity_Ground = lineDataNum;
+            Environnement.groundHumidity = lineDataNum;
         
         case 'V_inf'
             lineDataCells = textscan(lineData, '%s');
@@ -71,53 +71,53 @@ while ~feof(rfid)
             lineDataCells = textscan(lineData,'%s');
             Environnement.Turb_model = lineDataCells{1}{1};
             
-        case 'Rail_Length'
+        case 'railLength'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Rail_Length is not a number.');
+                error('environnementReader:NaN', 'Environment definition : railLength is not a number.');
             end
-            Environnement.Rail_Length = lineDataNum;
+            Environnement.railLength = lineDataNum;
             
-        case 'Rail_Angle'
+        case 'railAngle'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Rail_Angle is not a number.');
+                error('environnementReader:NaN', 'Environment definition : railAngle is not a number.');
             end
-            Environnement.Rail_Angle = lineDataNum/180*pi;
+            Environnement.railAngle = lineDataNum/180*pi;
             
-        case 'Rail_Azimuth'
+        case 'railAzimuth'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Rail_Azimuth is not a number.');
+                error('environnementReader:NaN', 'Environment definition : railAzimuth is not a number.');
             end
-            Environnement.Rail_Azimuth = lineDataNum/180*pi;
+            Environnement.railAzimuth = lineDataNum/180*pi;
             
-        case 'Start_Altitude'
+        case 'startAltitude'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Start_Altitude is not a number.');
+                error('environnementReader:NaN', 'Environment definition : startAltitude is not a number.');
             end
-            Environnement.Start_Altitude = lineDataNum;
+            Environnement.startAltitude = lineDataNum;
         
-        case 'Start_Latitude'
+        case 'startLatitude'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Start_Latitude is not a number.');
+                error('environnementReader:NaN', 'Environment definition : startLatitude is not a number.');
             end
-            Environnement.Start_Latitude = lineDataNum;
+            Environnement.startLatitude = lineDataNum;
             
-        case 'Start_Longitude'
+        case 'startLongitude'
             lineDataCells = textscan(lineData, '%s');
             lineDataNum = str2double(lineDataCells{1}(1));
             if isnan(lineDataNum)
-                error('environnementReader:NaN', 'Environment definition : Start_Longitude is not a number.');
+                error('environnementReader:NaN', 'Environment definition : startLongitude is not a number.');
             end
-            Environnement.Start_Longitude = lineDataNum;
+            Environnement.startLongitude = lineDataNum;
             
         case 'dTdh'
             lineDataCells = textscan(lineData, '%s');
@@ -196,7 +196,7 @@ while ~feof(rfid)
             [Environnement.map_x, Environnement.map_y, Environnement.map_z]=xyz2grid(map_name);
             Environnement.map_x = Environnement.map_x-2648540;  % what are
             Environnement.map_y = Environnement.map_y-1195050;  % these constants
-            Environnement.map_z = Environnement.map_z-Environnement.Start_Altitude;
+            Environnement.map_z = Environnement.map_z-Environnement.startAltitude;
             
         otherwise
             display(['ERROR: In environnement definition, unknown line identifier: ' lineId]);
@@ -210,35 +210,35 @@ end
 
 % The default values are taken from Environnement_Definition_EuRoC.txt
 
-if ~isfield(Environnement,'Temperature_Ground')
-    default_Temperature_Ground = 289.15;
-    Environnement.Temperature_Ground = default_Temperature_Ground;
-    warning('Missing field "Temperature_Ground"; defaulted to 289.15');
+if ~isfield(Environnement,'groundTemperature')
+    default_groundTemperature = 289.15;
+    Environnement.groundTemperature = default_groundTemperature;
+    warning('Missing field "groundTemperature"; defaulted to 289.15');
 end
-if ~isfield(Environnement,'Pressure_Ground')
-    default_Pressure_Ground = 102400;
-    Environnement.Pressure_Ground = default_Pressure_Ground;
-    warning('Missing field "Pressure_Ground"; defaulted to 102400');
+if ~isfield(Environnement,'groundPressure')
+    default_groundPressure = 102400;
+    Environnement.groundPressure = default_groundPressure;
+    warning('Missing field "groundPressure"; defaulted to 102400');
 end
-if ~isfield(Environnement,'Humidity_Ground')
-    default_Humidity_Ground = 0.7;
-    Environnement.Humidity_Ground = default_Humidity_Ground;
-    warning('Missing field "Humidity_Ground"; defaulted to 0.7');
+if ~isfield(Environnement,'groundHumidity')
+    default_groundHumidity = 0.7;
+    Environnement.groundHumidity = default_groundHumidity;
+    warning('Missing field "groundHumidity"; defaulted to 0.7');
 end
-if ~isfield(Environnement,'Start_Altitude')
-    default_Start_Altitude = 154;
-    Environnement.Start_Altitude = default_Start_Altitude;
-    warning('Missing field "Start_Altitude"; defaulted to 154');
+if ~isfield(Environnement,'startAltitude')
+    default_startAltitude = 154;
+    Environnement.startAltitude = default_startAltitude;
+    warning('Missing field "startAltitude"; defaulted to 154');
 end
-if ~isfield(Environnement,'Start_Latitude')
-    default_Start_Latitude = 39.393564;
-    Environnement.Start_Latitude = default_Start_Latitude;
-    warning('Missing field "Start_Latitude"; defaulted to 39.393564');
+if ~isfield(Environnement,'startLatitude')
+    default_startLatitude = 39.393564;
+    Environnement.startLatitude = default_startLatitude;
+    warning('Missing field "startLatitude"; defaulted to 39.393564');
 end
-if ~isfield(Environnement,'Start_Longitude')
-    default_Start_Longitude = -8.287676;
-    Environnement.Start_Longitude = default_Start_Longitude;
-    warning('Missing field "Start_Longitude"; defaulted to -8.287676');
+if ~isfield(Environnement,'startLongitude')
+    default_startLongitude = -8.287676;
+    Environnement.startLongitude = default_startLongitude;
+    warning('Missing field "startLongitude"; defaulted to -8.287676');
 end
 if ~isfield(Environnement,'dTdh')
     default_dTdh = -9.5;
@@ -265,20 +265,20 @@ if ~isfield(Environnement,'Turb_model')
     Environnement.Turb_model = default_Turb_model;
     warning('Missing field "Turb_model"; defaulted to "None"');
 end
-if ~isfield(Environnement,'Rail_Length')
-    default_Rail_Length = 12;
-    Environnement.Rail_Length = default_Rail_Length;
-    warning('Missing field "Rail_Length"; defaulted to 12');
+if ~isfield(Environnement,'railLength')
+    default_railLength = 12;
+    Environnement.railLength = default_railLength;
+    warning('Missing field "railLength"; defaulted to 12');
 end
-if ~isfield(Environnement,'Rail_Angle')
-    default_Rail_Angle = 5/180*pi;
-    Environnement.Rail_Angle = default_Rail_Angle;
-    warning('Missing field "Rail_Angle"; defaulted to 5/180*pi');
+if ~isfield(Environnement,'railAngle')
+    default_railAngle = 5/180*pi;
+    Environnement.railAngle = default_railAngle;
+    warning('Missing field "railAngle"; defaulted to 5/180*pi');
 end
-if ~isfield(Environnement,'Rail_Azimuth')
-    default_Rail_Azimuth = 156/180*pi;
-    Environnement.Rail_Azimuth = default_Rail_Azimuth;
-    warning('Missing field "Rail_Azimuth"; defaulted to 156/180*pi');
+if ~isfield(Environnement,'railAzimuth')
+    default_railAzimuth = 156/180*pi;
+    Environnement.railAzimuth = default_railAzimuth;
+    warning('Missing field "railAzimuth"; defaulted to 156/180*pi');
 end
     
 % -------------------------------------------------------------------------
@@ -290,8 +290,8 @@ Environnement.T_Nu = Tmp(:,1);
 Environnement.Viscosity = Tmp(:,2);
 
 % 3.2 Humidity Changes
-p_ws = exp(77.345+0.0057*Environnement.Temperature_Ground-7235/Environnement.Temperature_Ground)/Environnement.Temperature_Ground^8.2;
-p_a = Environnement.Pressure_Ground;
+p_ws = exp(77.345+0.0057*Environnement.groundTemperature-7235/Environnement.groundTemperature)/Environnement.groundTemperature^8.2;
+p_a = Environnement.groundPressure;
 Environnement.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
 
 % 3.3 Wind direction

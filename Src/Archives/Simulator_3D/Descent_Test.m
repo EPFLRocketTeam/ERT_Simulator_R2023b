@@ -19,17 +19,17 @@ Environnement = environnementReader('Environnement_Definition.txt');
 delta = 9*pi/18;
 
 % Initial Conditions
-X0 = [0; 0; 3488]; % spatial position of cm
-V0 = [1;0;-0.0001]; % Initial velocity of cm
-Q0 = [0;0.7071;0;0.7071]; % Initial attitude
-W0 = [0;0;0]; % Initial angular rotation in rocket principle coordinates
-S0 = [X0; V0; Q0; W0];
-% X0 = S2E(1,1:3)'; % spatial position of cm
-% V0 = S2E(1,4:6)'; % Initial velocity of cm
-% Q0 = [0;sin(delta/2);0;cos(delta/2)]; % Initial attitude
-% %Q0 = S2E(1,7:10)';
-% W0 = S2E(1,11:13)'; % Initial angular rotation in rocket principle coordinates
-% S0 = [X0; V0; Q0; W0];
+initialPosition = [0; 0; 3488]; % spatial position of cm
+initialVelocity = [1;0;-0.0001]; % Initial velocity of cm
+initialQuaternion = [0;0.7071;0;0.7071]; % Initial attitude
+initialAngularVelocity = [0;0;0]; % Initial angular rotation in rocket principle coordinates
+initialState = [initialPosition; initialVelocity; initialQuaternion; initialAngularVelocity];
+% initialPosition = S2E(1,1:3)'; % spatial position of cm
+% initialVelocity = S2E(1,4:6)'; % Initial velocity of cm
+% initialQuaternion = [0;sin(delta/2);0;cos(delta/2)]; % Initial attitude
+% %initialQuaternion = S2E(1,7:10)';
+% initialAngularVelocity = S2E(1,11:13)'; % Initial angular rotation in rocket principle coordinates
+% initialState = [initialPosition; initialVelocity; initialQuaternion; initialAngularVelocity];
 
 % time span
 tspan = [10, 40];
@@ -38,8 +38,8 @@ tspan = [10, 40];
 Option = odeset('Events', @FlightEventFunc);
 
 % integration
-[T, S, TE, SE, IE] = ode45(@(t,s) Dynamics_6DOF(t,s,Rocket,Environnement),tspan,S0, Option);
-[T1, S1, TE1, SE1, IE1] = ode45(@(t,s) Dynamics_3DOF(t,s,Rocket,Environnement),tspan,S0(1:6), Option);
+[T, S, TE, SE, IE] = ode45(@(t,s) Dynamics_6DOF(t,s,Rocket,Environnement),tspan,initialState, Option);
+[railTime, railState, TE1, SE1, IE1] = ode45(@(t,s) Dynamics_3DOF(t,s,Rocket,Environnement),tspan,initialState(1:6), Option);
 %% ------------------------------------------------------------------------
 % 6DOF Result Analysis
 %--------------------------------------------------------------------------
@@ -48,13 +48,13 @@ Option = odeset('Events', @FlightEventFunc);
 C = quat2rotmat(S(:, 7:10));
 %figure; 
 hold on;
-direcv = zeros(length(C),3);
+directionVectors = zeros(length(C),3);
 for i  = 1:length(C)
-    direcv(i,:) = C(:,:,i)*[0;0;1];
+    directionVectors(i,:) = C(:,:,i)*[0;0;1];
 end
 plot(S(:,1), S(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '6DOF']);
-plot(S1(:,1), S1(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '3DOF']);
-%quiver(S(:,1), S(:,3), direcv(:,1), direcv(:,3));
+plot(railState(:,1), railState(:,3), 'DisplayName', ['\delta_0 = ' num2str(delta*180/pi) ', V_{\infty} = ' num2str(Environnement.V_inf) '3DOF']);
+%quiver(S(:,1), S(:,3), directionVectors(:,1), directionVectors(:,3));
 title 'Altitude vs. drift'
 xlabel 'Drift [m]'; ylabel 'Altitude [m]';
 %daspect([1 1 1]); pbaspect([1 1 1])

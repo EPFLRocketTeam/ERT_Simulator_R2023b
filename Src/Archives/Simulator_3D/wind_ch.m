@@ -6,9 +6,9 @@ function wind_ch(wind_v,altitudes,azimuth,variance,environment_name)
 %This method changes the environment definition file for wind value
 %and azimuth angle value given as input
 input=readlines(environment_name,"EmptyLineRule","skip");
-replace1=['V_inf ' num2str(altitudes(1))];%replace1=['Rail_Angle ', num2str(azimuth)];
+replace1=['V_inf ' num2str(altitudes(1))];%replace1=['railAngle ', num2str(azimuth)];
 replace2=['V_Azimuth ',num2str(azimuth)];
-replace4=['Rail_Azimuth ', num2str(azimuth)]; %num2str(180+azimuth)];
+replace4=['railAzimuth ', num2str(azimuth)]; %num2str(180+azimuth)];
 replace3=['multilayerwind ',num2str(size(wind_v,2)),' '];
 for i=1:size(wind_v,2)
 replace3= [replace3 , num2str(altitudes(i)) ,' ' , num2str(wind_v(i)) ,...

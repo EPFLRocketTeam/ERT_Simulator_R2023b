@@ -13,7 +13,7 @@ addpath(genpath('../Declarations'),...
 % Rocket Definition
  Rocket = rocketReader('Wildhorn.txt');
 Environment = environnementReader('Environment/Environnement_Definition_EUROC.txt');
-% SimOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
+% simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 
 warning('off','all')
 %% For csv : time[s],altitude[ft],acc[m/s^2],stability margin [calib],mach
@@ -24,8 +24,8 @@ altitude = OpenRocketData(:,2); %altitude above launch point
 veloc = OpenRocketData(:,3);
 acc = OpenRocketData(:,4);
 attack_angle=OpenRocketData(:,5);
-Mass=OpenRocketData(:,6)/1000;
-Il=OpenRocketData(:,7);
+mass=OpenRocketData(:,6)/1000;
+inertiaLong=OpenRocketData(:,7);
 x_cp = OpenRocketData(:,8)/100;
 x_cg = OpenRocketData(:,9)/100;
 margin1 = OpenRocketData(:,10);
@@ -33,10 +33,10 @@ mach1 = OpenRocketData(:,11);
 [apogee1,i_apo1] = max(altitude);
 t_apo1 = time(i_apo1);
 
-% Y=gradient(Mass)./gradient(time);
+% Y=gradient(mass)./gradient(time);
 % 
 % figure
-% plot(time, Mass)
+% plot(time, mass)
 % hold on
 % plot(time(1:end), Y)
 % legend('mass','mdot')
@@ -46,7 +46,7 @@ t_apo1 = time(i_apo1);
 
 for j=1:length(time)
 % Local speed of sound and density of air
-[~,a(j),~,rho] = stdAtmos(Environment.Start_Altitude + altitude(j), Environment);
+[~,a(j),~,density] = stdAtmos(Environment.startAltitude + altitude(j), Environment);
 
 M(j) = veloc(j)/a(j); %mach number
 alpha = attack_angle(j)*pi/180; %angle of attack
@@ -61,9 +61,9 @@ end
 d = max(Rocket.stageDiameters);
 Ar = pi/4*d^2;
 
-C2A(j) = rho * veloc(j) * Ar / 2 * CNa2A(j);
+C2A(j) = density * veloc(j) * Ar / 2 * CNa2A(j);
 
-dMdt = -gradient(Mass)./gradient(time); %change in rocket mass
+dMdt = -gradient(mass)./gradient(time); %change in rocket mass
 Lne = 2.75; %distance tip of rocket to nozzle
 
 C2R(j) = dMdt(j) * (Lne - W)^2;
@@ -73,13 +73,13 @@ C2R(j) = dMdt(j) * (Lne - W)^2;
 % C2: Damping Moment Coefficient
 C2(j) = C2A(j) + C2R(j);
 
-CNa(j) = sum(Calpha(j,:));
+normalForceCoefficientSlope(j) = sum(Calpha(j,:));
 P = x_cp(j);
 
-C1(j) = rho / 2 * veloc(j)^2 * Ar * CNa(j) * (P - W);
+C1(j) = density / 2 * veloc(j)^2 * Ar * normalForceCoefficientSlope(j) * (P - W);
 
 % Damping ratio
-epsilon(j) = C2(j) / (2 * sqrt(C1(j) * Il(j)));
+epsilon(j) = C2(j) / (2 * sqrt(C1(j) * inertiaLong(j)));
 
 end
 %% Plot data
@@ -99,7 +99,7 @@ end
 % figure;
 % hold on;grid on;
 % title('Stability margin')
-% plot(time,margin1,'DisplayName','Stability Margin','Linewidth',lw);
+% plot(time,margin1,'DisplayName','Stability stabilityMargin','Linewidth',lw);
 % xlabel('time [s]');
 % ylabel('stability margin [cal]');
 % % 

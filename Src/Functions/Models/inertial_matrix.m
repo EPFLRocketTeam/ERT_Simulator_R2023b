@@ -2,13 +2,13 @@
 
 function I = inertial_matrix(rocket, Cm, t)
     if t < rocket.Burn_Time
-        % Find position of the CM of the propelant 
+        % Find position of the centerOfMass of the propelant 
         z_propel = rocket.tank_z + (1 - t / rocket.Burn_Time) * rocket.tank_L;
 
         % Evaluate the mass of propelant
         propelant_mass = rocket.propel_mass * (1 - t / rocket.Burn_Time);
 
-        % Find the distance between rocket CM and propelant CM
+        % Find the distance between rocket centerOfMass and propelant centerOfMass
         delta_z = z_propel - Cm;
     
         % Compute I of propelant

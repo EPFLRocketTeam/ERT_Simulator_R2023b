@@ -16,53 +16,53 @@ while ~feof(rfid)
     [line_id, line_data] = strtok(line_content);
     switch line_id
         
-        case 'Margin'
+        case 'stabilityMargin'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Margin = line_data_num{1}(1);
+            SimOutput.stabilityMargin = line_data_num{1}(1);
             
-        case 'Alpha'
+        case 'angleOfAttack'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Alpha = line_data_num{1}(1);
+            SimOutput.angleOfAttack = line_data_num{1}(1);
             
-        case 'Cn_alpha'
+        case 'normalForceCoefficientSlope'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Cn_alpha = line_data_num{1}(1);
+            SimOutput.normalForceCoefficientSlope = line_data_num{1}(1);
             
-        case 'Xcp'
+        case 'centerOfPressure'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Xcp = line_data_num{1}(1);    
+            SimOutput.centerOfPressure = line_data_num{1}(1);    
         
-        case 'Cd'
+        case 'dragCoefficient'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Cd = line_data_num{1}(1);
+            SimOutput.dragCoefficient = line_data_num{1}(1);
            
-        case 'Mass'
+        case 'mass'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Mass = line_data_num{1};  
+            SimOutput.mass = line_data_num{1};  
             
-        case 'CM'
+        case 'centerOfMass'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.CM = line_data_num{1}(1);
+            SimOutput.centerOfMass = line_data_num{1}(1);
             
-        case 'Il'
+        case 'inertiaLong'
             line_data_num = textscan(line_data,'%f');
-            SimOutput.Il = line_data_num{1}(1);
+            SimOutput.inertiaLong = line_data_num{1}(1);
             
-        case 'Ir'
+        case 'inertiaRot'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Ir = line_data_num{1}(1);
+            SimOutput.inertiaRot = line_data_num{1}(1);
             
-        case 'Delta'
+        case 'flightPathAngle'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Delta = line_data_num{1}(1);
+            SimOutput.flightPathAngle = line_data_num{1}(1);
             
-        case 'Nose_Alpha'
+        case 'noseAngleOfAttack'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Nose_Alpha = line_data_num{1}(1);
+            SimOutput.noseAngleOfAttack = line_data_num{1}(1);
             
-        case 'Nose_Delta'
+        case 'noseFlightPathAngle'
             line_data_num = textscan(line_data, '%f');
-            SimOutput.Nose_Delta = line_data_num{1}(1);
+            SimOutput.noseFlightPathAngle = line_data_num{1}(1);
             
         otherwise
             display(['ERROR: In simOutput definition, unknown line identifier: ' line_id]);

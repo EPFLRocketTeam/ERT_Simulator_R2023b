@@ -103,7 +103,7 @@ function varargout = boundedline(varargin)
 % Parse input
 %--------------------
 
-% Alpha flag
+% angleOfAttack flag
 
 isalpha = cellfun(@(x) ischar(x) && strcmp(x, 'alpha'), varargin);
 if any(isalpha)

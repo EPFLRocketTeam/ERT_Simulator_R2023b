@@ -4,7 +4,7 @@ function [mass,dmassdt] = Mass_Non_Lin(t,Rocket)
 %   - t         Time
 %   - Rocket    Structure Containing all datas
 %   OUTPUT:
-%   - Mass      Rocket mass
+%   - mass      Rocket mass
 %   - dMassdt   Rocket mass derivative over time
 
 % OUTPUT:

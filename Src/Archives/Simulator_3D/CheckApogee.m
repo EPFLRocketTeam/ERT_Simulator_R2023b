@@ -13,7 +13,7 @@ addpath(genpath('../Declarations'),...
 Rocket_USA = rocketReader('BL_H4.txt');
 Environment_USA = environnementReader('Environnement_Definition.txt');
 Environment_Payerne = environnementReader('Environnement_Definition_Payerne.txt');
-SimOutputs = SimOutputReader('Simulation_outputs.txt');
+simulationOutputs = SimOutputReader('Simulation_outputs.txt');
 
 % OpenRocket data
 OR_t_U = [25.3, 25.25, 25.25, 25.2];
@@ -46,14 +46,14 @@ for v = 0:2:6
     Environment_USA.V_inf = v+0.001;
 
     % 3D_USA 
-    SimObj_U = Simulator3D(Rocket_USA, Environment_USA, SimOutputs);
-    [T3D1_U, S3D1_U] = SimObj_U.RailSim();
-    [T3D2_U, S3D2_U] = SimObj_U.FlightSim(T3D1_U(end), S3D1_U(end,2));
+    simulationObj_U = Simulator3D(Rocket_USA, Environment_USA, simulationOutputs);
+    [T3D1_U, S3D1_U] = simulationObj_U.RailSim();
+    [T3D2_U, S3D2_U] = simulationObj_U.FlightSim(T3D1_U(end), S3D1_U(end,2));
 
     % 3D_Payerne
-    SimObj_P = Simulator3D(Rocket_Payerne, Environment_Payerne, SimOutputs);
-    [T3D1_P, S3D1_P] = SimObj_P.RailSim();
-    [T3D2_P, S3D2_P] = SimObj_P.FlightSim(T3D1_P(end), S3D1_P(end,2));
+    simulationObj_P = Simulator3D(Rocket_Payerne, Environment_Payerne, simulationOutputs);
+    [T3D1_P, S3D1_P] = simulationObj_P.RailSim();
+    [T3D2_P, S3D2_P] = simulationObj_P.FlightSim(T3D1_P(end), S3D1_P(end,2));
 
     % 2D_USA
     % Initial Conditions
@@ -64,11 +64,11 @@ for v = 0:2:6
     Option = odeset('Events', @myEventRail);
     [T2D1_U,S2D1_U] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket_USA,Environment_USA),tspan,x_0,Option);
 
-    Rail_Angle = Environment_USA.Rail_Angle;
-    Rail_L = Environment_USA.Rail_Length;
+    railAngle = Environment_USA.railAngle;
+    Rail_L = Environment_USA.railLength;
 
     % Initial Conditions
-    x_0 = [Rail_L*sin(Rail_Angle);S2D1_U(end,2)*sin(Rail_Angle);Rail_L*cos(Rail_Angle);S2D1_U(end,2)*cos(Rail_Angle);Rail_Angle;0]; % No speed, no height, no angle
+    x_0 = [Rail_L*sin(railAngle);S2D1_U(end,2)*sin(railAngle);Rail_L*cos(railAngle);S2D1_U(end,2)*cos(railAngle);railAngle;0]; % No speed, no height, no angle
     tspan = [T2D1_U(end) 28];
 
     % Simulation
@@ -84,11 +84,11 @@ for v = 0:2:6
     Option = odeset('Events', @myEventRail);
     [T2D1_P,S2D1_P] = ode45(@(t,x) Rail_Initial_State(t,x,Rocket_Payerne,Environment_Payerne),tspan,x_0,Option);
 
-    Rail_Angle = Environment_Payerne.Rail_Angle;
-    Rail_L = Environment_Payerne.Rail_Length;
+    railAngle = Environment_Payerne.railAngle;
+    Rail_L = Environment_Payerne.railLength;
 
     % Initial Conditions
-    x_0 = [Rail_L*sin(Rail_Angle);S2D1_P(end,2)*sin(Rail_Angle);Rail_L*cos(Rail_Angle);S2D1_P(end,2)*cos(Rail_Angle);Rail_Angle;0]; % No speed, no height, no angle
+    x_0 = [Rail_L*sin(railAngle);S2D1_P(end,2)*sin(railAngle);Rail_L*cos(railAngle);S2D1_P(end,2)*cos(railAngle);railAngle;0]; % No speed, no height, no angle
     tspan = [T2D1_P(end) 28];
 
     % Simulation

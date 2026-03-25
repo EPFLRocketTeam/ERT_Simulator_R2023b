@@ -20,7 +20,7 @@ V_inf = Environnement.V_inf;        % Vitesse du vent [m/s]
 
 % Appels des fonctions necessaires
 [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'NonLinear');
-[Temp, a, p, rho, nu] = stdAtmos(x(3),Environnement); % Atmosphere [K,m/s,Pa,kg/m3]
+[Temp, a, p, density, nu] = stdAtmos(x(3),Environnement); % Atmosphere [K,m/s,Pa,kg/m3]
 g = 9.81;                           % Gravite [m2/s]
 
 % Repere de base
@@ -61,16 +61,16 @@ T = [0;Thrust(t,Rocket)];
 V = norm(Vrel);          % Flux d'air vu par la fusee
 CD_AB = drag_shuriken(Rocket,theta,abs(alpha),V,nu); % Coef. Trainee des A?rofreins
 CD = drag(Rocket,abs(alpha),V,nu,a);             % Coef. Trainee de la fus?e
-q = 1/2*rho*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
+q = 1/2*density*Rocket.maxCrossSectionArea*V^2;                  % Pression dynamique
 Ft = [0;-q*(CD+CD_AB)];                     % Force de train?e
 
 % Force Normale (E,F)
-[CNa, Xp] = normalLift(Rocket,abs(alpha),1.1,V/a,0,0); % Normal lift Coefficient
-Fn = [q*CNa*alpha;0];        % Force Normale
+[normalForceCoefficientSlope, Xp] = normalLift(Rocket,abs(alpha),1.1,V/a,0,0); % Normal lift Coefficient
+Fn = [q*normalForceCoefficientSlope*alpha;0];        % Force Normale
 
 % Moment autour de X=D=U
 [Calpha, CP] = barrowmanLift(Rocket,abs(alpha),V/a,0); % Coef. Normaux des sections
-C1 = CorrectionMoment(t,Rocket,CNa,Xp,V,Environnement,x(3)); % Coef. Moment de correction
+C1 = CorrectionMoment(t,Rocket,normalForceCoefficientSlope,Xp,V,Environnement,x(3)); % Coef. Moment de correction
 C2 = DampingMoment(t,Rocket,Calpha,CP,V,Environnement,x(3)); % Coef. Moment amortis
 
 %--------------------------------------------------------------------------

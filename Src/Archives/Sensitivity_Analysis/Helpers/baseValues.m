@@ -1,8 +1,8 @@
- function XX = baseValues(SimObj, Xid, s)
-%BASEVALUES extracts the parameters of the already existing SimObj and return the domain
+ function XX = baseValues(simulatior3D, Xid, s)
+%BASEVALUES extracts the parameters of the already existing simulatior3D and return the domain
 %of definition of each value (i.e. the domain in which it can variate for the SA).
 %   INPUTS: 
-%       SimObj      Simulator object containing the base values of the parameters
+%       simulatior3D      Simulator object containing the base values of the parameters
 %       Xid         IDs of the parameters that will change during the SA.
 %       s           Relative size of the the domain of definition (i.g. if x0 is the base
 %                   value of parameter x, then x will take value in [a, b] with
@@ -18,7 +18,7 @@ end
 
 %TODO Check that the base values are correct
 
-[rocketparamIDs, envparamIDs] = paramNames(SimObj);
+[rocketparamIDs, envparamIDs] = paramNames(simulatior3D);
 
 % Initialazing
 k = length(Xid);
@@ -29,48 +29,48 @@ for i=1:k
     
     switch id
         case "dmin"
-            XX(i,1) = SimObj.Rocket.("stageDiameters")(end);
+            XX(i,1) = simulatior3D.Rocket.("stageDiameters")(end);
         case "dd"
-            XX(i,1) = max(SimObj.Rocket.("stageDiameters")) - SimObj.Rocket.("stageDiameters")(end);
+            XX(i,1) = max(simulatior3D.Rocket.("stageDiameters")) - simulatior3D.Rocket.("stageDiameters")(end);
         case "z1"
-            XX(i,1) = SimObj.Rocket.("stagePositions")(2);
+            XX(i,1) = simulatior3D.Rocket.("stagePositions")(2);
         case "z12"
-            XX(i,1) = SimObj.Rocket.("stagePositions")(3) - SimObj.Rocket.("stagePositions")(2);
+            XX(i,1) = simulatior3D.Rocket.("stagePositions")(3) - simulatior3D.Rocket.("stagePositions")(2);
         case "z23"
-            XX(i,1) = SimObj.Rocket.("stagePositions")(4) - SimObj.Rocket.("stagePositions")(3); 
-        case "T1"
-            XX(i,1) = SimObj.Rocket.("Thrust_Force")(2); 
-        case "T2"
-            XX(i,1) = SimObj.Rocket.("Thrust_Force")(3);
+            XX(i,1) = simulatior3D.Rocket.("stagePositions")(4) - simulatior3D.Rocket.("stagePositions")(3); 
+        case "railTime"
+            XX(i,1) = simulatior3D.Rocket.("Thrust_Force")(2); 
+        case "flightTime"
+            XX(i,1) = simulatior3D.Rocket.("Thrust_Force")(3);
         case "Vi1"
-            XX(i,1) = SimObj.Environment.("Vspeed")(2);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(2);
         case "Vi2"
-            XX(i,1) = SimObj.Environment.("Vspeed")(11);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(11);
         case "Vi3"
-            XX(i,1) = SimObj.Environment.("Vspeed")(16);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(16);
         case "Vi4"
-            XX(i,1) = SimObj.Environment.("Vspeed")(51);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(51);
         case "Vi5"
-            XX(i,1) = SimObj.Environment.("Vspeed")(101);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(101);
         case "Vi6"
-            XX(i,1) = SimObj.Environment.("Vspeed")(201);
+            XX(i,1) = simulatior3D.Environment.("Vspeed")(201);
         case "ai1"
-            XX(i,1) = SimObj.Environment.("Vazy")(2);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(2);
         case "ai2"
-            XX(i,1) = SimObj.Environment.("Vazy")(11);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(11);
         case "ai3"
-            XX(i,1) = SimObj.Environment.("Vazy")(16);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(16);
         case "ai4"
-            XX(i,1) = SimObj.Environment.("Vazy")(51);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(51);
         case "ai5"
-            XX(i,1) = SimObj.Environment.("Vazy")(101);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(101);
         case "ai6"
-            XX(i,1) = SimObj.Environment.("Vazy")(201);
+            XX(i,1) = simulatior3D.Environment.("Vazy")(201);
         otherwise
             if ismember(id, rocketparamIDs)
-                XX(i,1) = SimObj.Rocket.(id);
+                XX(i,1) = simulatior3D.Rocket.(id);
             elseif ismember(id, envparamIDs)
-                XX(i,1) = SimObj.Environment.(id);
+                XX(i,1) = simulatior3D.Environment.(id);
             else
                 print("Error: unknown parameter (", id, ")");
             end
@@ -82,9 +82,9 @@ XX(:,2) = (1-s)*XX(:,1);
 XX(:,3) = (1+s)*XX(:,1);
 
 % Checking the physical conditions
-if SimObj.Rocket.stagePositions(3)*(1-s) < (SimObj.Rocket.finRootChord + SimObj.Rocket.finRootPosition)*(1+s)
+if simulatior3D.Rocket.stagePositions(3)*(1-s) < (simulatior3D.Rocket.finRootChord + simulatior3D.Rocket.finRootPosition)*(1+s)
     disp("Warning: the fins might be two far back compared to the length of the rocket (unrealistic configuration). Decrease sigma.");
-if SimObj.Rocket.stagePositions(3)*(1-s) < SimObj.Rocket.airbrakePosition*(1+s)
+if simulatior3D.Rocket.stagePositions(3)*(1-s) < simulatior3D.Rocket.airbrakePosition*(1+s)
     disp("Warning: the airbrakes might be two far back compared to the length of the rocket (unrealistic configuration). Decrease sigma."); 
 end
 

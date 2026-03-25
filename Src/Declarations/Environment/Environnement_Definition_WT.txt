@@ -1,4 +1,4 @@
-Temperature_Ground 292
-Pressure_Ground 96685
-Humidity_Ground 1
+groundTemperature 292
+groundPressure 96685
+groundHumidity 1
 V_Azimuth 160

@@ -252,7 +252,7 @@ Rocket.virtualFinArea = Rocket.exposedFinArea + 1/2 * Rocket.finBodyDiameter * R
 Rocket.totalLength = Rocket.stagePositions(end);
 
 % 4.8 Rocket inertia including motor and tank
-[~, ~, ~, ~, longitudinalInertia, ~, radialInertia, ~] = Mass_Properties(0, Rocket, 'Linear');
+[~, ~, ~, ~, longitudinalInertia, ~, radialInertia, ~] = massProperties(0, Rocket, 'Linear');
 if ~isfield(Rocket, 'inertiaMatrix')
     Rocket.inertiaMatrix = [longitudinalInertia, 0, 0; 0, longitudinalInertia, 0; 0, 0, radialInertia];
 end

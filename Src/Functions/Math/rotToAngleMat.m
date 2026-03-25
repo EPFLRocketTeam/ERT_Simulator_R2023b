@@ -1,4 +1,5 @@
-function angle = rot2anglemat(C)
+function angle = rotToAngleMat(C)
+% C is the rotation matrix
 
 pitch = atand(C(2,3,:)./C(3,3,:));
 yaw = -asind(C(1,3,:));

@@ -1,4 +1,4 @@
-function dragCoefficient = drag(rocket, angleOfAttack, freestreamVelocity, kinematicViscosity, speedOfSound)
+function dragCoefficient = drag(rocket, angleOfAttack, freeStreamVelocity, kinematicViscosity, speedOfSound)
 % CALCULATEDRAG - Rocket drag calculation function based on Mandell's book "Topics
 % on advanced model Rocketry" (unless otherwise specified). 
 %
@@ -9,7 +9,7 @@ function dragCoefficient = drag(rocket, angleOfAttack, freestreamVelocity, kinem
 % INPUTS:
 % - rocket            : Rocket object
 % - angleOfAttack     : Angle of attack [rad]
-% - freestreamVelocity : Free stream velocity [m/s]
+% - freeStreamVelocity : Free stream velocity [m/s]
 % - kinematicViscosity : Kinematic viscosity [m2/s] (Note: Original was 'Dynamic' but unit m2/s is kinematic)
 % - speedOfSound      : Speed of sound [m/s]
 %
@@ -19,12 +19,21 @@ function dragCoefficient = drag(rocket, angleOfAttack, freestreamVelocity, kinem
 % REFERENCES:
 % - Gordon K. Mandell, Topics in Advanced Model Rocketry, MIT Press, 1973
 % - Hassan Arif, Identification and Control of a High Power Rocket, EPFL
-%   Semester Project Report, Professor Collin Jones, June 2017.
+% Semester Project Report, Professor Collin Jones, June 2017.
+
+% read this file with data used for drag calculation as a persistent
+% variable, since reading it every time step is inefficient
+% (defined in eq 3.3, p 19)
+persistent cpSinArray
+    if isempty(cpSinArray)
+        cpSinArray = readmatrix("data_Cp_conical_nose_sin.csv");
+    end
+
 % -------------------------------------------------------------------------
 % 0. Divergence 
 % -------------------------------------------------------------------------
-if freestreamVelocity < 0.1
-    freestreamVelocity = 0.1;
+if freeStreamVelocity < 0.1
+    freeStreamVelocity = 0.1;
 end
 % -------------------------------------------------------------------------
 % 1. Geometrical Parameters
@@ -39,10 +48,10 @@ finVirtualPlanformArea = rocket.virtualFinArea; % Virtual fin planform area
 % 2. Reynolds Numbers (eq 191, p 458)
 % -------------------------------------------------------------------------
 % 2.1 Body 
-reynoldsNumberBody = rocket.stagePositions(end) * freestreamVelocity / kinematicViscosity;
+reynoldsNumberBody = rocket.stagePositions(end) * freeStreamVelocity / kinematicViscosity;
 reynoldsNumberBodyCritical = 5e5;
 % 2.2 Fins
-reynoldsNumberFins = finChord * freestreamVelocity / kinematicViscosity; 
+reynoldsNumberFins = finChord * freeStreamVelocity / kinematicViscosity; 
 reynoldsNumberFinsCritical = 5.14e6;
 % Critical values of the Reynolds number are selected as shown in Fig. 51,
 % p.464
@@ -209,14 +218,14 @@ end
     finalTransonicMach = 1.5; %a1*((Le)/(d))^(b)+1.0275;
     
     % Mach number
-    machNumber = freestreamVelocity / speedOfSound;
+    machNumber = freeStreamVelocity / speedOfSound;
     
     if dragDivergenceMach < machNumber && machNumber < finalTransonicMach
     % -------------------------------------------------------------------------
     % 7. Transsonic drag coefficient
     % -------------------------------------------------------------------------    
         
-        dragCoefficient = dragTransonic(rocket, angleOfAttack, freestreamVelocity, kinematicViscosity, speedOfSound);
+        dragCoefficient = dragTransonic(rocket, angleOfAttack, freeStreamVelocity, kinematicViscosity, speedOfSound);
     
     elseif machNumber >= finalTransonicMach
         
@@ -238,9 +247,6 @@ end
         % heat capacity ratio
         heatCapacityRatio = 1.4;
         
-        % (defined in eq 3.3, p 19)
-        cpSinArray = load("data_Cp_conical_nose_sin.csv");
-        
         % ---------------------------------------------------------------------
         % 3.1  Nose drag
         % ---------------------------------------------------------------------
@@ -249,8 +255,8 @@ end
         numPhiAngles = 100;
         phiAngles = linspace(0.5 * pi / numPhiAngles, (numPhiAngles - 0.5) * pi / numPhiAngles, numPhiAngles);
         noseConeAngle = atan(noseBaseRadiusMeters / noseLengthMeters);
-        localConeAngle = asin(cos(angleOfAttack) * sin(noseConeAngle) * ones(1, numPhiAngles) - sin(angleOfAttack) * cos(phiAngles) * cos(noseConeAngle));
-        nosePressureDragCoeff = sum(cp_sin(localConeAngle, machNumber, cpSinArray)) * noseLengthMeters / numPhiAngles / noseBaseRadiusMeters / cos(noseConeAngle);
+        semiVertexAngle = asin(cos(angleOfAttack) * sin(noseConeAngle) * ones(1, numPhiAngles) - sin(angleOfAttack) * cos(phiAngles) * cos(noseConeAngle));
+        nosePressureDragCoeff = sum(cpSin(semiVertexAngle, machNumber, cpSinArray)) * noseLengthMeters / numPhiAngles / noseBaseRadiusMeters / cos(noseConeAngle);
         
         % 3.1.2  Friction drag of nose + body (eq 3.4, p 19)
         if reynoldsNumberBody < reynoldsNumberBodyCritical
@@ -315,7 +321,7 @@ end
         % Linear interpolation between transonic and supersonic drag
         % coefficient. Interpolation between M = 1.5 and M = 3.
         if machNumber < 3
-            transonicDrag = dragTransonic(rocket, angleOfAttack, freestreamVelocity, kinematicViscosity, speedOfSound);
+            transonicDrag = dragTransonic(rocket, angleOfAttack, freeStreamVelocity, kinematicViscosity, speedOfSound);
             supersonicDrag =  nosePressureDragCoeff + noseBodyFrictionDragCoeff + bodyPressureDragCoeff + (finPressureDragCoeff + finFrictionDragCoeff) * finChord * rocket.finSpan / maxCrossSectionalArea + supersonicBaseDragCoeff * baseArea / maxCrossSectionalArea;
             dragCoefficient = ((3 - machNumber) * transonicDrag + (machNumber - 1.5) * supersonicDrag) / 1.5;
         else

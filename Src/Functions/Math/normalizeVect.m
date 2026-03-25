@@ -1,8 +1,8 @@
-function v_unit = normalizeVect(v)
-    v_norm = norm(v);
-    if v_norm == 0
-       v_unit = v*0; 
+function vUnit = normalizeVect(v)
+    vNorm = norm(v);
+    if vNorm == 0
+       vUnit = v*0; 
     else
-       v_unit = v/v_norm;
+       vUnit = v/vNorm;
     end
 end

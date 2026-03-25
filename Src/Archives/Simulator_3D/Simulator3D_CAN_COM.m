@@ -86,7 +86,7 @@ classdef Simulator3D_CAN_COM < handle
             v = s(2); % speed
 
             % Rocket Inertia
-            [mass,dMdt] = Mass_Non_Lin(t,obj.Rocket); % mass
+            [mass,dMdt] = massNonLin(t,obj.Rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -149,8 +149,8 @@ classdef Simulator3D_CAN_COM < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -400,7 +400,7 @@ classdef Simulator3D_CAN_COM < handle
             G = -9.81*M*ZE;
             % Drag
             % Drag coefficient
-            CD = Nose_drag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
+            CD = noseDrag(Rocket, 0, norm(V_rel), nu, a); % (TODO: make air-viscosity adaptable to temperature)
             % Drag force
             D = -0.5*density*Rocket.maxCrossSectionArea*CD*V_rel*norm(V_rel); 
 
@@ -443,8 +443,8 @@ classdef Simulator3D_CAN_COM < handle
             ZE = [0, 0, 1]';
 
             % Rocket Inertia
-            [M,dMdt,Cm,~,I_L,~,I_R,~] = Mass_Properties(t,obj.Rocket,'NonLinear');
-            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in Mass_Properties
+            [M,dMdt,Cm,~,I_L,~,I_R,~] = massProperties(t,obj.Rocket,'NonLinear');
+            I = C'*diag([I_L, I_L, I_R])*C; % Inertia TODO: I_R in massProperties
 
             % Environment
             g = 9.81;               % Gravity [m/s2]
@@ -519,7 +519,7 @@ classdef Simulator3D_CAN_COM < handle
 
             % Drag
             % Drag coefficient
-            CD = Nose_drag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
+            CD = noseDrag(obj.Rocket, alpha, Vmag, nu, a)*obj.Rocket.dragCoefficientFactor; 
             if(t>obj.Rocket.Burn_Time)
               CD = CD + drag_shuriken(obj.Rocket, obj.Rocket.airbrakeAngle, alpha, Vmag, nu); 
             end

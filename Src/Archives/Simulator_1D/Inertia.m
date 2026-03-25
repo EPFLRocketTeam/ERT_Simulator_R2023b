@@ -8,7 +8,7 @@ function [I_L,dI_Ldt,I_R] = Inertia(t,Rocket)
 %   - I_R       Rotational Inertia
 
 % Appel de fonctions necessaires
-[M,dMdt] = Mass_Lin(t,Rocket);
+[M,dMdt] = massLin(t,Rocket);
 [cm dcmdt] = centerOfMass(t,Rocket);
 
 % I_L:

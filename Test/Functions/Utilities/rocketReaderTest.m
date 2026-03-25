@@ -43,7 +43,7 @@ classdef rocketReaderTest < matlab.unittest.TestCase
         function setupMethod(testCase)
             % Save original functions and create mocks
             testCase.OriginalMotor2RocketReader = which('motor2RocketReader');
-            testCase.OriginalMassProperties = which('Mass_Properties');
+            testCase.OriginalMassProperties = which('massProperties');
             
             % Get the path where rocketReader is located
             rocketReaderPath = which('rocketReader');
@@ -58,10 +58,10 @@ classdef rocketReaderTest < matlab.unittest.TestCase
             fprintf(fid, 'end\n');
             fclose(fid);
             
-            % Create a simple mock for Mass_Properties
-            mockFile2 = fullfile(funcPath, 'Mass_Properties.m');
+            % Create a simple mock for massProperties
+            mockFile2 = fullfile(funcPath, 'massProperties.m');
             fid = fopen(mockFile2, 'w');
-            fprintf(fid, 'function [mass, cm, inertia, cp, longInertia, radInertia, Ixx, Iyy] = Mass_Properties(time, Rocket, mode)\n');
+            fprintf(fid, 'function [mass, cm, inertia, cp, longInertia, radInertia, Ixx, Iyy] = massProperties(time, Rocket, mode)\n');
             fprintf(fid, '    %% Mock function for testing\n');
             fprintf(fid, '    longInertia = 1.0;\n');
             fprintf(fid, '    radInertia = 0.1;\n');
@@ -88,7 +88,7 @@ classdef rocketReaderTest < matlab.unittest.TestCase
                 delete(mockFile);
             end
             
-            mockFile2 = fullfile(funcPath, 'Mass_Properties.m');
+            mockFile2 = fullfile(funcPath, 'massProperties.m');
             if exist(mockFile2, 'file')
                 delete(mockFile2);
             end

@@ -57,7 +57,7 @@ end
 dNom = max(rocket.stageDiameters);
 arNom = pi/4*dNom^2;
 c2ANom = rhoNom * vNom * arNom / 2 * cNa2ANom;
-[~,dMdtNom] = Mass_Non_Lin(t1Nom(end), rocket);
+[~,dMdtNom] = massNonLin(t1Nom(end), rocket);
 lneNom = rocket.stagePositions(end);
 c2RNom = dMdtNom * (lneNom - wNom)^2;
 % c2A Aerodynamic Damping Moment Coefficient
@@ -138,7 +138,7 @@ end
 dMax = max(rocket.stageDiameters);
 arMax = pi/4*dMax^2;
 c2AMax = rhoMax * norm(vMax) * arMax / 2 * cNa2AMax;
-[~,dMdtMax] = Mass_Non_Lin(t2Nom(indexMax), rocket);
+[~,dMdtMax] = massNonLin(t2Nom(indexMax), rocket);
 lneMax = rocket.stagePositions(end);
 c2RMax = dMdtMax * (lneMax - wMax)^2;
 % c2A Aerodynamic Damping Moment Coefficient
@@ -236,7 +236,7 @@ end
 dWcRail = max(rocketWcRail.stageDiameters);
 arWcRail = pi/4*dWcRail^2;
 c2AWcRail = rhoWcRail * vWcRail * arWcRail / 2 * cNa2AWcRail;
-[~,dMdtWcRail] = Mass_Non_Lin(t1WcRail(end), rocketWcRail);
+[~,dMdtWcRail] = massNonLin(t1WcRail(end), rocketWcRail);
 lneWcRail = rocketWcRail.stagePositions(end);
 c2RWcRail = dMdtWcRail * (lneWcRail - wWcRail)^2;
 % c2A Aerodynamic Damping Moment Coefficient
@@ -321,7 +321,7 @@ end
 dWcMax = max(simObjWcRail.Rocket.stageDiameters);
 arWcMax = pi/4*dWcMax^2;
 c2AWcMax = rhoWcMax * norm(vWcMax) * arWcMax / 2 * cNa2AWcMax;
-[~,dMdtWcMax] = Mass_Non_Lin(t2WcRail(indexWcMax), simObjWcRail.Rocket);
+[~,dMdtWcMax] = massNonLin(t2WcRail(indexWcMax), simObjWcRail.Rocket);
 lneWcMax = simObjWcRail.Rocket.stagePositions(end);
 c2RWcMax = dMdtWcMax * (lneWcMax - wWcMax)^2;
 % c2A Aerodynamic Damping Moment Coefficient

@@ -208,7 +208,7 @@ classdef MainTest < matlab.unittest.TestCase
             % Test that key computational functions exist and are callable
             
             functionsToCheck = {
-                'drag', 'normalLift', 'Mass_Properties', 'findAltitude', ...
+                'drag', 'normalLift', 'massProperties', 'findAltitude', ...
                 'ApogeeEvent', 'RailEvent', 'Simulator3D'
             };
             

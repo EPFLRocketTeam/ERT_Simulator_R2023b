@@ -18,7 +18,7 @@ dxdt = zeros(6,1);
 V_inf = Environnement.V_inf;        % Vitesse du vent [m/s]
 
 % Appels des fonctions necessaires
-[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'NonLinear');
+[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,'NonLinear');
 [Temp, a, p, density, Nu] = stdAtmos(x(3)+Environnement.startAltitude,Environnement); % Atmosphere [K,m/s,Pa,kg/m3]
 g = 9.81;                           % Gravite [m2/s]
 

@@ -9,7 +9,7 @@ function xdot = Rocket_Kinematic(t,x,Rocket,Environnement,theta,Amplifier)
 xdot = zeros(2,1);
 
 % Call Function:
-[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'Linear');
+[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,'Linear');
 % <<<<<<< HEAD
 % [Temp, a, p, density] = stdAtmos(x(1));
 % =======

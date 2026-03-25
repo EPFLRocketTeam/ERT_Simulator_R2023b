@@ -4,7 +4,7 @@ X = [s(1);s(3)];
 V = [s(2);s(4)];
 
 % Compute mass
-[M,~] = Mass_Lin(t,Rocket);
+[M,~] = massLin(t,Rocket);
 M = M - Rocket.payloadMass;
 
 % Atmospheric Data

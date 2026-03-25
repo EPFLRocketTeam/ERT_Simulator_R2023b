@@ -7,7 +7,7 @@ function [cm dcmdt] = centerOfMass(t,Rocket)
 %   - cm        Center of mass
 
 % Appels de fonctions necessaires
-[M,dMdt] = Mass_Lin(t,Rocket);
+[M,dMdt] = massLin(t,Rocket);
 
 % Centre de masse
 cm = (Rocket.emptyCenterOfMass*Rocket.emptyMass + ... 

@@ -97,7 +97,7 @@ classdef Simulator3DDragOpenRocket < handle
             velocity = state(2); % speed
 
             % Rocket Inertia
-            [mass,massRate] = Mass_Non_Lin(time,obj.rocket); % mass
+            [mass,massRate] = massNonLin(time,obj.rocket); % mass
 
             % Environment
             g = 9.81;               % Gravity [m/s2] 
@@ -158,7 +158,7 @@ classdef Simulator3DDragOpenRocket < handle
             zEarth = [0, 0, 1]';
 
             % Rocket Inertia
-            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = Mass_Properties(time,obj.rocket,'NonLinear');
+            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = massProperties(time,obj.rocket,'NonLinear');
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by a cylinder)
@@ -383,7 +383,7 @@ classdef Simulator3DDragOpenRocket < handle
             gravityForce = -9.81*mass*zEarth;
             
             % Drag coefficient
-            dragCoefficient = Nose_drag(rocket, 0, norm(relativeVelocity), kinematicViscosity, speedOfSound);
+            dragCoefficient = noseDrag(rocket, 0, norm(relativeVelocity), kinematicViscosity, speedOfSound);
             
             % Drag force
             dragForce = -0.5*density*rocket.maxCrossSectionArea*dragCoefficient*relativeVelocity*norm(relativeVelocity);
@@ -426,7 +426,7 @@ classdef Simulator3DDragOpenRocket < handle
             zEarth = [0, 0, 1]';
 
             % Rocket Inertia
-            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = Mass_Properties(time,obj.rocket,'NonLinear');
+            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = massProperties(time,obj.rocket,'NonLinear');
 
             % Inertia using the given I_rocket and the motor
             motorInertia = inertia_fill_cylinder(mass, ...
@@ -493,7 +493,7 @@ classdef Simulator3DDragOpenRocket < handle
             end
 
             % Drag
-            dragCoefficient = Nose_drag(obj.rocket, angleOfAttack, relativeSpeed, kinematicViscosity, speedOfSound)*obj.rocket.dragCoefficientFactor; 
+            dragCoefficient = noseDrag(obj.rocket, angleOfAttack, relativeSpeed, kinematicViscosity, speedOfSound)*obj.rocket.dragCoefficientFactor; 
             
             if time > obj.rocket.flightTime
                 dragCoefficient = dragCoefficient + drag_shuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 

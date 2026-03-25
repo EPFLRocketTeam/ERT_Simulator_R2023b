@@ -1,4 +1,16 @@
-function [normalForceCoefficientSlope, Xp, CNa_barrowman, Xp_barrowman] = normalLift(Rocket, alpha, K, M, theta, Galejs)
+function [ ...
+    normalLiftDerivative, ... CNa
+    centerOfPressure, ... Xp
+    normalLiftDerivativeBarrowman, ... CNa_barrowman
+    centerOfPressureBarrowman ... Xp_barrowman
+] = normalLift( ...
+    Rocket, ...
+    angleOfAttack, ... alpha
+    galejsFactor, ... K
+    machNumber, ... M
+    rollAngle, ... theta
+    Galejs...
+)
 % NORMALLIFT computes the normal force intensity applied to the center of
 % pressure according to Barrowman's theory and corrections for extreme
 % aspect ratio bodies proposed by robert Galejs.
@@ -10,24 +22,35 @@ function [normalForceCoefficientSlope, Xp, CNa_barrowman, Xp_barrowman] = normal
 % - theta       : Roll angle [rad]
 % - Galejs      : Flag indicating use of Galejs' correction or not [1 or 0]
 % OUTPUTS:
-% - normalForceCoefficientSlope        : Normal lift derivative versus delta coefficient derivative [1/rad]
+% - CNa         : Normal lift derivative
+%   versus delta coefficient derivative [1/rad]
 % - Xp          : Center of pressure
 % - CNa_barrowman: Normal lift coefficient derivatives of rocket components
-% according to barrowman theory [1/rad]
+%   according to barrowman theory [1/rad]
 % - Xp_barrowman: Center of pressure of rocket components
-% according to barrowman theory [1/rad]
+%   according to barrowman theory [1/rad]
 
-[CNa_barrowman, Xp_barrowman] = barrowmanLift(Rocket, alpha, M, theta);
+[normalLiftDerivativeBarrowman, centerOfPressureBarrowman] ...
+    = barrowmanLift(Rocket, angleOfAttack, machNumber, rollAngle);
 % Fac for montecarlo simulation 
-Xp_barrowman = Xp_barrowman*Rocket.centerOfPressureFactor;
-CNa_barrowman = CNa_barrowman*Rocket.normalForceCoefficientFactor;
+centerOfPressureBarrowman ...
+    = centerOfPressureBarrowman*Rocket.centerOfPressureFactor;
+normalLiftDerivativeBarrowman ...
+    = normalLiftDerivativeBarrowman*Rocket.normalForceCoefficientFactor;
 if Galejs
-    [CNa_galejs, Xp_galejs] = robertGalejsLift(Rocket, alpha, K);
-    normalForceCoefficientSlope = sum([CNa_barrowman, CNa_galejs]);
-    Xp = sum([CNa_barrowman.*Xp_barrowman, CNa_galejs.*Xp_galejs])/normalForceCoefficientSlope;
+    [normalLiftDerivativeGalejs, centerOfPressureGalejs] ...
+        = robertGalejsLift(Rocket, angleOfAttack, galejsFactor);
+    normalLiftDerivative ...
+        = sum([normalLiftDerivativeBarrowman, normalLiftDerivativeGalejs]);
+    centerOfPressure = sum([ ...
+        normalLiftDerivativeBarrowman.*centerOfPressureBarrowman, ...
+        normalLiftDerivativeGalejs.*centerOfPressureGalejs ...
+    ])/normalLiftDerivative;
 else
-    normalForceCoefficientSlope = sum(CNa_barrowman);
-    Xp = sum(CNa_barrowman.*Xp_barrowman)/normalForceCoefficientSlope;
+    normalLiftDerivative = sum(normalLiftDerivativeBarrowman);
+    centerOfPressure ...
+        = sum(normalLiftDerivativeBarrowman.*centerOfPressureBarrowman) / ...
+        normalLiftDerivative;
 end
 
 end

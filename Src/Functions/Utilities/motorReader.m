@@ -1,4 +1,4 @@
-function [t,T,Info] = motorReader(motorFilePath)
+function [time,Thrust,Info] = motorReader(motorFilePath)
 % MOTORREADER extracts the raw motor data from RASP formated text file 
 % named 'motorFilePath'.
 
@@ -9,18 +9,18 @@ function [t,T,Info] = motorReader(motorFilePath)
 rfid = fopen(motorFilePath);
 
 % 1.1 Read Informations
-line_content = fgetl(rfid); % Read one line
-Info = textscan(line_content,'%s %f32 %f32 %s %f32 %f32 %s');
+lineContent = fgetl(rfid); % Read one line
+Info = textscan(lineContent,'%s %f32 %f32 %s %f32 %f32 %s');
 
 % 1.2 Read Thrust Informations
-t = []; T = []; % Initialization
+time = []; Thrust = []; % Initialization
 
 while ~feof(rfid)   % Test end of file
     
-    line_content = fgetl(rfid); % Read one line
-    Tmp = textscan(line_content,'%f %f');
-    t = [t Tmp{1}];
-    T = [T Tmp{2}];
+    lineContent = fgetl(rfid); % Read one line
+    Tmp = textscan(lineContent,'%f %f');
+    time = [time Tmp{1}];
+    Thrust = [Thrust Tmp{2}];
 end
 end
 

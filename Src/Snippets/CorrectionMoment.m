@@ -6,7 +6,7 @@ function C1 = CorrectionMoment(t,Rocket,normalForceCoefficientSlope,Xp,Velocity,
 % 1 Intrasic parameter
 %--------------------------------------------------------------------------
 [T, a, p, density, Nu] = stdAtmos(Altitude,Environnement);
-[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'NonLinear');
+[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,'NonLinear');
 
 %--------------------------------------------------------------------------
 % 2 Total Damping Coefficient

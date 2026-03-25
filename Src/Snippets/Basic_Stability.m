@@ -25,7 +25,7 @@ da_0 = 0;   % Rail condition
 [normalForceCoefficientSlope, Xp] = normalLift(Rocket,0,1.1,Velocity/346,0,0);
 C1 = CorrectionMoment(0,Rocket,normalForceCoefficientSlope,Xp,Velocity,Environnement,0);
 C2 = DampingMoment(0,Rocket,Calpha,CP,Velocity,Environnement,0);
-[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(Rocket.Burn_Time,Rocket,'Linear');
+[M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(Rocket.Burn_Time,Rocket,'Linear');
 
 % 1.1 Wind disturbance:
 beta = atan(V_inf/Velocity);

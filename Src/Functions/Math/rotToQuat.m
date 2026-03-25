@@ -1,7 +1,9 @@
-function q = rot2quat(C)
-% ROT2QUAT computes the quaternion representation of the attitude based on
+function q = rotToQuat(C)
+% rotToQuat computes the quaternion representation of the attitude based on
 % the rotation matrix rotating the earth coordinate system to the rocket
 % coordinate system.
+
+% C is the rotation matrix
 
 q = zeros(4,1);
 T = trace(C);

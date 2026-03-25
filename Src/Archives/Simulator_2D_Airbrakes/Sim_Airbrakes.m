@@ -46,7 +46,7 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     V_inf = Environment.V_inf;
 
     % Necessary function calls
-    [M,dMdt] = Mass_Non_Lin(t,Rocket);  % Rocket mass information
+    [M,dMdt] = massNonLin(t,Rocket);  % Rocket mass information
     [Temp, a, p, density] = stdAtmos(x(1)); % Atmosphere information
     T = Thrust(t,Rocket);   % Motor thrust
     g = 9.81;               % Gravity []
@@ -87,7 +87,7 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     V_inf = Environment.V_inf;        % Vitesse du vent [m/s]
 
     % Appels des fonctions necessaires
-    [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = Mass_Properties(t,Rocket,'Linear');
+    [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,'Linear');
     [Temp, a, p, density] = stdAtmos(x(3)); % Atmosphere [K,m/s,Pa,kg/m3]
     g = 9.81;                           % Gravite [m2/s]
 

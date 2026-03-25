@@ -68,7 +68,7 @@ Ar = pi/4*d^2;
 
 C2A = density * V * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(railTime(end), Rocket);
+[~,dMdt] = massNonLin(railTime(end), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -166,7 +166,7 @@ Ar = pi/4*d^2;
 
 C2A = density * norm(V) * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(flightTime(index), Rocket);
+[~,dMdt] = massNonLin(flightTime(index), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -295,7 +295,7 @@ Ar = pi/4*d^2;
 
 C2A = density * V * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(railTime(end), Rocket);
+[~,dMdt] = massNonLin(railTime(end), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;
@@ -397,7 +397,7 @@ Ar = pi/4*d^2;
 
 C2A = density * norm(V) * Ar / 2 * CNa2A;
 
-[~,dMdt] = Mass_Non_Lin(flightTime(index), Rocket);
+[~,dMdt] = massNonLin(flightTime(index), Rocket);
 Lne = Rocket.stagePositions(end);
 
 C2R = dMdt * (Lne - W)^2;

@@ -97,8 +97,8 @@ classdef Simulator3D_AB_COM < handle
             % gravity
             G = -g*cos(obj.Environment.railAngle)*mass;
 
-            % Thrust 
-            T = Thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
+            % thrust 
+            T = thrust(t,obj.Rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
             CD = drag(obj.Rocket, 0, v,Nu, a); % (TODO: make air-viscosity adaptable to temperature)
@@ -159,9 +159,9 @@ classdef Simulator3D_AB_COM < handle
 
             % Force estimations 
 
-            % Thrust
+            % thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
+            T = thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             G = -g*M*ZE;
@@ -228,7 +228,7 @@ classdef Simulator3D_AB_COM < handle
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force
@@ -439,9 +439,9 @@ classdef Simulator3D_AB_COM < handle
 
             % Force estimations 
 
-            % Thrust
+            % thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            T = Thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
+            T = thrust(t,obj.Rocket)*RA; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             G = -g*M*ZE;
@@ -508,7 +508,7 @@ classdef Simulator3D_AB_COM < handle
 
             % Total forces
             F_tot = ...
-                T*obj.Rocket.motorThrustFactor +...  ;% Thrust
+                T*obj.Rocket.motorThrustFactor +...  ;% thrust
                 G +...  ;% gravity
                 N +... ;% normal force
                 D      ; % drag force

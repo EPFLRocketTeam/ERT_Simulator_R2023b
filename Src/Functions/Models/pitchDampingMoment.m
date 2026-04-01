@@ -8,7 +8,7 @@ function pitchDampingCoefficient = pitchDampingMoment(Rocket, rho, Calpha, cente
         pitchDampingCoefficient = 0;
     else
         % -------------------------------------------------------------------------
-        % Thrust damping
+        % thrust damping
         % -------------------------------------------------------------------------
 
         thrustDampingCoefficient = massRate*(Rocket.totalLength-centerOfMass).^2*w*2/V^2/rho/Rocket.maxCrossSectionArea;

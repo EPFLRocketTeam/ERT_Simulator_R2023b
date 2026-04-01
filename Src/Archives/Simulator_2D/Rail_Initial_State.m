@@ -12,7 +12,7 @@ V_inf = Environnement.V_inf;
 % Necessary function calls
 [M,dMdt,Cm,dCmdt,I_L,dI_Ldt,I_R,dI_Rdt] = massProperties(t,Rocket,'NonLinear');
 [Temp, a, p, density, Nu] = stdAtmos(x(1),Environnement); % Atmosphere information
-T = Thrust(t,Rocket);   % Motor thrust
+T = thrust(t,Rocket);   % Motor thrust
 g = 9.81;               % Gravity []
 
 % Multiple Time Used Parameters

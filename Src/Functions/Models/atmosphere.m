@@ -23,7 +23,7 @@ function [temperature, speedOfSound, pressure, density, kinematicViscosity] = at
 
     % Initial
     seaPressure = 101325;                       % [Pa] Pressure at sea level
-    seaTemperature = env.Temperature_Ground;    % [K] Temperature at sea level
+    seaTemperature = env.groundTemperature;     % [K] Temperature at sea level
     gravity = 9.80665;                          % [m/sec^2] Gravity at sea level
     
     % Evaluate temperature using ISA and the Temperature Lapse Rate [K/m]
@@ -41,7 +41,7 @@ function [temperature, speedOfSound, pressure, density, kinematicViscosity] = at
     end
 
     % Density (ideal gas law)
-    x = env.Saturation_Vapor_Ratio*env.Humidity_Ground;
+    x = env.saturationVaporRatio*env.groundHumidity;
     density = pressure / (temperature * specificGasConstant) * (1 + x) / (1 + 1.609 * x);
     
     % Viscosity
@@ -68,7 +68,7 @@ function [temperature, I] = atmosphereTemperatureIntegral(alt, env)
     % Table of the International Atmospheric Model
     % Source : https://en.wikipedia.org/wiki/International_Standard_Atmosphere
     tableIsaAltitude = [0,      11000,  20000,  32000,  47000,  51000,  71000,  86000];
-    tableIsaTemperature = [floor(env.Temperature_Ground), 216.65, ...
+    tableIsaTemperature = [floor(env.groundTemperature), 216.65, ...
         216.65, 228.65, 270.65, 270.65, 214.15, 186.95];
 
     % Initialize the integral

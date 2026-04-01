@@ -2,7 +2,7 @@
 
 % Initialize
 close all; 
-%clear all; 
+clear all; 
 clc;
 addpath(genpath('./Declarations'),...
         genpath('./Functions'),...
@@ -10,7 +10,7 @@ addpath(genpath('./Declarations'),...
         genpath('./Simulator_3D'));
 
 % Rocket Definition
-rocket = rocketReader('Wildhorn.txt');
+rocket = rocketReader('Nordend_EUROC.txt');
 environment = environnementReader('Environment/Environnement_Definition_EuRoC.txt');
 simulationOutputs = SimOutputReader('Simulation/Simulation_outputs.txt');
 simulator3D = Simulator3D(rocket, environment, simulationOutputs);
@@ -31,7 +31,7 @@ display(['Launch rail departure time : ' num2str(railTime(end))]);
 % 6DOF Flight Simulation
 %--------------------------------------------------------------------------
 
-[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulator3D.FlightSim([railTime(end) simulator3D.rocket.Burn_Time(end)], railState(end, 2));
+[flightTime, flightState, flightTimeEvents, flightStateEvents, flightEventIndices] = simulator3D.FlightSim([railTime(end) simulator3D.rocket.burnTime(end)], railState(end, 2));
 
 % simulator3D.rocket.coneMode = 'off';
 
@@ -60,7 +60,7 @@ dragForce = 0.5 * simulator3D.simAuxResults.dragCoefficient(maxSpeedIndex) * den
 display(['Max drag force = ' num2str(dragForce)]);
 display(['Max drag force along rocket axis = ' num2str(dragForce * cos(simulator3D.simAuxResults.flightPathAngle(maxSpeedIndex)))]);
 
-dragCoefficientAb = drag_shuriken(rocket, 0, simulator3D.simAuxResults.flightPathAngle(maxSpeedIndex), maxSpeed, kinematicViscosity);
+dragCoefficientAb = dragShuriken(rocket, 0, simulator3D.simAuxResults.flightPathAngle(maxSpeedIndex), maxSpeed, kinematicViscosity);
 dragForceAb = 0.5 * dragCoefficientAb * density * pi * rocket.maxDiameter^2 / 4 * maxSpeed^2;
 display(['AB drag force at max speed = ' num2str(dragForceAb)]);
 display(['Max Mach number : ' num2str(maxSpeed / speedOfSound)]);
@@ -136,8 +136,8 @@ end
 %--------------------------------------------------------------------------
 
 % Convert quaternions to rotation matrices
-rotationMatrices = quat2rotmat(flightState(:, 7:10));
-eulerAngles = rot2anglemat(rotationMatrices);
+rotationMatrices = quatToRotMat(flightState(:, 7:10));
+eulerAngles = rotToAngleMat(rotationMatrices);
 
 % Plot rocket orientation
 directionVectors = zeros(length(rotationMatrices),3);
@@ -201,28 +201,28 @@ figure('Name','Aerodynamic properties'); hold on;
 subplot(3,2,1);
 plot(flightTime, simulator3D.simAuxResults.stabilityMargin)
 grid on; box on; hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 title 'stabilityMargin';
 
 % Plot centerOfPressure
 subplot(3,2,2);
 plot(flightTime, simulator3D.simAuxResults.centerOfPressure)
 hold on; grid on; box on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 title 'X_{cp}';
 
 % Plot AoA vs. time
 subplot(3,2,3);
 plot(flightTime, simulator3D.simAuxResults.angleOfAttack)
 hold on; grid on; box on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 title '\alpha';
 
 % Plot normalForceCoefficientSlope vs. speed
 subplot(3,2,4);
 plot(flightTime, simulator3D.simAuxResults.normalForceCoefficientSlope)
 hold on; grid on; box on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 title 'Cn_{\alpha}';
 
 % Plot Scaled CD
@@ -238,7 +238,7 @@ ylim([0, 1]);
 currentYLim = ylim;
 set(gca, 'YTick', currentYLim(1):0.1:currentYLim(2));
 grid on; box on; hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 title 'delta, angle with Oz'
 
 screenSize = get(groot, 'Screensize');
@@ -251,7 +251,7 @@ figure('Name','mass properties'); hold on;
 subplot(2,2,1);
 plot(flightTime, simulator3D.simAuxResults.mass)
 hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 currentYLim = ylim;
 title 'mass';
 set(gca, 'YTick', currentYLim(1):0.5:currentYLim(2));
@@ -265,7 +265,7 @@ title 'centerOfMass';
 set(gca, 'YTick', currentYLim(1):0.03:currentYLim(2));
 grid on; box on;
 hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 
 % Plot inertiaLong vs. time
 subplot(2,2,3);
@@ -275,14 +275,14 @@ title 'inertiaLong';
 set(gca, 'YTick', currentYLim(1):0.5:currentYLim(2));
 grid on; box on;
 hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 
 % Plot inertiaRot vs. time
 subplot(2,2,4);
 plot(flightTime, simulator3D.simAuxResults.inertiaRot)
 title 'inertiaRot';
 hold on;
-plot(ones(1,2) * rocket.Burn_Time, ylim, 'g');
+plot(ones(1,2) * rocket.burnTime, ylim, 'g');
 grid on; box on;
 
 set(gcf,'Position',[screenSize(3)*0.5, screenSize(2), screenSize(3)*0.5, screenSize(3)*0.5]);
@@ -323,7 +323,7 @@ legend("ax", "ay", "az", fontsize=15)
 % PLOT 9: Euler angles
 figure(Name="Euler angles")
 quaternionStates = flightState(:,7:10)';
-[phi, theta, psi] = quat_to_euler_angles(quaternionStates(1,:), quaternionStates(2,:), quaternionStates(3,:), quaternionStates(4,:));
+[phi, theta, psi] = quatToEulerAngles(quaternionStates(1,:), quaternionStates(2,:), quaternionStates(3,:), quaternionStates(4,:));
 hold on
 plot(flightTime, phi .* 180 ./ pi, lineWidth=2)
 plot(flightTime, theta .* 180 ./ pi, lineWidth=2)

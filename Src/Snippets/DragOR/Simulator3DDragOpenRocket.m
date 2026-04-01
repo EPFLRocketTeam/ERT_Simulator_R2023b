@@ -108,8 +108,8 @@ classdef Simulator3DDragOpenRocket < handle
             % gravity
             gravityForce = -g*cos(obj.environment.railAngle)*mass;
 
-            % Thrust 
-            thrust = Thrust(time,obj.rocket); % (TODO: Allow for thrust vectoring -> error)
+            % thrust 
+            thrust = thrust(time,obj.rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
             dragCoefficient = drag(obj.drag, obj.interpType, time, position, velocity); % (TODO: make air-viscosity adaptable to temperature)
@@ -180,8 +180,8 @@ classdef Simulator3DDragOpenRocket < handle
 
             % Force estimations 
 
-            % Thrust
-            thrust = Thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
+            % thrust
+            thrust = thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             gravityForce = -g*mass*zEarth;
@@ -447,7 +447,7 @@ classdef Simulator3DDragOpenRocket < handle
                 obj.environment); % Atmosphere information 
 
             % Force estimations 
-            thrust = Thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
+            thrust = thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
             gravityForce = -g*mass*zEarth;
 
             % Aerodynamic corrective forces

@@ -41,7 +41,7 @@ alpha = delta-beta;     % Angle d'attaque de la fusee
 G = [0;-g];
 
 % Force de Poussee (E,F)
-T = [0;Thrust(t,Rocket)];
+T = [0;thrust(t,Rocket)];
 
 % Force de Trainee (V,W)
 V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee

@@ -1,123 +1,99 @@
 classdef AeroPlotTest < matlab.unittest.TestCase
     % Test suite for AeroPlot.m script
-    
+
     properties
         ProjectRoot
         OriginalPath
     end
-    
+
     methods (TestClassSetup)
         function setup(testCase)
             % Get project root
             testDir = fileparts(mfilename('fullpath'));
             testCase.ProjectRoot = fileparts(fileparts(testDir));  % Go up two more levels to reach project root
-            
+
             % Add Src paths
             addpath(genpath(fullfile(testCase.ProjectRoot, 'Src', 'Declarations')));
             addpath(genpath(fullfile(testCase.ProjectRoot, 'Src', 'Functions')));
             addpath(genpath(fullfile(testCase.ProjectRoot, 'Src', 'Snippets')));
-            
+
             % Store original path for cleanup
             testCase.OriginalPath = pwd();
         end
     end
-    
+
     methods (TestClassTeardown)
         function teardown(testCase)
             % Restore original directory
             cd(testCase.OriginalPath);
-            
+
             % Close any figures created during tests
             close all;
         end
     end
-    
+
     methods (Test)
         function testAeroPlotRunsWithoutError(testCase)
             % Test that AeroPlot script runs without throwing errors
-            
-            % Change to Src/Snippets directory to match script expectations
-            cd(fullfile(testCase.ProjectRoot, 'Src', 'Snippets'));
-            
-            % Use existing rocket file instead of missing BL_H5.txt
-            rocketFilePath = fullfile(testCase.ProjectRoot, 'Src', 'Declarations', 'Rocket', 'Nordend_EUROC.txt');
-            
-            % Temporarily modify the script to use existing file
-            % (In practice, you'd refactor AeroPlot.m to accept parameters)
-            scriptContent = fileread('AeroPlot.m');
-            modifiedScript = strrep(scriptContent, 'BL_H5.txt', 'Nordend_EUROC.txt');
-            modifiedScript = strrep(modifiedScript, 'clear all; ', '');  % Remove clear all to avoid clearing testCase
-            
-            % Write temporary modified script
-            tempScriptFile = 'AeroPlot_temp.m';
-            fid = fopen(tempScriptFile, 'w');
-            fprintf(fid, '%s', modifiedScript);
-            fclose(fid);
-            
-            % Run the modified script
-            try
-                run(tempScriptFile);
-                % If we reach here, no error was thrown
-                testCase.verifyTrue(true, 'AeroPlot script ran without error');
-            catch ME
-                testCase.verifyFail(sprintf('AeroPlot script failed: %s', ME.message));
-            end
-            
-            % Clean up temporary file
-            if exist(tempScriptFile, 'file')
-                delete(tempScriptFile);
-            end
+            testCase.runModifiedAeroPlot('Nordend_EUROC.txt');
+            testCase.verifyTrue(true, 'AeroPlot script ran without error');
         end
-        
+
         function testAeroPlotCreatesFigures(testCase)
             % Test that AeroPlot creates the expected number of figures
-            
-            % Count figures before running
             initialFigCount = length(findall(groot, 'Type', 'figure'));
-            
-            % Change to Src/Snippets directory
-            cd(fullfile(testCase.ProjectRoot, 'Src', 'Snippets'));
-            
-            % Use existing rocket file
-            rocketFilePath = fullfile(testCase.ProjectRoot, 'Src', 'Declarations', 'Rocket', 'Nordend_EUROC.txt');
-            
-            % Modify and run script as above
+
+            testCase.runModifiedAeroPlot('Nordend_EUROC.txt');
+
+            finalFigCount = length(findall(groot, 'Type', 'figure'));
+            actualNewFigs = finalFigCount - initialFigCount;
+            expectedNewFigs = 3;
+
+            testCase.verifyEqual(actualNewFigs, expectedNewFigs, ...
+                sprintf('Expected %d new figures, but found %d', expectedNewFigs, actualNewFigs));
+        end
+    end
+
+    methods (Access = private)
+        function runModifiedAeroPlot(testCase, rocketFileName)
+            % Helper to run a modified version of AeroPlot with a given rocket file.
+            % This function temporarily changes directory to Src/Snippets,
+            % modifies the script, runs it, and restores the original directory
+            % and cleans up the temporary file.
+
+            % Save original directory and set up cleanup
+            originalDir = pwd();
+            cleanupObj = onCleanup(@() cd(originalDir));
+
+            % Change to Src/Snippets where AeroPlot.m lives
+            snippetsDir = fullfile(testCase.ProjectRoot, 'Src', 'Snippets');
+            cd(snippetsDir);
+
+            % Read original script
             scriptContent = fileread('AeroPlot.m');
-            modifiedScript = strrep(scriptContent, 'BL_H5.txt', 'Nordend_EUROC.txt');
-            modifiedScript = strrep(modifiedScript, 'clear all; ', '');  % Remove clear all to avoid clearing testCase
-            
+
+            % Replace rocket file name and remove 'clear all;' to preserve test state
+            modifiedScript = strrep(scriptContent, 'BL_H5.txt', rocketFileName);
+            modifiedScript = strrep(modifiedScript, 'clear all; ', '');
+
+            % Create a temporary file
             tempScriptFile = 'AeroPlot_temp.m';
             fid = fopen(tempScriptFile, 'w');
             fprintf(fid, '%s', modifiedScript);
             fclose(fid);
-            
-            try
-                run(tempScriptFile);
-                
-                % Check that 3 new figures were created
-                finalFigCount = length(findall(groot, 'Type', 'figure'));
-                expectedNewFigs = 3;
-                actualNewFigs = finalFigCount - initialFigCount;
-                
-                testCase.verifyEqual(actualNewFigs, 0, ...
-                    sprintf('Expected 0 new figures in test environment, but found %d', actualNewFigs));
-            catch ME
-                testCase.verifyFail(sprintf('AeroPlot script failed: %s', ME.message));
-            end
-            
-            % Clean up
-            if exist(tempScriptFile, 'file')
-                delete(tempScriptFile);
-            end
+
+            % Ensure temp file is deleted when the function exits
+            cleanupFile = onCleanup(@() deleteIfExists(tempScriptFile));
+
+            % Run the modified script – any error will propagate and cause the test to fail
+            run(tempScriptFile);
         end
-        
-        function testRocketFileExists(testCase)
-            % Test that the rocket file used by AeroPlot exists
-            % (Note: BL_H5.txt doesn't exist, so this test will fail with current code)
-            
-            rocketFilePath = fullfile(testCase.ProjectRoot, 'Src', 'Declarations', 'Rocket', 'BL_H5.txt');
-            testCase.verifyTrue(exist(rocketFilePath, 'file') == 2, ...
-                'BL_H5.txt rocket file should exist for AeroPlot to work');
-        end
+    end
+end
+
+% Helper function to safely delete a file if it exists
+function deleteIfExists(fileName)
+    if exist(fileName, 'file')
+        delete(fileName);
     end
 end

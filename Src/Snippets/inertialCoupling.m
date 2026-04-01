@@ -235,7 +235,7 @@ function stateDerivative = rocketDynamics3D(time, state, ...
     rocketAxis = rotationMatrix * [0; 0; 1];
     rocketAxis = rocketAxis / norm(rocketAxis);
     
-    % Thrust direction in global frame
+    % thrust direction in global frame
     thrustDirectionLocal = [sin(thrustAngle); 0; cos(thrustAngle)];
     thrustDirectionGlobal = rotationMatrix * thrustDirectionLocal;
     thrustDirectionGlobal = thrustDirectionGlobal / norm(thrustDirectionGlobal);

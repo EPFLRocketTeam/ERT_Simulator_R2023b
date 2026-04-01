@@ -211,8 +211,8 @@ end
 % The default values are taken from Environnement_Definition_EuRoC.txt
 
 if ~isfield(Environnement,'groundTemperature')
-    default_groundTemperature = 289.15;
-    Environnement.groundTemperature = default_groundTemperature;
+    defaultGroundTemperature = 289.15;
+    Environnement.groundTemperature = defaultGroundTemperature;
     warning('Missing field "groundTemperature"; defaulted to 289.15');
 end
 if ~isfield(Environnement,'groundPressure')
@@ -221,8 +221,8 @@ if ~isfield(Environnement,'groundPressure')
     warning('Missing field "groundPressure"; defaulted to 102400');
 end
 if ~isfield(Environnement,'groundHumidity')
-    default_groundHumidity = 0.7;
-    Environnement.groundHumidity = default_groundHumidity;
+    defaultGroundHumidity = 0.7;
+    Environnement.groundHumidity = defaultGroundHumidity;
     warning('Missing field "groundHumidity"; defaulted to 0.7');
 end
 if ~isfield(Environnement,'startAltitude')
@@ -292,7 +292,7 @@ Environnement.Viscosity = Tmp(:,2);
 % 3.2 Humidity Changes
 p_ws = exp(77.345+0.0057*Environnement.groundTemperature-7235/Environnement.groundTemperature)/Environnement.groundTemperature^8.2;
 p_a = Environnement.groundPressure;
-Environnement.Saturation_Vapor_Ratio = 0.62198*p_ws/(p_a-p_ws);
+Environnement.saturationVaporRatio = 0.62198*p_ws/(p_a-p_ws);
 
 % 3.3 Wind direction
 Environnement.V_dir = [cosd(Environnement.V_Azimuth);sind(Environnement.V_Azimuth); 0];

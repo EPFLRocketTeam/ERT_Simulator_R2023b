@@ -16,31 +16,31 @@ theta = linspace(-190.5,1.165,10);
 % -------------------------------------------------------------------------
 % Simulation 1D
 % -------------------------------------------------------------------------
-% Thrust Phase Simulation
+% thrust Phase Simulation
 x_0 = [0;0];
 
 tspan = [0 Rocket.Burn_Time];
 Amplifier = 1;
 [T,X] = ode45(@(t,x) Rocket_Kinematic(t,x,Rocket,Environnement,theta(1),Amplifier),tspan,x_0);
 figure(1);
-plot(T,X(:,1),'g','DisplayName','Thrust Phase');hold on,grid on;
+plot(T,X(:,1),'g','DisplayName','thrust Phase');hold on,grid on;
 X_End_Burn = X(end,1);
 
 tspan = [0 28];
 Amplifier = 1.20;
 [T,X] = ode45(@(t,x) Rocket_Kinematic(t,x,Rocket,Environnement,theta(1),Amplifier),tspan,x_0);
 figure(1);
-plot(T,X(:,1),'r','DisplayName','Thrust Phase');hold on,grid on;
+plot(T,X(:,1),'r','DisplayName','thrust Phase');hold on,grid on;
 
 Amplifier = 0.8;
 [T,X] = ode45(@(t,x) Rocket_Kinematic(t,x,Rocket,Environnement,theta(1),Amplifier),tspan,x_0);
 figure(1);
-plot(T,X(:,1),'b','DisplayName','Thrust Phase');hold on,grid on;
+plot(T,X(:,1),'b','DisplayName','thrust Phase');hold on,grid on;
 
 Amplifier = 1;
 [T_Nominal,X_Nominal] = ode45(@(t,x) Rocket_Kinematic(t,x,Rocket,Environnement,theta(1),Amplifier),tspan,x_0);
 figure(1);
-plot(T_Nominal,X_Nominal(:,1),'g','DisplayName','Thrust Phase');hold on,grid on;
+plot(T_Nominal,X_Nominal(:,1),'g','DisplayName','thrust Phase');hold on,grid on;
 
 %% Backward Simulation
 % Altitude of Interest

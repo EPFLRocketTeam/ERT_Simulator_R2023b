@@ -14,8 +14,7 @@
 %   - rocketReader.m: Reads rocket configuration from file
 %   - drag.m: Computes drag coefficient
 %   - normalLift.m: Computes normal force coefficient and center of pressure
-%
-% Updated : 30.12.2025 - Added comprehensive comments and error handling
+%   - motor2RocketReader.m: Reads motor data into rocket structure (if needed)
 % -------------------------------------------------------------------------
 
 clear all; 
@@ -40,7 +39,7 @@ end
 
 % Rocket configuration
 readRocketFile = 1;           % Flag to read rocket from file (1=yes, 0=no)
-rocketFile = 'BL_H5.txt';    % Rocket configuration file name
+rocketFile = 'Nordend_EUROC.txt';    % Rocket configuration file name
 
 % Analysis ranges
 velocityRange = linspace(0, 346, 20);    % Velocity range [m/s] (0 to speed of sound)
@@ -180,7 +179,7 @@ try
     
     % 5.3 Stability Margin vs Angle of Attack
     figure('Name', 'Stability Analysis', ...
-           'Position', [1800, 100, 800, 600], ...
+           'Position', [500, 100, 800, 600], ...
            'NumberTitle', 'off');
     hold on; grid on; box on;
     

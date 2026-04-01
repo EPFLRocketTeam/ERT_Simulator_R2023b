@@ -1,18 +1,18 @@
-function Thrust = thrust(time,Rocket)
+function thrust = thrust(time,Rocket)
 %	Return the motor thrust along its axis
 %   INPUT:
 %   - t         Time
 %   - Rocket    Structure Containing all datas
 %   OUTPUT:
-%   - T         Motor Thrust
+%   - T         Motor thrust
 
 %   Linear Interpolation
 if time > Rocket.burnTime 
-    Thrust = 0;
+    thrust = 0;
 elseif time < 0
-    Thrust = 0;
+    thrust = 0;
 else
-    Thrust = interp1(Rocket.thrustTime,Rocket.thrustForce,time);
+    thrust = interp1(Rocket.thrustTime,Rocket.thrustForce,time);
 end
 end
 

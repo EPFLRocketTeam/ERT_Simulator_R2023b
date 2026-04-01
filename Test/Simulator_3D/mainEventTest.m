@@ -1,4 +1,4 @@
-classdef motor2RocketReaderTest < matlab.unittest.TestCase
+classdef mainEventTest < matlab.unittest.TestCase
     properties
         AddedPath
     end
@@ -17,7 +17,7 @@ classdef motor2RocketReaderTest < matlab.unittest.TestCase
 
             % 3. Construct the path to the function file's directory
             % (e.g., ...\ERT_Simulator_R2023b\Src\Simulator_3D)
-            functionPath = fullfile(rootPath, 'Src', 'Functions', 'Utilities');
+            functionPath = fullfile(rootPath, 'Src', 'Simulator_3D');
 
             % 4. Add the paths to MATLAB's search path
             addpath(functionPath);
@@ -26,19 +26,24 @@ classdef motor2RocketReaderTest < matlab.unittest.TestCase
             testCase.AddedPath = {functionPath};
         end
 
-
-        function testSolidMotorParsing(testCase)
-            % This test assumes motorReader is mocked or available in path
-            rocket.isHybrid = 0;
-            % Note: You will need a dummy .eng file or to mock motorReader
-            % For this example, we assume motorReader returns valid data
-            try
-                updatedRocket = motor2RocketReader('dummy.eng', rocket);
-                testCase.verifyTrue(isfield(updatedRocket, 'motorDia'));
-                testCase.verifyTrue(isfield(updatedRocket, 'thrustForce'));
-            catch ME
-                testCase.assumeFail(['motorReader missing or file error: ' ME.message]);
-            end
+        
+        function testParachuteDeployment(testCase)
+            % Setup rocket parameters
+            rocket.paraMainEvent = 450; % Deployment altitude
+            
+            % Mock states: [x; y; altitude]
+            xAbove = [0; 0; 500];
+            xBelow = [0; 0; 400];
+            
+            % Call the refactored function
+            [valAbove, isTerminal, direction] = mainEvent(0, xAbove, rocket);
+            [valBelow, ~, ~] = mainEvent(0, xBelow, rocket);
+            
+            % Assertions
+            testCase.verifyGreaterThan(valAbove, 0);
+            testCase.verifyLessThan(valBelow, 0);
+            testCase.verifyEqual(isTerminal, 1);
+            testCase.verifyEqual(direction, -1);
         end
     end
 end

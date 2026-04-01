@@ -1,4 +1,4 @@
-function [value, isterminal, direction] = CrashEvent(T,X,Environnement)
+function [value, isterminal, direction] = crashEvent(T,X,Environnement)
 %   Stop simulation at apogee
 % %map_pos=abs(Environnement.map_x-2648540-X(1))< 2 & abs(Environnement.map_y-X(2))< 2;
 % 

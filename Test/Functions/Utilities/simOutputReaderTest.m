@@ -1,4 +1,4 @@
-classdef motor2RocketReaderTest < matlab.unittest.TestCase
+classdef simOutputReaderTest < matlab.unittest.TestCase
     properties
         AddedPath
     end
@@ -26,19 +26,24 @@ classdef motor2RocketReaderTest < matlab.unittest.TestCase
             testCase.AddedPath = {functionPath};
         end
 
-
-        function testSolidMotorParsing(testCase)
-            % This test assumes motorReader is mocked or available in path
-            rocket.isHybrid = 0;
-            % Note: You will need a dummy .eng file or to mock motorReader
-            % For this example, we assume motorReader returns valid data
-            try
-                updatedRocket = motor2RocketReader('dummy.eng', rocket);
-                testCase.verifyTrue(isfield(updatedRocket, 'motorDia'));
-                testCase.verifyTrue(isfield(updatedRocket, 'thrustForce'));
-            catch ME
-                testCase.assumeFail(['motorReader missing or file error: ' ME.message]);
-            end
+        
+        function testFileParsing(testCase)
+            % Create a temporary test file
+            fileName = 'testSimOutput.txt';
+            fid = fopen(fileName, 'w');
+            fprintf(fid, 'Margin 2.5\nAlpha 1.2\nCd 0.45\n');
+            fclose(fid);
+            
+            % Run reader
+            simOutput = simOutputReader(fileName);
+            
+            % Verify results
+            testCase.verifyEqual(simOutput.margin, 2.5);
+            testCase.verifyEqual(simOutput.alpha, 1.2);
+            testCase.verifyEqual(simOutput.cd, 0.45);
+            
+            % Cleanup
+            delete(fileName);
         end
     end
 end

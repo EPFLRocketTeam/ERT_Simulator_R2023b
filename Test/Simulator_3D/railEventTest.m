@@ -1,4 +1,4 @@
-classdef motor2RocketReaderTest < matlab.unittest.TestCase
+classdef railEventTest < matlab.unittest.TestCase
     properties
         AddedPath
     end
@@ -17,7 +17,7 @@ classdef motor2RocketReaderTest < matlab.unittest.TestCase
 
             % 3. Construct the path to the function file's directory
             % (e.g., ...\ERT_Simulator_R2023b\Src\Simulator_3D)
-            functionPath = fullfile(rootPath, 'Src', 'Functions', 'Utilities');
+            functionPath = fullfile(rootPath, 'Src', 'Simulator_3D');
 
             % 4. Add the paths to MATLAB's search path
             addpath(functionPath);
@@ -26,19 +26,23 @@ classdef motor2RocketReaderTest < matlab.unittest.TestCase
             testCase.AddedPath = {functionPath};
         end
 
-
-        function testSolidMotorParsing(testCase)
-            % This test assumes motorReader is mocked or available in path
-            rocket.isHybrid = 0;
-            % Note: You will need a dummy .eng file or to mock motorReader
-            % For this example, we assume motorReader returns valid data
-            try
-                updatedRocket = motor2RocketReader('dummy.eng', rocket);
-                testCase.verifyTrue(isfield(updatedRocket, 'motorDia'));
-                testCase.verifyTrue(isfield(updatedRocket, 'thrustForce'));
-            catch ME
-                testCase.assumeFail(['motorReader missing or file error: ' ME.message]);
-            end
+        function testRailExit(testCase)
+            % Setup environment
+            environment.railLength = 4.0; 
+            
+            % Mock states: [positionOnRail; velocity; altitude]
+            xBefore = [3.5; 20; 0];
+            xAfter  = [4.5; 25; 0];
+            
+            % Call the refactored function
+            [valBefore, isTerminal, direction] = railEvent(0, xBefore, environment);
+            [valAfter, ~, ~] = railEvent(0, xAfter, environment);
+            
+            % Assertions
+            testCase.verifyLessThan(valBefore, 0, 'Value should be negative while on rail');
+            testCase.verifyGreaterThan(valAfter, 0, 'Value should be positive after leaving rail');
+            testCase.verifyEqual(isTerminal, 1);
+            testCase.verifyEqual(direction, 1, 'Direction must be 1 for increasing position');
         end
     end
 end

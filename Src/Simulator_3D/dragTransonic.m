@@ -1,4 +1,4 @@
-function Value = drag_transonic(Rocket, alpha, Uinf, nu, a)
+function Value = dragTransonic(Rocket, alpha, Uinf, nu, a)
     % INPUTS:
     % - Rocket  : Rocket object
     % - alpha   : angle of attack [rad]

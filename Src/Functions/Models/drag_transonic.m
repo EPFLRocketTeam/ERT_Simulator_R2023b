@@ -22,6 +22,8 @@ function Value = drag_transonic(Rocket, alpha, Uinf, nu, a)
 %     % nu in ft2/s
 %     mu = nu * 3.28084^2;
 
+%REMARK: drag is independent of alpha (subsitious) + lotta magic numbers
+
     % -------------------------------------------------------------------------
     % 0.2 Divergence 
     % -------------------------------------------------------------------------

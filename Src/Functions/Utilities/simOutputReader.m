@@ -1,4 +1,4 @@
-function SimOutput = SimOutputReader(simOutputFilePath)
+function SimOutput = simOutputReader(simOutputFilePath)
 
 % -------------------------------------------------------------------------
 % 1. Read Environnement

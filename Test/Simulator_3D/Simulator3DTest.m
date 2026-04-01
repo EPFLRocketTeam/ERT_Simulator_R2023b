@@ -92,18 +92,18 @@ classdef Simulator3DTest < matlab.unittest.TestCase
                             testCase.TestEnvironment, ...
                             testCase.TestSimOutput);
             
-            testCase.verifyEqual(sim.Rocket, testCase.TestRocket);
-            testCase.verifyEqual(sim.Environment, testCase.TestEnvironment);
-            testCase.verifyEqual(sim.SimOutput, testCase.TestSimOutput);
-            testCase.verifyTrue(isstruct(sim.SimAuxResults));
+            testCase.verifyEqual(sim.rocket, testCase.TestRocket);
+            testCase.verifyEqual(sim.environment, testCase.TestEnvironment);
+            testCase.verifyEqual(sim.simOutput, testCase.TestSimOutput);
+            testCase.verifyTrue(isstruct(sim.simAuxResults));
             
             % Verify SimAuxResults is initialized correctly
-            auxFields = {'margin', 'alpha', 'cnAlpha', 'xcp', 'dragCoefficient', ...
-                        'mass', 'centerOfMass', 'inertiaLong', 'inertiaRot', 'delta', ...
-                        'noseAlpha', 'noseDelta'};
+            auxFields = {'stabilityMargin', 'angleOfAttack', 'normalForceCoefficientSlope', 'centerOfPressure', 'dragCoefficient', ...
+                        'mass', 'centerOfMass', 'inertiaLong', 'inertiaRot', 'flightPathAngle', ...
+                        'noseAngleOfAttack', 'noseFlightPathAngle'};
             for i = 1:length(auxFields)
-                testCase.verifyTrue(isfield(sim.SimAuxResults, auxFields{i}));
-                testCase.verifyTrue(isempty(sim.SimAuxResults.(auxFields{i})));
+                testCase.verifyTrue(isfield(sim.simAuxResults, auxFields{i}));
+                testCase.verifyTrue(isempty(sim.simAuxResults.(auxFields{i})));
             end
         end
         
@@ -112,13 +112,13 @@ classdef Simulator3DTest < matlab.unittest.TestCase
             sim = Simulator3D();
             
             % Verify properties are empty
-            testCase.verifyTrue(isempty(sim.Rocket));
-            testCase.verifyTrue(isempty(sim.Environment));
-            testCase.verifyTrue(isempty(sim.SimOutput));
+            testCase.verifyTrue(isempty(sim.rocket));
+            testCase.verifyTrue(isempty(sim.environment));
+            testCase.verifyTrue(isempty(sim.simOutput));
             
             % Verify SimAuxResults is still initialized
-            testCase.verifyTrue(isstruct(sim.SimAuxResults));
-            testCase.verifyTrue(isfield(sim.SimAuxResults, 'margin'));
+            testCase.verifyTrue(isstruct(sim.simAuxResults));
+            testCase.verifyTrue(isfield(sim.simAuxResults, 'stabilityMargin'));
         end
         
         % function testConstructorErrorHandling(testCase)
@@ -159,13 +159,13 @@ classdef Simulator3DTest < matlab.unittest.TestCase
             newEnvironment = struct('test', 2);
             newSimOutput = struct('test', 3);
             
-            sim.Rocket = newRocket;
-            sim.Environment = newEnvironment;
-            sim.SimOutput = newSimOutput;
+            sim.rocket = newRocket;
+            sim.environment = newEnvironment;
+            sim.simOutput = newSimOutput;
             
-            testCase.verifyEqual(sim.Rocket, newRocket);
-            testCase.verifyEqual(sim.Environment, newEnvironment);
-            testCase.verifyEqual(sim.SimOutput, newSimOutput);
+            testCase.verifyEqual(sim.rocket, newRocket);
+            testCase.verifyEqual(sim.environment, newEnvironment);
+            testCase.verifyEqual(sim.simOutput, newSimOutput);
         end
         
         function testSimAuxResultsStructure(testCase)
@@ -175,14 +175,14 @@ classdef Simulator3DTest < matlab.unittest.TestCase
                             testCase.TestSimOutput);
             
             % Check all expected fields exist and are empty
-            expectedFields = {'margin', 'alpha', 'cnAlpha', 'xcp', 'dragCoefficient', ...
-                             'mass', 'centerOfMass', 'inertiaLong', 'inertiaRot', 'delta', ...
-                             'noseAlpha', 'noseDelta'};
+            expectedFields = {'stabilityMargin', 'angleOfAttack', 'normalForceCoefficientSlope', 'centerOfPressure', 'dragCoefficient', ...
+                             'mass', 'centerOfMass', 'inertiaLong', 'inertiaRot', 'flightPathAngle', ...
+                             'noseAngleOfAttack', 'noseFlightPathAngle'};
             
             for i = 1:length(expectedFields)
-                testCase.verifyTrue(isfield(sim.SimAuxResults, expectedFields{i}), ...
-                    sprintf('Field %s should exist in SimAuxResults', expectedFields{i}));
-                testCase.verifyTrue(isempty(sim.SimAuxResults.(expectedFields{i})), ...
+                testCase.verifyTrue(isfield(sim.simAuxResults, expectedFields{i}), ...
+                    sprintf('Field %s should exist in simAuxResults', expectedFields{i}));
+                testCase.verifyTrue(isempty(sim.simAuxResults.(expectedFields{i})), ...
                     sprintf('Field %s should be initially empty', expectedFields{i}));
             end
         end

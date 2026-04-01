@@ -34,7 +34,7 @@ parfor idx_sim = 1:N
     [railTime, railState] = simulationObj_i.RailSim();
     
     if any(ismember(Yid, Yimp_apogee)) || any(ismember(Yid, Yimp_landing))
-        % Thrust phase
+        % thrust phase
         [flightTime, flightState, ~, ~, ~] = simulationObj_i.FlightSim([railTime(end) simulationObj_i.Rocket.Burn_Time(end)], railState(end, 2));
         
         % Ballistic phase

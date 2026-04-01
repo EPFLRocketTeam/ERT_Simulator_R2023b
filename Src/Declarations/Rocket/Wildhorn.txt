@@ -7,7 +7,7 @@ finSpan 0.09
 finRootChord 0.30
 finTipChord 0.06
 finSweepDistance 0.215
-finLeadingEdgeLength 0.026
+finLead ingEdgeLength 0.026
 finTrailingEdgeLength 0.028
 finThickness 0.008
 numLaunchLugs 2 

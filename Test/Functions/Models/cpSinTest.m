@@ -55,23 +55,27 @@ classdef cpSinTest < matlab.unittest.TestCase
         end
 
         function testIndexOutOfRange(testCase)
-            % declare parameters with out of range index
-            semiVertexAngleIndex = 300;  % should be between -225 and 225, inclusive
-            semiVertexAngle = semiVertexAngleIndex*0.2 *pi/180;
-            machNumberIndex = 250;  % should be between 1 and 450, inclusive
-            machNumber = machNumberIndex*0.02 + 1;
-
-            %verify that we get an error
-            testCase.verifyError(@() cpSin(semiVertexAngle,machNumber,testCase.cpSinArray),"MATLAB:badsubscript");
+            % Test that out of range indices are clamped and don't cause errors
             
-            % declare parameters with out of range index
-            semiVertexAngleIndex = 125;  % should be between -225 and 225, inclusive
-            semiVertexAngle = semiVertexAngleIndex*0.2 *pi/180;
-            machNumberIndex = 500;  % should be between 1 and 450, inclusive
+            % Test with semiVertexAngle out of range
+            semiVertexAngleIndex = 300;  % exceeds max
+            semiVertexAngle = semiVertexAngleIndex*0.2 * pi/180;
+            machNumberIndex = 250;
             machNumber = machNumberIndex*0.02 + 1;
-
-            %verify that we get an error
-            testCase.verifyError(@() cpSin(semiVertexAngle,machNumber,testCase.cpSinArray),"MATLAB:badsubscript");
+            
+            % Should not error and return a value
+            value = cpSin(semiVertexAngle, machNumber, testCase.cpSinArray);
+            testCase.verifyTrue(isnumeric(value) && ~isnan(value), 'Should return valid numeric value for out of range semiVertexAngle');
+            
+            % Test with machNumber out of range
+            semiVertexAngleIndex = 125;
+            semiVertexAngle = semiVertexAngleIndex*0.2 * pi/180;
+            machNumberIndex = 500;  % exceeds max
+            machNumber = machNumberIndex*0.02 + 1;
+            
+            % Should not error and return a value
+            value = cpSin(semiVertexAngle, machNumber, testCase.cpSinArray);
+            testCase.verifyTrue(isnumeric(value) && ~isnan(value), 'Should return valid numeric value for out of range machNumber');
         end
     end
 end

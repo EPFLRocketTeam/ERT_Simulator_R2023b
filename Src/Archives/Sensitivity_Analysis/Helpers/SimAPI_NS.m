@@ -26,7 +26,7 @@ for idx_sim = 1:N
     [railTime, railState] = simulatior3D.RailSim();
     t_R = toc(t_R0);
     
-    % Thrust phase
+    % thrust phase
     t_A10 = tic;
     [flightTime, flightState, ~, ~, ~] = simulatior3D.FlightSim([railTime(end) simulatior3D.Rocket.Burn_Time(end)], railState(end, 2));
     t_A1 = toc(t_A10);

@@ -80,7 +80,7 @@ classdef Simulator3D < handle
             v = state(2); % speed
 
             % rocket Inertia
-            [mass, massRate] = Mass_Non_Lin(time,obj.rocket); % mass
+            [mass, massRate] = massNonLin(time, obj.rocket); % mass
 
             % Environment
             g = 9.81;  % Gravity [m/s2] 
@@ -91,14 +91,14 @@ classdef Simulator3D < handle
             % gravity
             gravityForce = -g*cos(obj.environment.railAngle)*mass;
 
-            % Thrust 
-            thrust = Thrust(time,obj.rocket); % (TODO: Allow for thrust vectoring -> error)
+            % thrust 
+            thrustForce = thrust(time,obj.rocket); % (TODO: Allow for thrust vectoring -> error)
 
             % drag
             dragCoefficient = drag(obj.rocket, 0, v,kinematicViscosity, speedOfSound); % (TODO: make air-viscosity adaptable to temperature)
             dragForce = -0.5*density*obj.rocket.maxCrossSectionArea*dragCoefficient*v^2; % (TODO: define drag in wind coordinate system)
 
-            totalForce = gravityForce + thrust*obj.rocket.motorThrustFactor + dragForce;
+            totalForce = gravityForce + thrustForce*obj.rocket.motorThrustFactor + dragForce;
 
             % State derivatives
             
@@ -133,8 +133,8 @@ classdef Simulator3D < handle
             % Coordinate systems
 
             % Rotation matrix from rocket coordinates to Earth coordinates
-            rotationMatrix = quat2rotmat(quaternion);
-            eulerAngles = rot2anglemat(rotationMatrix);
+            rotationMatrix = quatToRotMat(quaternion);
+            eulerAngles = rotToAngleMat(rotationMatrix);
 
             % rocket principle frame vectors expressed in earth coordinates
             yawAxis = rotationMatrix*[1,0,0]'; % Yaw axis
@@ -147,13 +147,13 @@ classdef Simulator3D < handle
             zEarth = [0, 0, 1]';
 
             % rocket Inertia
-            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = Mass_Properties(time,obj.rocket,'NonLinear');
+            [mass,massRate,centerOfMass,~,inertiaLong,~,inertiaRot,~] = massProperties(time,obj.rocket,'NonLinear');
             %inertiaMatrix = rotationMatrix'*diag([inertiaLong, inertiaLong, inertiaRot])*rotationMatrix; % Inertia TODO: inertiaRot in Mass_Properties
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by speedOfSound cylinder)
             motorInertia = inertia_fill_cylinder(mass, ...
-                obj.rocket.motor_length, obj.rocket.motor_dia / 2);
+                obj.rocket.motorLength, obj.rocket.motorDiameter / 2);
             % Total inertia
             %inertiaMatrix = inertial_matrix(obj.rocket, centerOfMass, time);
             %disp(inertiaMatrix)
@@ -163,8 +163,8 @@ classdef Simulator3D < handle
             inertiaMatrix = rotationMatrix' * inertiaMatrix * rotationMatrix; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            dIdt = inertia_fill_cylinder(massRate, obj.rocket.motor_length, ...
-                obj.rocket.motor_dia / 2); % Inertial matrix time derivative
+            dIdt = inertia_fill_cylinder(massRate, obj.rocket.motorLength, ...
+                obj.rocket.motorDiameter / 2); % Inertial matrix time derivative
             dIdt = rotationMatrix' * dIdt * rotationMatrix; % Transfert to earth coordinates
 
             % Environment
@@ -174,9 +174,9 @@ classdef Simulator3D < handle
 
             % Force estimations 
 
-            % Thrust
+            % thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            thrust = Thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
+            thrustVector = thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             gravityForce = -g*mass*zEarth;
@@ -236,15 +236,15 @@ classdef Simulator3D < handle
             % Drag
             % Drag coefficient
             dragCoefficient = drag(obj.rocket, angleOfAttack, relativeSpeed, kinematicViscosity, speedOfSound)*obj.rocket.dragCoefficientFactor; 
-            if(time>obj.rocket.Burn_Time)
-              dragCoefficient = dragCoefficient + drag_shuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
+            if(time>obj.rocket.burnTime)
+              dragCoefficient = dragCoefficient + dragShuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
             end
             % Drag force
             dragForce = -0.5*density*obj.rocket.maxCrossSectionArea*dragCoefficient*relativeSpeed^2*normalizedVelocity ;
 
             % Total forces
             totalForce = ...
-                thrust*obj.rocket.motorThrustFactor +...  ;% Thrust
+                thrustVector*obj.rocket.motorThrustFactor +...  ;% thrust
                 gravityForce +...  ;% gravity
                 normalForce +... ;% normal force
                 dragForce      ; % drag force
@@ -272,7 +272,7 @@ classdef Simulator3D < handle
             dv = 1/mass*(totalForce);
 
             % Rotational dynamics
-            dQuaternion = quat_evolve(quaternion, angularVelocity);
+            dQuaternion = quatEvolve(quaternion, angularVelocity);
             
             %dAngularVelocity = pinv(inertiaMatrix)*totalMoment;
             %dAngularVelocity = mldivide(inertiaMatrix,totalMoment); % (TODO: Add inertia variation with time)
@@ -307,8 +307,8 @@ classdef Simulator3D < handle
             % Coordinate systems
 
             % Rotation matrix from rocket coordinates to Earth coordinates
-            rotationMatrix = quat2rotmat(quaternion);
-            angleOfAttack = rot2anglemat(rotationMatrix);
+            rotationMatrix = quatToRotMat(quaternion);
+            angleOfAttack = rotToAngleMat(rotationMatrix);
 
             % rocket principle frame vectors expressed in earth coordinates
             yawAxis = rotationMatrix*[1,0,0]'; % Yaw axis
@@ -321,21 +321,21 @@ classdef Simulator3D < handle
             zEarth = [0, 0, 1]';
 
             % rocket Inertia
-            [mass, massRate, centerOfMass, ~, inertiaLong, ~, inertiaRot, ~] = Mass_Properties(time,obj.rocket,'NonLinear');
+            [mass, massRate, centerOfMass, ~, inertiaLong, ~, inertiaRot, ~] = massProperties(time,obj.rocket,'NonLinear');
             %inertiaMatrix = rotationMatrix'*diag([inertiaLong, inertiaLong, inertiaRot])*rotationMatrix; % Inertia TODO: inertiaRot in Mass_Properties
             
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by speedOfSound cylinder)
             motorInertia = inertia_fill_cylinder(mass, ...
-                obj.rocket.motor_length, obj.rocket.motor_dia / 2);
+                obj.rocket.motorLength, obj.rocket.motorDiameter / 2);
             
              % Total inertia
             inertiaMatrix = obj.rocket.emptyInertia + motorInertia;
             inertiaMatrix = rotationMatrix' * inertiaMatrix * rotationMatrix; % Transfer to earth coordinates
 
             % Temporal derivative of inertial matrix
-            inertiaRot = inertia_fill_cylinder(massRate, obj.rocket.motor_length, ...
-                obj.rocket.motor_dia / 2); % Inertial matrix time derivative
+            inertiaRot = inertia_fill_cylinder(massRate, obj.rocket.motorLength, ...
+                obj.rocket.motorDiameter / 2); % Inertial matrix time derivative
             inertiaRot = rotationMatrix' * inertiaRot * rotationMatrix; % Transfert to earth coordinates
 
             % Environment
@@ -343,11 +343,11 @@ classdef Simulator3D < handle
             [~, speedOfSound, ~, density, kinematicViscosity] = atmosphere(position(3)+obj.environment.startAltitude,...
                 obj.environment); % Atmosphere information 
 
-            % Force estimations 
+            % Force estimations
 
-            % Thrust
+            % thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            thrust = Thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
+            thrustVector = thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             gravityForce = -g*mass*zEarth;
@@ -409,15 +409,15 @@ classdef Simulator3D < handle
             % Drag
             % Drag coefficient
             dragCoefficient = drag(obj.rocket, angleOfAttack, relativeSpeed, kinematicViscosity, speedOfSound)*obj.rocket.dragCoefficientFactor; 
-            if(time>obj.rocket.Burn_Time)
-              dragCoefficient = dragCoefficient + drag_shuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
+            if(time>obj.rocket.burnTime)
+              dragCoefficient = dragCoefficient + dragShuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
             end
             % Drag force
             dragForce = -0.5*density*obj.rocket.maxCrossSectionArea*dragCoefficient*relativeSpeed^2*normalizedVelocity ;
 
             % Total forces
             totalForce = ...
-                thrust*obj.rocket.motorThrustFactor +...  ;% Thrust
+                thrustVector*obj.rocket.motorThrustFactor +...  ;% thrust
                 gravityForce +...  ;% gravity
                 normalForce +... ;% normal force
                 dragForce      ; % drag force
@@ -445,7 +445,7 @@ classdef Simulator3D < handle
             velocityDot = 1/mass*(totalForce);
 
             % Rotational dynamics
-            quaternionDot = quat_evolve(quaternion, angularVelocity);
+            quaternionDot = quatEvolve(quaternion, angularVelocity);
             
             %angularVelocityDot = pinv(inertiaMatrix)*totalMoment;
             %angularVelocityDot = mldivide(inertiaMatrix,totalMoment); % (TODO: Add inertia variation with time)
@@ -602,8 +602,8 @@ classdef Simulator3D < handle
             % Coordinate systems
 
             % Rotation matrix from rocket coordinates to Earth coordinates
-            rotationMatrix = quat2rotmat(quaternion);
-            angleOfAttack = rot2anglemat(rotationMatrix);
+            rotationMatrix = quatToRotMat(quaternion);
+            angleOfAttack = rotToAngleMat(rotationMatrix);
 
             % rocket principle frame vectors expressed in earth coordinates
             yawAxis = rotationMatrix*[1,0,0]'; % Yaw axis
@@ -616,20 +616,20 @@ classdef Simulator3D < handle
             zEarth = [0, 0, 1]';
 
             % rocket Inertia
-            [mass,massRate, centerOfMass,~,inertiaLong,~,inertiaRot,~] = Mass_Properties(time,obj.rocket,'NonLinear');
+            [mass,massRate, centerOfMass,~,inertiaLong,~,inertiaRot,~] = massProperties(time,obj.rocket,'NonLinear');
             %inertiaMatrix = rotationMatrix'*diag([inertiaLong, inertiaLong, inertiaRot])*rotationMatrix; % Inertia TODO: inertiaRot in Mass_Properties
 
             % Inertia using the given I_rocket and the motor
             % Compute I_motor (approximate by speedOfSound cylinder)
             motorInertia = inertia_fill_cylinder(mass, ...
-                obj.rocket.motor_length, obj.rocket.motor_dia / 2);
+                obj.rocket.motorLength, obj.rocket.motorDiameter / 2);
             % Total inertia
             inertiaMatrix = obj.rocket.emptyInertia + motorInertia;
             inertiaMatrix = rotationMatrix' * inertiaMatrix * rotationMatrix; % Transfert to earth coordinates
 
             % Temporal derivative of inertial matrix
-            inertiaRot = inertia_fill_cylinder(massRate, obj.rocket.motor_length, ...
-                obj.rocket.motor_dia / 2); % Inertial matrix time derivative
+            inertiaRot = inertia_fill_cylinder(massRate, obj.rocket.motorLength, ...
+                obj.rocket.motorDiameter / 2); % Inertial matrix time derivative
             inertiaRot = rotationMatrix' * inertiaRot * rotationMatrix; % Transfert to earth coordinates
 
             % environment
@@ -639,9 +639,9 @@ classdef Simulator3D < handle
 
             % Force estimations 
 
-            % Thrust
+            % thrust
             % Oriented along roll axis of rocket frame, expressed in earth coordinates. 
-            thrust = Thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
+            thrustVector = thrust(time,obj.rocket)*rollAxis; % (TODO: Allow for thrust vectoring -> error)
 
             % Gravity
             gravityForce = -g*mass*zEarth;
@@ -700,15 +700,15 @@ classdef Simulator3D < handle
             % Drag
             % Drag coefficient
             dragCoefficient = Nose_drag(obj.rocket, angleOfAttack, relativeSpeed, kinematicViscosity, speedOfSound)*obj.rocket.dragCoefficientFactor; 
-            if(time>obj.rocket.Burn_Time)
-              dragCoefficient = dragCoefficient + drag_shuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
+            if(time>obj.rocket.burnTime)
+              dragCoefficient = dragCoefficient + dragShuriken(obj.rocket, obj.rocket.airbrakeAngle, angleOfAttack, relativeSpeed, kinematicViscosity); 
             end
             % Drag force
             dragForce = -0.5*density*obj.rocket.maxCrossSectionArea*dragCoefficient*relativeSpeed^2*normalizedVelocity;
 
             % Total forces
             totalForce = ...
-                thrust*obj.rocket.motorThrustFactor +...  ;% Thrust
+                thrustVector*obj.rocket.motorThrustFactor +...  ;% thrust
                 gravityForce +...  ;% gravity
                 normalForce +... ;% normal force
                 dragForce      ; % drag force
@@ -735,7 +735,7 @@ classdef Simulator3D < handle
             velocityDot = 1/mass*(totalForce);
 
             % Rotational dynamics
-            quaternionDot = quat_evolve(quaternion, angularVelocity);
+            quaternionDot = quatEvolve(quaternion, angularVelocity);
             %angularVelocityDot = mldivide(inertiaMatrix,totalMoment); % (TODO: Add inertia variation with time)
             angularVelocityDot = mldivide(inertiaMatrix, totalMoment - inertiaRot*angleOfAttack');
 
@@ -833,7 +833,7 @@ classdef Simulator3D < handle
                 % Initial Conditions
                 initialPosition = railVector*obj.environment.railLength; % spatial position of cm
                 initialVelocity = railVector*velocity; % Initial velocity of cm
-                initialQuaternion = rot2quat(railRotation'); % Initial attitude
+                initialQuaternion = rotToQuat(railRotation'); % Initial attitude
                 initialAngularVelocity = [0;0;0]; % Initial angular rotation in rocket principle coordinates
                 initialState = [initialPosition; initialVelocity; initialQuaternion; initialAngularVelocity];
             elseif (nargin == 6)

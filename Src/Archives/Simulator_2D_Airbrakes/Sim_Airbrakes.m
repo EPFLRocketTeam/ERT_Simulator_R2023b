@@ -48,7 +48,7 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     % Necessary function calls
     [M,dMdt] = massNonLin(t,Rocket);  % Rocket mass information
     [Temp, a, p, density] = stdAtmos(x(1)); % Atmosphere information
-    T = Thrust(t,Rocket);   % Motor thrust
+    T = thrust(t,Rocket);   % Motor thrust
     g = 9.81;               % Gravity []
 
     % Multiple Time Used Parameters
@@ -110,7 +110,7 @@ function [flightTime,X2, ab_control] = Sim_Airbrakes(Rocket, Environment, AB_dra
     G = [0;-g];
 
     % Force de Poussee (E,F)
-    T = [0;Thrust(t,Rocket)];
+    T = [0;thrust(t,Rocket)];
 
     % Force de Trainee (V,W)
     V = sqrt((x(2)+V_inf).^2+x(4).^2);          % Flux d'air vu par la fusee

@@ -15,7 +15,7 @@ xdot = zeros(2,1);
 % =======
 [Temp, a, p, density, Nu] = stdAtmos(x(1),Environnement);
 % >>>>>>> origin/master
-T = Thrust(t,Rocket);
+T = thrust(t,Rocket);
 g = 9.81; %[m/s2] Gravity
 CD = drag(Rocket,0,x(2),Nu,a)
 CD_AB = drag_shuriken(Rocket,theta,0,x(2),Nu);

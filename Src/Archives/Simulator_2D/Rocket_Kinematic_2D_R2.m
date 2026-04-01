@@ -55,7 +55,7 @@ Q_beta = [cos(beta),sin(beta);-sin(beta),cos(beta)];
 G = [0;-g];
 
 % Force de Poussee (E,F)
-T = [0;Thrust(t,Rocket)];
+T = [0;thrust(t,Rocket)];
 
 % Force de Trainee (V,W)
 V = norm(Vrel);          % Flux d'air vu par la fusee

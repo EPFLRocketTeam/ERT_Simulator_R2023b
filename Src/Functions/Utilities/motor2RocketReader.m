@@ -2,7 +2,7 @@ function Rocket = motor2RocketReader(motorFilePath, Rocket)
 % MOTOR2ROCKETREADER reads the information contained in the RASP formatted
 % motor text file named 'motorFilePath' into the 'Rocket' structure.
 if( Rocket.isHybrid == 0)
-[time, Thrust, Info] = motorReader(motorFilePath);
+[time, thrust, Info] = motorReader(motorFilePath);
 
 % motor info
 Rocket.motorDiameter = Info{2}/1000;
@@ -15,23 +15,23 @@ Rocket.casingMass = Rocket.motorMass-Rocket.propelMass;
 % thrust lookup table
 if time(1)>0
    time = [0, time];
-   Thrust = [0, Thrust];
+   thrust = [0, thrust];
 elseif time(1)<0
    error('ERROR: in motor2RocketReader, thrust curve only allows positive time values'); 
 end
 Rocket.thrustTime = time;
-Rocket.thrustForce = Thrust;
+Rocket.thrustForce = thrust;
 
 % Burn time
 Rocket.burnTime = time(end);
 
 % mass variation coefficient
-A_T = trapz(time,Thrust);
+A_T = trapz(time,thrust);
 Rocket.Thrust2dMass_Ratio = Rocket.propelMass/A_T;
 else
     
 [time, ThrustP, InfoP] = motorReader(motorFilePath);
-[timeF,ThrustF,InfoF] = motorReader(Rocket.fuel_ID);
+[timeF,ThrustF,InfoF] = motorReader(Rocket.motorId);
 
 
 % prop bloc info
@@ -52,7 +52,7 @@ Rocket.casingMassFuel = Rocket.motorMassFuel-Rocket.massFuel;
 
 %Global info
 Rocket.motorDiameter = max(Rocket.motorDiameterPropel, Rocket.motorDiameterFuel);
-Rocket.motorLength = Rocket.motorLengthPropel + Rocket.motorLengthFuel + Rocket.distanceInterMotors ;
+Rocket.motorLength = Rocket.motorLengthPropel + Rocket.motorLengthFuel + Rocket.interMotorDistance ;
 Rocket.motorDelay = InfoP{4}{1};
 Rocket.propelMass = Rocket.massPropel + Rocket.massFuel ;
 Rocket.motorMass = Rocket.motorMassPropel + Rocket.motorMassFuel; 

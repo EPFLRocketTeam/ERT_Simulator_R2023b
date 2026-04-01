@@ -315,8 +315,8 @@ end
         
         % (eq 3.10, p 25)
         baseArea = pi * (rocket.stageDiameters(end) / 2)^2;
-        if strcmp(rocket.motor_state, 'on')
-            baseArea = baseArea - pi * (rocket.motor_dia / 2)^2;
+        if strcmp(rocket.motorState, 'on')
+            baseArea = baseArea - pi * (rocket.motorDiameter / 2)^2;
         end
         % Linear interpolation between transonic and supersonic drag
         % coefficient. Interpolation between M = 1.5 and M = 3.
